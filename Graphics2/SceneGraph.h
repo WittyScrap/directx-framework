@@ -3,6 +3,7 @@
 #include <list>
 
 using namespace std;
+typedef SceneNode	Super;
 
 class SceneGraph : public SceneNode
 {

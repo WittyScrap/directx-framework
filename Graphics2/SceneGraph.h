@@ -1,5 +1,8 @@
 #pragma once
 #include "SceneNode.h"
+#include <list>
+
+using namespace std;
 
 class SceneGraph : public SceneNode
 {
@@ -17,10 +20,9 @@ public:
 	void Remove(SceneNodePointer node);
 	SceneNodePointer Find(wstring name);
 
-//private:
+private:
+	list<SceneNodePointer> _children;
 
-	// Here you need to add whatever collection you are going to
-	// use to store the children of this scene graph
 };
 
 typedef shared_ptr<SceneGraph>			 SceneGraphPointer;

@@ -17,6 +17,8 @@ public:
 
     virtual ~Material();
 
+    void SetShader(const Shader& shader);
+
     void SetInt(const wstring& propertyName, const int& value);
     void SetFloat(const wstring& propertyName, const float& value);
     void SetTexture(const wstring& propertyName, const int& value);

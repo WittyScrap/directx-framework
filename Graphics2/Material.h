@@ -29,3 +29,4 @@ private:
     Shader _shader;
 };
 
+typedef shared_ptr<Material> MaterialPtr;

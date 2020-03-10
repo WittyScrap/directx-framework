@@ -41,3 +41,4 @@ private:
     ComPtr<ID3D11PixelShader> _frag;
 };
 
+typedef shared_ptr<Shader> ShaderPtr;

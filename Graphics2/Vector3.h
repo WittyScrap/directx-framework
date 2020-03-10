@@ -1,4 +1,5 @@
 #pragma once
+#include "DirectXCore.h"
 
 /**
  * Represents a 3D vector.
@@ -46,6 +47,8 @@ public:
     const Vector3& operator-=(const float& rhs);
     const Vector3& operator*=(const float& rhs);
     const Vector3& operator/=(const float& rhs);
+
+    XMFLOAT3 ToDX() const;
 
 private:
     float _x;

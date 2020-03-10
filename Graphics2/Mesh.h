@@ -2,6 +2,9 @@
 #include "Core.h"
 #include <vector>
 
+// DX Framework forward declaration
+class DirectXFramework;
+
 /**
  * Represents a simple vertex.
  *

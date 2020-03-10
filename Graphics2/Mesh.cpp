@@ -42,15 +42,15 @@ const vector<int>& Mesh::GetTriangles() const
 
 void Mesh::AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c)
 {
-	int lastIndex = _vertices.size();
+	size_t lastIndex = _vertices.size();
 	
 	_vertices.push_back(a);
 	_vertices.push_back(b);
 	_vertices.push_back(c);
 
-	_triangles.push_back(++lastIndex);
-	_triangles.push_back(++lastIndex);
-	_triangles.push_back(++lastIndex);
+	_triangles.push_back((int)(++lastIndex));
+	_triangles.push_back((int)(++lastIndex));
+	_triangles.push_back((int)(++lastIndex));
 }
 
 void Mesh::AddVertex(const Vector3& vertex)
@@ -122,7 +122,7 @@ void Mesh::Apply()
 
 	D3D11_BUFFER_DESC vertexBufferDescriptor;
 	vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * _vertices.size();
+	vertexBufferDescriptor.ByteWidth = (UINT)(sizeof(Vertex) * _vertices.size());
 	vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDescriptor.CPUAccessFlags = 0;
 	vertexBufferDescriptor.MiscFlags = 0;
@@ -154,7 +154,7 @@ void Mesh::Apply()
 
 	D3D11_BUFFER_DESC indexBufferDescriptor;
 	indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDescriptor.ByteWidth = sizeof(UINT) * _triangles.size();
+	indexBufferDescriptor.ByteWidth = (UINT)(sizeof(UINT) * _triangles.size());
 	indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDescriptor.CPUAccessFlags = 0;
 	indexBufferDescriptor.MiscFlags = 0;

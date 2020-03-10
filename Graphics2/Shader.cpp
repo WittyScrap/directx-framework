@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "DirectXFramework.h"
 
 
 Shader::Shader() : _file(L""), b_isCompiled(false)
@@ -65,6 +66,8 @@ const Shader& Shader::operator=(const Shader& rhs)
 	{
 		Compile();
 	}
+
+	return *this;
 }
 
 bool Shader::CompileVertex(DWORD flags)

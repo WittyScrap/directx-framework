@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "DirectXFramework.h"
 
 Material::Material()
 { }

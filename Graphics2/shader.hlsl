@@ -45,7 +45,7 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return pin.Colour * Texture.Sample(ss, pin.TexCoord);
+	return pin.Colour/* * Texture.Sample(ss, pin.TexCoord)*/;
 }
 
 

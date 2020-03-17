@@ -16,6 +16,16 @@ struct Vertex
 };
 
 /**
+ * Constant buffer wrapper.
+ *
+ */
+struct CBUFFER
+{
+	XMMATRIX CompleteTransformation;
+	XMFLOAT4 AmbientColour;
+};
+
+/**
  * Represents a simple container for vertices,
  * triangles, normals, and other information related
  * to a mesh.
@@ -47,9 +57,18 @@ public:
     void ClearVertices();
     void ClearNormals();
     void ClearIndices();
+    void ClearBuffers();
 
     void Clear();
     void Apply();
+
+    ID3D11Buffer* const * GetVertexBufferPointer() const;
+    ID3D11Buffer* const * GetIndexBufferPointer() const;
+    ID3D11Buffer* const * GetConstantBufferPointer() const;
+
+    ID3D11Buffer* const GetVertexBuffer() const;
+    ID3D11Buffer* const GetIndexBuffer() const;
+    ID3D11Buffer* const GetConstantBuffer() const;
 
 private:
     static DirectXFramework* GetFramework();
@@ -61,6 +80,7 @@ private:
 
     ComPtr<ID3D11Buffer> _vertexBuffer;
     ComPtr<ID3D11Buffer> _indexBuffer;
+    ComPtr<ID3D11Buffer> _constantBuffer;
 };
 
 typedef shared_ptr<Mesh> MeshPtr;

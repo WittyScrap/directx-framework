@@ -1,17 +1,17 @@
 #include "Mesh.h"
 #include "DirectXFramework.h"
 
-Mesh::Mesh()
+Mesh::Mesh() : _vertices(), _normals(), _triangles()
 { }
 
-Mesh::Mesh(const Mesh& copy)
+Mesh::Mesh(const Mesh& copy) : Mesh()
 {
 	_vertices = copy._vertices;
 	_normals = copy._normals;
 	_triangles = copy._triangles;
 }
 
-Mesh::Mesh(const vector<Vector3> vertices, const vector<Vector3> normals, const vector<int> triangles)
+Mesh::Mesh(const vector<Vector3> vertices, const vector<Vector3> normals, const vector<int> triangles) : Mesh()
 {
 	_vertices = vertices;
 	_normals = normals;
@@ -98,11 +98,19 @@ void Mesh::ClearIndices()
 	_triangles.clear();
 }
 
+void Mesh::ClearBuffers()
+{
+	_vertexBuffer.Reset();
+	_indexBuffer.Reset();
+	_constantBuffer.Reset();
+}
+
 void Mesh::Clear()
 {
 	ClearVertices();
 	ClearNormals();
 	ClearIndices();
+	ClearBuffers();
 }
 
 void Mesh::Apply()
@@ -172,6 +180,50 @@ void Mesh::Apply()
 	);
 
 	delete[] indicesBuffer;
+
+	D3D11_BUFFER_DESC bufferDesc;
+	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = sizeof(CBUFFER);
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	ThrowIfFailed(
+		device->CreateBuffer(
+			&bufferDesc,
+			NULL,
+			_constantBuffer.GetAddressOf()
+		)
+	);
+}
+
+ID3D11Buffer* const * Mesh::GetVertexBufferPointer() const
+{
+	return _vertexBuffer.GetAddressOf();
+}
+
+ID3D11Buffer* const * Mesh::GetIndexBufferPointer() const
+{
+	return _indexBuffer.GetAddressOf();
+}
+
+ID3D11Buffer* const * Mesh::GetConstantBufferPointer() const
+{
+	return _constantBuffer.GetAddressOf();
+}
+
+ID3D11Buffer* const Mesh::GetVertexBuffer() const
+{
+	return _vertexBuffer.Get();
+}
+
+ID3D11Buffer* const Mesh::GetIndexBuffer() const
+{
+	return _indexBuffer.Get();
+}
+
+ID3D11Buffer* const Mesh::GetConstantBuffer() const
+{
+	return _constantBuffer.Get();
 }
 
 DirectXFramework* Mesh::GetFramework()

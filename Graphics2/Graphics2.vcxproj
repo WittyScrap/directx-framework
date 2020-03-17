@@ -144,11 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core.h" />
+    <ClInclude Include="CubeNode.h" />
     <ClInclude Include="DirectXCore.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
     <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="IPrimitive.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshNode.h" />
@@ -167,6 +169,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CubeNode.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Graphics2.cpp" />

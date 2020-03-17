@@ -70,6 +70,11 @@ const Shader& Shader::operator=(const Shader& rhs)
 	return *this;
 }
 
+const Shader Shader::Load(const wstring& file)
+{
+	return Shader(file);
+}
+
 bool Shader::CompileVertex(DWORD flags)
 {
 	ComPtr<ID3DBlob> m = nullptr;

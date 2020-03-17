@@ -10,7 +10,7 @@ DirectXFramework::DirectXFramework() : DirectXFramework(800, 600)
 {
 }
 
-DirectXFramework::DirectXFramework(unsigned int width, unsigned int height) : Framework(width, height)
+DirectXFramework::DirectXFramework(unsigned int width, unsigned int height) : Framework(width, height), _projectionTransformation(), _screenViewport(), _viewTransformation()
 {
 	_dxFramework = this;
 

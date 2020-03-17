@@ -50,6 +50,13 @@ public:
 
     XMFLOAT3 ToDX() const;
 
+    static const Vector3 UpVector;
+    static const Vector3 DownVector;
+    static const Vector3 LeftVector;
+    static const Vector3 RightVector;
+    static const Vector3 ForwardVector;
+    static const Vector3 BackwardVector;
+
 private:
     float _x;
     float _y;

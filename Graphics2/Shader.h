@@ -25,6 +25,7 @@ public:
     ID3D11PixelShader* const GetFragmentShader() const;
 
     const Shader& operator=(const Shader& rhs);
+    static const Shader Load(const wstring& file);
 
 protected:
     bool CompileVertex(DWORD flags);

@@ -14,6 +14,8 @@ typedef shared_ptr<SceneNode>	SceneNodePointer;
 class SceneNode : public enable_shared_from_this<SceneNode>
 {
 public:
+	SceneNode() : _combinedWorldTransformation(), _worldTransformation() {}
+
 	SceneNode(wstring name) {_name = name; XMStoreFloat4x4(&_worldTransformation, XMMatrixIdentity()); };
 	~SceneNode(void) {};
 
@@ -31,9 +33,17 @@ public:
 	virtual void Remove(SceneNodePointer node) {};
 	virtual	SceneNodePointer Find(wstring name) { return (_name == name) ? shared_from_this() : nullptr; }
 
+	template<typename TNode>
+	static shared_ptr<TNode> Create();
+
 protected:
 	XMFLOAT4X4			_worldTransformation;
 	XMFLOAT4X4			_combinedWorldTransformation;
 	wstring				_name;
 };
 
+template<typename TNode>
+inline shared_ptr<TNode> SceneNode::Create()
+{
+	return std::make_shared<TNode>();
+}

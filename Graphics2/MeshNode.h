@@ -11,6 +11,9 @@ class MeshNode : public SceneNode
 {
 
 public:
+	MeshNode() : _mesh(std::make_shared<Mesh>()), _material(std::make_shared<Material>())
+	{}
+
 	virtual bool Initialise() = 0;	
 	virtual void Render();
 	virtual void Shutdown();

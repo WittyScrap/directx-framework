@@ -62,21 +62,24 @@ public:
     void Clear();
     void Apply();
 
-    ID3D11Buffer* const * GetVertexBufferPointer() const;
-    ID3D11Buffer* const * GetIndexBufferPointer() const;
-    ID3D11Buffer* const * GetConstantBufferPointer() const;
+    ID3D11Buffer* const *    GetVertexBufferPointer() const;
+    ID3D11Buffer* const *    GetIndexBufferPointer() const;
+    ID3D11Buffer* const *    GetConstantBufferPointer() const;
 
-    ID3D11Buffer* const GetVertexBuffer() const;
-    ID3D11Buffer* const GetIndexBuffer() const;
-    ID3D11Buffer* const GetConstantBuffer() const;
+    ID3D11Buffer* const      GetVertexBuffer() const;
+    ID3D11Buffer* const      GetIndexBuffer() const;
+    ID3D11Buffer* const      GetConstantBuffer() const;
 
 private:
     static DirectXFramework* GetFramework();
 
 private:
-    vector<Vector3> _vertices;
-    vector<Vector3> _normals;
-    vector<int> _triangles;
+    vector<Vector3>      _vertices;
+    vector<Vector3>      _normals;
+    vector<int>          _triangles;
+
+    Vertex*              _rawVertices = nullptr;
+    UINT*                _rawIndices = nullptr;
 
     ComPtr<ID3D11Buffer> _vertexBuffer;
     ComPtr<ID3D11Buffer> _indexBuffer;

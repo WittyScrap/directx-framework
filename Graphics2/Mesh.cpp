@@ -1,6 +1,9 @@
 #include "Mesh.h"
 #include "DirectXFramework.h"
 
+#define DELETE_BUF(buff) { if (buff) { delete buff; } buff = nullptr; }
+#define DELETE_ARR(buff) { if (buff) { delete[] buff; } buff = nullptr; }
+
 Mesh::Mesh() : _vertices(), _normals(), _triangles()
 { }
 
@@ -20,9 +23,7 @@ Mesh::Mesh(const vector<Vector3> vertices, const vector<Vector3> normals, const 
 
 Mesh::~Mesh()
 {
-	_vertices.clear();
-	_normals.clear();
-	_triangles.clear();
+	Clear();
 }
 
 const vector<Vector3>& Mesh::GetVertices() const
@@ -103,6 +104,9 @@ void Mesh::ClearBuffers()
 	_vertexBuffer.Reset();
 	_indexBuffer.Reset();
 	_constantBuffer.Reset();
+	
+	DELETE_ARR(_rawVertices);
+	DELETE_ARR(_rawIndices);
 }
 
 void Mesh::Clear()
@@ -117,12 +121,14 @@ void Mesh::Apply()
 {
 	/**            Build VERTEX buffer            **/
 
-	Vertex* vertexBuffer = new Vertex[_vertices.size() + 1]; // VS code analysis gets anxiety
+	DELETE_ARR(_rawVertices);
+
+	_rawVertices = new Vertex[_vertices.size() + 1]; // VS code analysis gets anxiety
 															 // when buffers are the same length
 
 	for (size_t i = 0; i < _vertices.size(); ++i)
 	{
-		vertexBuffer[i] =
+		_rawVertices[i] =
 		{
 			_vertices[i].ToDX(), XMFLOAT4(Colors::White)
 		};
@@ -137,7 +143,7 @@ void Mesh::Apply()
 	vertexBufferDescriptor.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA vertexInitialisationData;
-	vertexInitialisationData.pSysMem = vertexBuffer;
+	vertexInitialisationData.pSysMem = _rawVertices;
 
 	const auto& device = GetFramework()->GetDevice();
 
@@ -149,15 +155,15 @@ void Mesh::Apply()
 		)
 	);
 
-	delete[] vertexBuffer;
-
 	/**          Build TRIANGLE buffer           **/
 
-	UINT* indicesBuffer = new UINT[_triangles.size() + 1];
+	DELETE_ARR(_rawIndices);
+
+	_rawIndices = new UINT[_triangles.size() + 1];
 
 	for (size_t i = 0; i < _triangles.size(); ++i)
 	{
-		indicesBuffer[i] = _triangles[i];
+		_rawIndices[i] = _triangles[i];
 	}
 
 	D3D11_BUFFER_DESC indexBufferDescriptor;
@@ -169,7 +175,7 @@ void Mesh::Apply()
 	indexBufferDescriptor.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA indexInitialisationData;
-	indexInitialisationData.pSysMem = &indicesBuffer;
+	indexInitialisationData.pSysMem = &_rawIndices;
 
 	ThrowIfFailed(
 		device->CreateBuffer(
@@ -178,8 +184,6 @@ void Mesh::Apply()
 			_indexBuffer.GetAddressOf()
 		)
 	);
-
-	delete[] indicesBuffer;
 
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));

@@ -12,8 +12,7 @@ class CubeNode : public MeshNode, public IPrimitive
 public:
     /*     Constructors     */
 
-    CubeNode(wstring name) {}
-
+    CubeNode(const wstring& name) : MeshNode(name) {}
     virtual bool Initialise() override;
 };
 

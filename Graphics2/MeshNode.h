@@ -11,7 +11,7 @@ class MeshNode : public SceneNode
 {
 
 public:
-	MeshNode() : _mesh(std::make_shared<Mesh>()), _material(std::make_shared<Material>())
+	MeshNode(const wstring& name) : SceneNode(name), _mesh { make_shared<Mesh>() }, _material { make_shared<Material>() }
 	{}
 
 	virtual bool Initialise() = 0;	

@@ -33,7 +33,8 @@ private:
 	ComPtr<ID3D11InputLayout>		_layout;
 	ComPtr<ID3D11Buffer>			_constantBuffer;
 
-	ComPtr<ID3D11ShaderResourceView> _texture;;
+	ComPtr<ID3D11ShaderResourceView> _texture;
+	ComPtr<ID3D11ShaderResourceView> _texture2;
 
 
 	D3D11_VIEWPORT					_screenViewport;

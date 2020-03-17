@@ -104,6 +104,9 @@ void Graphics2::Render()
 	cBuffer.CompleteTransformation = completeTransformation;
 	cBuffer.WorldTransformation = XMLoadFloat4x4(&_worldTransformation2);
 
+	// Set the texture to be used by the pixel shader
+	_deviceContext->PSSetShaderResources(0, 1, _texture2.GetAddressOf());
+
 	_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 	_deviceContext->UpdateSubresource(_constantBuffer.Get(), 0, 0, &cBuffer, 0, 0);
 	_deviceContext->DrawIndexed(36, 0, 0);
@@ -405,5 +408,12 @@ void Graphics2::BuildTexture()
 										   L"Woodbox.bmp",
 										   nullptr,
 										   _texture.GetAddressOf()
+										));
+
+	ThrowIfFailed(CreateWICTextureFromFile(_device.Get(),
+										   _deviceContext.Get(),
+										   L"Concrete.png",
+										   nullptr,
+										   _texture2.GetAddressOf()
 										));
 }

@@ -146,18 +146,11 @@
     <ClInclude Include="Core.h" />
     <ClInclude Include="DirectXCore.h" />
     <ClInclude Include="Framework.h" />
-    <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
     <ClInclude Include="HelperFunctions.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshNode.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SceneGraph.h" />
-    <ClInclude Include="SceneNode.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc" />
@@ -168,17 +161,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework.cpp" />
-    <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Graphics2.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MeshNode.cpp" />
-    <ClCompile Include="SceneGraph.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="WICTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shader.hlsl" />
+    <Text Include="shader.hlsl">
+      <FileType>Document</FileType>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

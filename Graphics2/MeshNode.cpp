@@ -1,5 +1,4 @@
 #include "MeshNode.h"
-#include "WICTextureLoader.h"
 #include "DirectXFramework.h"
 
 /**
@@ -9,7 +8,6 @@
 bool MeshNode::Initialise()
 {
 	this->BuildBuffers();
-	this->BuildTexture();
 
 	return true;
 }
@@ -25,9 +23,7 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
-	GetDeviceContext()->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
-	GetDeviceContext()->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
-	GetDeviceContext()->IASetInputLayout(_shader->GetInputLayout().Get());
+	_material->Activate();
 
 	DirectXFramework* framework = DirectXFramework::GetDXFramework();
 
@@ -43,11 +39,11 @@ void MeshNode::Render()
 	cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Update the constant buffer 
-	GetDeviceContext()->VSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf());
-	GetDeviceContext()->UpdateSubresource(_shader->GetConstantBuffer().Get(), 0, 0, &cBuffer, 0, 0);
+	GetDeviceContext()->VSSetConstantBuffers(0, 1, _material->GetShader().GetConstantBuffer().GetAddressOf());
+	GetDeviceContext()->UpdateSubresource(_material->GetShader().GetConstantBuffer().Get(), 0, 0, &cBuffer, 0, 0);
 
 	// Set the texture to be used by the pixel shader
-	GetDeviceContext()->PSSetShaderResources(0, 1, _texture.GetAddressOf());
+	GetDeviceContext()->PSSetShaderResources(0, 1, _material->GetTexture().GetAddressOf());
 
 	// Now render the cube
 	UINT stride = sizeof(Vertex);
@@ -75,12 +71,14 @@ void MeshNode::Shutdown()
  */
 void MeshNode::SetShader(const wstring& fileName)
 {
-	if (!this->_shader || fileName != this->_shader->GetSource())
+	if (!this->_material)
 	{
-		this->_shader = make_shared<Shader>(fileName);
+		this->_material = make_shared<Material>(fileName);
 	}
-
-	this->_shader->CompileOnce();
+	else
+	{
+		this->_material->SetShader(fileName);
+	}
 }
 
 /**
@@ -90,7 +88,7 @@ void MeshNode::SetShader(const wstring& fileName)
  */
 void MeshNode::SetTexture(const wstring& textureName)
 {
-    _textureName = textureName;
+    this->_material->SetTexture(textureName);
 }
 
 /**
@@ -142,29 +140,6 @@ void MeshNode::BuildBuffers()
 
 	// and create the index buffer
 	ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
-}
-
-/**
- * Loads the texture from the stored file and passes it onto
- * the shader program.
- *
- */
-void MeshNode::BuildTexture()
-{
-	// Note that in order to use CreateWICTextureFromFile, we 
-	// need to ensure we make a call to CoInitializeEx in our 
-	// Initialise method (and make the corresponding call to 
-	// CoUninitialize in the Shutdown method).  Otherwise, 
-	// the following call will throw an exception
-	ThrowIfFailed(
-		CreateWICTextureFromFile(
-			GetDevice().Get(),
-			GetDeviceContext().Get(),
-			_textureName.c_str(),
-			nullptr,
-			_texture.GetAddressOf()
-		)
-	);
 }
 
 /**

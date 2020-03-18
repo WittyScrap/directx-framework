@@ -1,7 +1,7 @@
 #pragma once
 #include "SceneNode.h"
 #include "DirectXCore.h"
-#include "Shader.h"
+#include "Material.h"
 #include <vector>
 
 /**
@@ -28,7 +28,6 @@ public:
 
 protected:
             void BuildBuffers();
-            void BuildTexture();
 
     static  ComPtr<ID3D11Device>                GetDevice();
     static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
@@ -40,10 +39,7 @@ private:
             ComPtr<ID3D11Buffer>                _vertexBuffer;
             ComPtr<ID3D11Buffer>                _indexBuffer;
 
-            shared_ptr<Shader>                  _shader = nullptr;
-
-            ComPtr<ID3D11ShaderResourceView>    _texture;
-            wstring                             _textureName;
+            shared_ptr<Material>                _material = nullptr;
 
             UINT                                _indicesCount;
 };

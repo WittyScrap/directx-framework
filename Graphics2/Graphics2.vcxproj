@@ -150,6 +150,7 @@
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
     <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="MeshNode.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SceneGraph.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Graphics2.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshNode.cpp" />
     <ClCompile Include="SceneGraph.cpp" />
     <ClCompile Include="Shader.cpp" />

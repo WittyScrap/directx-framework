@@ -24,6 +24,11 @@ void Shader::SetSource(const wstring& file)
 	_file = file;
 }
 
+const wstring& Shader::GetSource() const
+{
+	return _file;
+}
+
 void Shader::Compile()
 {
 	DWORD shaderCompileFlags = 0;

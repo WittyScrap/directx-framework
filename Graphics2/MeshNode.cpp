@@ -8,9 +8,7 @@
  */
 bool MeshNode::Initialise()
 {
-	this->_shader = make_shared<Shader>(_shaderName);
 	this->BuildBuffers();
- _shader->Compile();
 	this->BuildTexture();
 
 	return true;
@@ -77,7 +75,12 @@ void MeshNode::Shutdown()
  */
 void MeshNode::SetShader(const wstring& fileName)
 {
-    _shaderName = fileName;
+	if (!this->_shader || fileName != this->_shader->GetSource())
+	{
+		this->_shader = make_shared<Shader>(fileName);
+	}
+
+	this->_shader->CompileOnce();
 }
 
 /**

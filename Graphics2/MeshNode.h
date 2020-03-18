@@ -40,11 +40,9 @@ private:
             ComPtr<ID3D11Buffer>                _vertexBuffer;
             ComPtr<ID3D11Buffer>                _indexBuffer;
 
-            shared_ptr<Shader>                  _shader;
+            shared_ptr<Shader>                  _shader = nullptr;
 
             ComPtr<ID3D11ShaderResourceView>    _texture;
-
-            wstring                             _shaderName;
             wstring                             _textureName;
 
             UINT                                _indicesCount;

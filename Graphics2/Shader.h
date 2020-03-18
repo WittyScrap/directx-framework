@@ -44,6 +44,8 @@ public:
     virtual ~Shader();
 
     void SetSource(const wstring& file);
+    const wstring& GetSource() const;
+
     void Compile();
     void CompileOnce();
 

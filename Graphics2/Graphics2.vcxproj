@@ -150,10 +150,12 @@
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
     <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="MeshNode.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SceneGraph.h" />
     <ClInclude Include="SceneNode.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="WICTextureLoader.h" />
@@ -170,8 +172,10 @@
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Graphics2.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshNode.cpp" />
     <ClCompile Include="SceneGraph.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
   </ItemGroup>

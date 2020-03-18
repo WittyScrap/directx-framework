@@ -15,6 +15,13 @@ public:
     virtual vector<Vertex>  MeshVertices()      override;
     virtual vector<UINT>    MeshIndices()       override;
 
-    virtual bool            Initialise()        override;
+    virtual void Update(FXMMATRIX& m)           override;
+
+    void SetRotationSpeed(const float& speed);
+    const float& GetRotationSpeed() const;
+
+private:
+    float           _currentRotation{ 0 };
+    float           _rotationSpeed{ 1 };
 };
 

@@ -53,15 +53,20 @@ vector<UINT> CubeNode::MeshIndices()
 	};
 }
 
-bool CubeNode::Initialise()
+void CubeNode::Update(FXMMATRIX& m)
 {
-	SetShader(L"shader.hlsl");
-	SetTexture(L"Concrete.png");
+	XMStoreFloat4x4(&_worldTransformation, XMMatrixRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), _currentRotation * 0.5f * XM_PI / 180.0f));
+	_currentRotation += _rotationSpeed;
 
-	if (!MeshNode::Initialise())
-	{
-		return false;
-	}
+	MeshNode::Update(m);
+}
 
-	return true;
+void CubeNode::SetRotationSpeed(const float& speed)
+{
+	_rotationSpeed = speed;
+}
+
+const float& CubeNode::GetRotationSpeed() const
+{
+	return _rotationSpeed;
 }

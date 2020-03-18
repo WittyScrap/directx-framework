@@ -1,5 +1,9 @@
 #pragma once
 #include "SceneNode.h"
+#include <list>
+
+using namespace std;
+typedef SceneNode	Super;
 
 class SceneGraph : public SceneNode
 {
@@ -17,10 +21,27 @@ public:
 	void Remove(SceneNodePointer node);
 	SceneNodePointer Find(wstring name);
 
-//private:
+	template<typename TNode>
+	static shared_ptr<TNode> Create(wstring name);
 
-	// Here you need to add whatever collection you are going to
-	// use to store the children of this scene graph
+	template<typename TNode>
+	static shared_ptr<TNode> Create();
+
+private:
+	list<SceneNodePointer> _children;
+
 };
 
 typedef shared_ptr<SceneGraph>			 SceneGraphPointer;
+
+template<typename TNode>
+inline shared_ptr<TNode> SceneGraph::Create(wstring name)
+{
+	return make_shared<TNode>(name);
+}
+
+template<typename TNode>
+inline shared_ptr<TNode> SceneGraph::Create()
+{
+	return Create<TNode>(L"Scene Node");
+}

@@ -1,4 +1,5 @@
 #include "Graphics2.h"
+#include "CubeNode.h"
 
 Graphics2 app;
 
@@ -6,7 +7,11 @@ void Graphics2::CreateSceneGraph()
 {
 	SceneGraphPointer sceneGraph = GetSceneGraph();
 	
-	// This is where you add nodes to the scene graph
+	// Construct all meshes...
+	shared_ptr<CubeNode> cubeTest = SceneGraph::Create<CubeNode>(L"Testing Cube");
+	
+	// Add them to the scene graph...
+	sceneGraph->Add(cubeTest);
 }
 
 void Graphics2::UpdateSceneGraph()

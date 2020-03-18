@@ -8,11 +8,10 @@
  */
 bool MeshNode::Initialise()
 {
-	BuildBuffers();
-	BuildShader();
-	BuildVertexLayout();
-	BuildConstantBuffer();
-	BuildTexture();
+	this->_shader = make_shared<Shader>(_shaderName);
+	this->BuildBuffers();
+ _shader->Compile();
+	this->BuildTexture();
 
 	return true;
 }
@@ -28,6 +27,10 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
+	GetDeviceContext()->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
+	GetDeviceContext()->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
+	GetDeviceContext()->IASetInputLayout(_shader->GetInputLayout().Get());
+
 	DirectXFramework* framework = DirectXFramework::GetDXFramework();
 
 	// Calculate the world x view x projection transformation
@@ -42,8 +45,8 @@ void MeshNode::Render()
 	cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Update the constant buffer 
-	GetDeviceContext()->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
-	GetDeviceContext()->UpdateSubresource(_constantBuffer.Get(), 0, 0, &cBuffer, 0, 0);
+	GetDeviceContext()->VSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf());
+	GetDeviceContext()->UpdateSubresource(_shader->GetConstantBuffer().Get(), 0, 0, &cBuffer, 0, 0);
 
 	// Set the texture to be used by the pixel shader
 	GetDeviceContext()->PSSetShaderResources(0, 1, _texture.GetAddressOf());
@@ -136,101 +139,6 @@ void MeshNode::BuildBuffers()
 
 	// and create the index buffer
 	ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
-}
-
-/**
- * Builds the shader and compiles it.
- *
- */
-void MeshNode::BuildShader()
-{
-	DWORD shaderCompileFlags = 0;
-
-#if defined( _DEBUG )
-	shaderCompileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	ComPtr<ID3DBlob> compilationMessages = nullptr;
-
-	//Compile vertex shader
-	HRESULT hr = D3DCompileFromFile
-	(
-		_shaderName.c_str(),
-		nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		"VS", "vs_5_0",
-		shaderCompileFlags, 0,
-		_vertBytes.GetAddressOf(),
-		compilationMessages.GetAddressOf()
-	);
-
-	if (compilationMessages.Get() != nullptr)
-	{
-		// If there were any compilation messages, display them
-		MessageBoxA(0, (char*)compilationMessages->GetBufferPointer(), 0, 0);
-	}
-
-	// Even if there are no compiler messages, check to make sure there were no other errors.
-	ThrowIfFailed(hr);
-	ThrowIfFailed(GetDevice()->CreateVertexShader(_vertBytes->GetBufferPointer(), _vertBytes->GetBufferSize(), NULL, _vert.GetAddressOf()));
-	GetDeviceContext()->VSSetShader(_vert.Get(), 0, 0);
-
-	// Compile pixel shader
-	hr = D3DCompileFromFile
-	(
-		_shaderName.c_str(),
-		nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		"PS", "ps_5_0",
-		shaderCompileFlags, 0,
-		_fragBytes.GetAddressOf(),
-		compilationMessages.GetAddressOf()
-	);
-
-	if (compilationMessages.Get() != nullptr)
-	{
-		// If there were any compilation messages, display them
-		MessageBoxA(0, (char*)compilationMessages->GetBufferPointer(), 0, 0);
-	}
-
-	ThrowIfFailed(hr);
-	ThrowIfFailed(GetDevice()->CreatePixelShader(_fragBytes->GetBufferPointer(), _fragBytes->GetBufferSize(), NULL, _frag.GetAddressOf()));
-	GetDeviceContext()->PSSetShader(_frag.Get(), 0, 0);
-}
-
-/**
- * Configures the vertex layout to indicate the
- * format of the vertices that will be given to the
- * shader program.
- *
- */
-void MeshNode::BuildVertexLayout()
-{
-	// Create the vertex input layout. This tells DirectX the format
-	// of each of the vertices we are sending to it.
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	ThrowIfFailed(GetDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), _vertBytes->GetBufferPointer(), _vertBytes->GetBufferSize(), _layout.GetAddressOf()));
-	GetDeviceContext()->IASetInputLayout(_layout.Get());
-}
-
-/**
- * Builds a constant buffer to exchange data with the
- * GPU.
- *
- */
-void MeshNode::BuildConstantBuffer()
-{
-	D3D11_BUFFER_DESC bufferDesc;
-	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(CBUFFER);
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-	ThrowIfFailed(GetDevice()->CreateBuffer(&bufferDesc, NULL, _constantBuffer.GetAddressOf()));
 }
 
 /**

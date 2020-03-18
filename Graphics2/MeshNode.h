@@ -13,8 +13,8 @@ class MeshNode : public SceneNode
 {
 public:
     /* --- Constructors --- */
-                 MeshNode()                     : SceneNode(L"Mesh Node") {}
-                 MeshNode(const wstring& name)  : SceneNode(name)         {}
+                 MeshNode()                     : SceneNode(L"Mesh Node"), _indicesCount { 0 } {}
+                 MeshNode(const wstring& name)  : SceneNode(name), _indicesCount{ 0 }          {}
 
     virtual      ~MeshNode()                                              {}
 

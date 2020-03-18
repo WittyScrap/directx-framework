@@ -40,7 +40,7 @@ void MeshNode::Render()
 
 	_material->Update(&cBuffer);
 
-	// Now render the cube
+	// Now render the mesh
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 

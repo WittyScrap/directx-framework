@@ -93,8 +93,8 @@ void Graphics2::Render()
 	// Now render the cube
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-	_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	_deviceContext->IASetVertexBuffers(0, 1, _cubeVertices.GetAddressOf(), &stride, &offset);
+	_deviceContext->IASetIndexBuffer(_cubeIndices.Get(), DXGI_FORMAT_R32_UINT, 0);
 	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	_deviceContext->DrawIndexed(36, 0, 0);
 
@@ -109,7 +109,9 @@ void Graphics2::Render()
 
 	_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 	_deviceContext->UpdateSubresource(_constantBuffer.Get(), 0, 0, &cBuffer, 0, 0);
-	_deviceContext->DrawIndexed(36, 0, 0);
+	_deviceContext->IASetVertexBuffers(0, 1, _pyramidVertices.GetAddressOf(), &stride, &offset);
+	_deviceContext->IASetIndexBuffer(_pyramidIndices.Get(), DXGI_FORMAT_R32_UINT, 0);
+	_deviceContext->DrawIndexed(12, 0, 0);
 
 	// Update the window
 	ThrowIfFailed(_swapChain->Present(0, 0));
@@ -238,7 +240,7 @@ bool Graphics2::GetDeviceAndSwapChain()
 void Graphics2::CreateShape()
 {
 	// Create vertex buffer
-	Vertex vertices[] =
+	Vertex verticesCube[] =
 	{
 		{ XMFLOAT3(-1.0f, -1.0f, 1.0f),  XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 1
 		{ XMFLOAT3(1.0f, -1.0f, 1.0f),   XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(0.0f, 1.0f) },
@@ -272,7 +274,7 @@ void Graphics2::CreateShape()
 	};
 
 	// Create the index buffer
-	UINT indices[] = {
+	UINT indicesCube[] = {
 						0, 1, 2,       // side 1
 						2, 1, 3,
 						4, 5, 6,       // side 2
@@ -287,66 +289,43 @@ void Graphics2::CreateShape()
 						22, 21, 23,
 	};
 
-	BuildGeometryBuffers(vertices, indices, _vertexBuffer, _indexBuffer);
+	BuildGeometryBuffers(verticesCube, indicesCube, _cubeVertices.GetAddressOf(), _cubeIndices.GetAddressOf(), 24, 36);
+
+
+	Vertex verticesPyramid[] =
+	{
+		{ XMFLOAT3(0, 1, 0),	XMFLOAT3(0, 0, 0), XMFLOAT2(.5f, 0) },
+		{ XMFLOAT3(1, -1, 1),	XMFLOAT3(0, 0, 0), XMFLOAT2(1, 1)	},
+		{ XMFLOAT3(1, -1, -1),	XMFLOAT3(0, 0, 0), XMFLOAT2(0, 1)	},
+		{ XMFLOAT3(0, 1, 0),	XMFLOAT3(0, 0, 0), XMFLOAT2(.5f, 0) },
+		{ XMFLOAT3(-1, -1, 1),	XMFLOAT3(0, 0, 0), XMFLOAT2(1, 1)	},
+		{ XMFLOAT3(1, -1, 1),	XMFLOAT3(0, 0, 0), XMFLOAT2(0, 1)	},
+		{ XMFLOAT3(0, 1, 0),	XMFLOAT3(0, 0, 0), XMFLOAT2(.5f, 0) },
+		{ XMFLOAT3(-1, -1, -1), XMFLOAT3(0, 0, 0), XMFLOAT2(1, 1)	},
+		{ XMFLOAT3(-1, -1, 1),	XMFLOAT3(0, 0, 0), XMFLOAT2(0, 1)	},
+		{ XMFLOAT3(0, 1, 0),	XMFLOAT3(0, 0, 0), XMFLOAT2(.5f, 0) },
+		{ XMFLOAT3(1, -1, -1),	XMFLOAT3(0, 0, 0), XMFLOAT2(1, 1)	},
+		{ XMFLOAT3(-1, -1, -1), XMFLOAT3(0, 0, 0), XMFLOAT2(0, 1)	},
+	};
+
+	UINT indicesPyramid[] = {
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+		9, 10, 11
+	};
+
+
+	BuildGeometryBuffers(verticesPyramid, indicesPyramid, _pyramidVertices.GetAddressOf(), _pyramidIndices.GetAddressOf(), 12, 12);
 }
 
-void Graphics2::BuildGeometryBuffers(Vertex verticesEx[], UINT indicesEx[], ComPtr<ID3D11Buffer> vertexTarget, ComPtr<ID3D11Buffer> indexTarget)
+void Graphics2::BuildGeometryBuffers(Vertex verticesEx[], UINT indicesEx[], ID3D11Buffer** vertexTarget, ID3D11Buffer** indexTarget, UINT verticesCount, UINT indicesCount)
 {
-	// Create vertex buffer
-	Vertex vertices[] =
-	{
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f),  XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 1
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f),   XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f),   XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f),    XMFLOAT3(0.0f, 0.0f, 1.0f),  XMFLOAT2(1.0f, 1.0f) },
-
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 2
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f),  XMFLOAT3(0.0f, 0.0f, -1.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f),  XMFLOAT3(0.0f, 0.0f, -1.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f),   XMFLOAT3(0.0f, 0.0f, -1.0f),  XMFLOAT2(1.0f, 1.0f) },
-
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 3
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f),   XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f),   XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f),    XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f, 1.0f) },
-
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 4
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f),  XMFLOAT3(0.0f, -1.0f, 0.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f),  XMFLOAT3(0.0f, -1.0f, 0.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f),   XMFLOAT3(0.0f, -1.0f, 0.0f),  XMFLOAT2(1.0f, 1.0f) },
-
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f),  XMFLOAT3(1.0f, 0.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 5
-		{ XMFLOAT3(1.0f, 1.0f, -1.0f),   XMFLOAT3(1.0f, 0.0f, 0.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 1.0f),   XMFLOAT3(1.0f, 0.0f, 0.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 1.0f),    XMFLOAT3(1.0f, 0.0f, 0.0f),  XMFLOAT2(1.0f, 1.0f) },
-
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f),  XMFLOAT2(0.0f, 0.0f) },    // side 6
-		{ XMFLOAT3(-1.0f, -1.0f, 1.0f),  XMFLOAT3(-1.0f, 0.0f, 0.0f),  XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, -1.0f),  XMFLOAT3(-1.0f, 0.0f, 0.0f),  XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 1.0f),   XMFLOAT3(-1.0f, 0.0f, 0.0f),  XMFLOAT2(1.0f, 1.0f) },
-	};
-
-	// Create the index buffer
-	UINT indices[] = {
-						0, 1, 2,       // side 1
-						2, 1, 3,
-						4, 5, 6,       // side 2
-						6, 5, 7,
-						8, 9, 10,      // side 3
-						10, 9, 11,
-						12, 13, 14,    // side 4
-						14, 13, 15,
-						16, 17, 18,    // side 5
-						18, 17, 19,
-						20, 21, 22,    // side 6
-						22, 21, 23,
-	};
-
 	// Setup the structure that specifies how big the vertex 
 	// buffer should be
 	D3D11_BUFFER_DESC vertexBufferDescriptor;
 	vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * 24;
+	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * verticesCount;
 	vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDescriptor.CPUAccessFlags = 0;
 	vertexBufferDescriptor.MiscFlags = 0;
@@ -358,13 +337,13 @@ void Graphics2::BuildGeometryBuffers(Vertex verticesEx[], UINT indicesEx[], ComP
 	vertexInitialisationData.pSysMem = verticesEx;
 	
 	// and create the vertex buffer
-	ThrowIfFailed(_device->CreateBuffer(&vertexBufferDescriptor, &vertexInitialisationData, _vertexBuffer.GetAddressOf()));
+	ThrowIfFailed(_device->CreateBuffer(&vertexBufferDescriptor, &vertexInitialisationData, vertexTarget));
 
 	// Setup the structure that specifies how big the index 
 	// buffer should be
 	D3D11_BUFFER_DESC indexBufferDescriptor;
 	indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDescriptor.ByteWidth = sizeof(UINT) * 36;
+	indexBufferDescriptor.ByteWidth = sizeof(UINT) * indicesCount;
 	indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDescriptor.CPUAccessFlags = 0;
 	indexBufferDescriptor.MiscFlags = 0;
@@ -376,7 +355,7 @@ void Graphics2::BuildGeometryBuffers(Vertex verticesEx[], UINT indicesEx[], ComP
 	indexInitialisationData.pSysMem = indicesEx;
 
 	// and create the index buffer
-	ThrowIfFailed(_device->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
+	ThrowIfFailed(_device->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, indexTarget));
 } 
 
 void Graphics2::BuildShaders()

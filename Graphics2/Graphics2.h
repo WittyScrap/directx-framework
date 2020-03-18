@@ -25,8 +25,11 @@ private:
 	ComPtr<ID3D11RenderTargetView>	_renderTargetView;
 	ComPtr<ID3D11DepthStencilView>	_depthStencilView;
 
-	ComPtr<ID3D11Buffer>			_vertexBuffer;
-	ComPtr<ID3D11Buffer>			_indexBuffer;
+	ComPtr<ID3D11Buffer>			_cubeVertices;
+	ComPtr<ID3D11Buffer>			_cubeIndices;
+
+	ComPtr<ID3D11Buffer>			_pyramidVertices;
+	ComPtr<ID3D11Buffer>			_pyramidIndices;
 
 	ComPtr<ID3DBlob>				_vertexShaderByteCode = nullptr;
 	ComPtr<ID3DBlob>				_pixelShaderByteCode = nullptr;
@@ -59,7 +62,7 @@ private:
 
 	bool GetDeviceAndSwapChain();
 	void CreateShape();
-	void BuildGeometryBuffers(Vertex vertices[], UINT indices[], ComPtr<ID3D11Buffer> vertexTarget, ComPtr<ID3D11Buffer> indexTarget);
+	void BuildGeometryBuffers(Vertex vertices[], UINT indices[], ID3D11Buffer** vertexTarget, ID3D11Buffer** indexTarget, UINT verticesCount, UINT indicesCount);
 	void BuildShaders();
 	void BuildVertexLayout();
 	void BuildConstantBuffer();

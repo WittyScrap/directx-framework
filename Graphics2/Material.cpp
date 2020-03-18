@@ -16,6 +16,7 @@ Material::~Material()
 void Material::SetShader(const Shader& shader)
 {
 	_shader = shader;
+	_shader.CompileOnce();
 }
 
 void Material::SetInt(const wstring& propertyName, const int& value)
@@ -41,4 +42,5 @@ void Material::Activate()
 
 	deviceContext->VSSetShader(_shader.GetVertexShader(), 0, 0);
 	deviceContext->PSSetShader(_shader.GetFragmentShader(), 0, 0);
+	deviceContext->IASetInputLayout(_shader.GetInputLayout());
 }

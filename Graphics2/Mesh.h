@@ -22,7 +22,6 @@ struct Vertex
 struct CBUFFER
 {
 	XMMATRIX CompleteTransformation;
-	XMFLOAT4 AmbientColour;
 };
 
 /**

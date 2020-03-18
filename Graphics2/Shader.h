@@ -23,6 +23,7 @@ public:
 
     ID3D11VertexShader* const GetVertexShader() const;
     ID3D11PixelShader* const GetFragmentShader() const;
+    ID3D11InputLayout* const GetInputLayout() const;
 
     const Shader& operator=(const Shader& rhs);
     static const Shader Load(const wstring& file);
@@ -30,6 +31,8 @@ public:
 protected:
     bool CompileVertex(DWORD flags);
     bool CompileFragment(DWORD flags);
+
+    void BuildVertexLayout();
 
 private:
     bool b_isCompiled;
@@ -40,6 +43,7 @@ private:
 
     ComPtr<ID3D11VertexShader> _vert;
     ComPtr<ID3D11PixelShader> _frag;
+    ComPtr<ID3D11InputLayout> _layout;
 };
 
 typedef shared_ptr<Shader> ShaderPtr;

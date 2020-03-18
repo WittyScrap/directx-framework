@@ -37,6 +37,10 @@ void Shader::Compile()
 		MessageBoxA(0, "Could not compile source shader, refer to log for details.", "Shader error", 0);
 		return;
 	}
+	else
+	{
+		BuildVertexLayout();
+	}
 
 	b_isCompiled = true;
 }
@@ -57,6 +61,11 @@ ID3D11VertexShader* const Shader::GetVertexShader() const
 ID3D11PixelShader* const Shader::GetFragmentShader() const
 {
 	return _frag.Get();
+}
+
+ID3D11InputLayout* const Shader::GetInputLayout() const
+{
+	return _layout.Get();
 }
 
 const Shader& Shader::operator=(const Shader& rhs)
@@ -92,15 +101,21 @@ bool Shader::CompileVertex(DWORD flags)
 
 	if (m.Get() != nullptr)
 	{
-		// TODO: log error...
+		// If there were any compilation messages, display them
+		MessageBoxA(0, (char*)m->GetBufferPointer(), 0, 0);
+
 		return false;
 	}
 
-	const auto& buff_ptr = _vertBytes->GetBufferPointer();
-	const auto& buff_size = _vertBytes->GetBufferSize();
-
 	ThrowIfFailed(result);
-	ThrowIfFailed(device->CreateVertexShader(buff_ptr, buff_size, NULL, _vert.GetAddressOf()));
+	ThrowIfFailed(
+		device->CreateVertexShader(
+			_vertBytes->GetBufferPointer(),
+			_vertBytes->GetBufferSize(),
+			NULL,
+			_vert.GetAddressOf()
+		)
+	);
 
 	return true;
 }
@@ -127,11 +142,28 @@ bool Shader::CompileFragment(DWORD flags)
 		return false;
 	}
 
-	const auto& buff_ptr = _fragBytes->GetBufferPointer();
-	const auto& buff_size = _fragBytes->GetBufferSize();
-
 	ThrowIfFailed(result);
-	ThrowIfFailed(device->CreatePixelShader(buff_ptr, buff_size, NULL, _frag.GetAddressOf()));
+	ThrowIfFailed(
+		device->CreatePixelShader(
+			_fragBytes->GetBufferPointer(),
+			_fragBytes->GetBufferSize(),
+			NULL,
+			_frag.GetAddressOf()
+		)
+	);
 
 	return true;
+}
+
+void Shader::BuildVertexLayout()
+{
+	const auto& device = DirectXFramework::GetDXFramework()->GetDevice();
+
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
+	ThrowIfFailed(device->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), _vertBytes->GetBufferPointer(), _vertBytes->GetBufferSize(), _layout.GetAddressOf()));
 }

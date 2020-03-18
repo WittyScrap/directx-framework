@@ -11,7 +11,6 @@ void MeshNode::Render()
 
 		CBUFFER cBuffer;
 		cBuffer.CompleteTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-		cBuffer.AmbientColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		deviceContext->VSSetConstantBuffers(0, 1, _mesh->GetConstantBufferPointer());
 		deviceContext->UpdateSubresource(_mesh->GetConstantBuffer(), 0, 0, &cBuffer, 0, 0);

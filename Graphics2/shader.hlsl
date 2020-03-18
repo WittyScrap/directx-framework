@@ -2,7 +2,6 @@
 cbuffer ConstantBuffer
 {
 	matrix worldViewProj;
-	float4 ambientColour;
 };
 
 Texture2D Texture;
@@ -34,5 +33,5 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return pin.Colour;
+	return 1;
 }

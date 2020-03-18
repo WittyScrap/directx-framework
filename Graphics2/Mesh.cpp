@@ -137,7 +137,7 @@ void Mesh::Apply()
 	DELETE_ARR(_rawVertices);
 
 	_rawVertices = new Vertex[_vertices.size() + 1]; // VS code analysis gets anxiety
-															 // when buffers are the same length
+													 // when buffers are the same length
 
 	for (size_t i = 0; i < _vertices.size(); ++i)
 	{
@@ -149,7 +149,7 @@ void Mesh::Apply()
 
 	D3D11_BUFFER_DESC vertexBufferDescriptor;
 	vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDescriptor.ByteWidth = (UINT)(sizeof(Vertex) * _vertices.size());
+	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * (UINT)_vertices.size();
 	vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDescriptor.CPUAccessFlags = 0;
 	vertexBufferDescriptor.MiscFlags = 0;
@@ -181,14 +181,14 @@ void Mesh::Apply()
 
 	D3D11_BUFFER_DESC indexBufferDescriptor;
 	indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDescriptor.ByteWidth = (UINT)(sizeof(UINT) * _triangles.size());
+	indexBufferDescriptor.ByteWidth = sizeof(UINT) * (UINT)_triangles.size();
 	indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDescriptor.CPUAccessFlags = 0;
 	indexBufferDescriptor.MiscFlags = 0;
 	indexBufferDescriptor.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA indexInitialisationData;
-	indexInitialisationData.pSysMem = &_rawIndices;
+	indexInitialisationData.pSysMem = _rawIndices;
 
 	ThrowIfFailed(
 		device->CreateBuffer(

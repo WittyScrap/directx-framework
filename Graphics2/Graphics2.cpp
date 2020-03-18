@@ -9,6 +9,9 @@ void Graphics2::CreateSceneGraph()
 	
 	// Construct all meshes...
 	shared_ptr<CubeNode> cubeTest = SceneGraph::Create<CubeNode>(L"Testing Cube");
+	cubeTest->SetShader(L"shader.hlsl");
+	cubeTest->SetTexture(L"Concrete.png");
+
 	
 	// Add them to the scene graph...
 	sceneGraph->Add(cubeTest);

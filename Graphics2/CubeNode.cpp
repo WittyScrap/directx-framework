@@ -55,9 +55,6 @@ vector<UINT> CubeNode::MeshIndices()
 
 bool CubeNode::Initialise()
 {
-	SetShader(L"shader.hlsl");
-	SetTexture(L"Concrete.png");
-
 	if (!MeshNode::Initialise())
 	{
 		return false;

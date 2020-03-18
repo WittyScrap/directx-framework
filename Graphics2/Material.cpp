@@ -62,6 +62,18 @@ void Material::Activate()
 	deviceContext->IASetInputLayout(_shader->GetInputLayout().Get());
 }
 
+void Material::Update(CBUFFER* cbuf)
+{
+	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
+
+	// Update the constant buffer 
+	deviceContext->VSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf());
+	deviceContext->UpdateSubresource(_shader->GetConstantBuffer().Get(), 0, 0, cbuf, 0, 0);
+
+	// Set the texture to be used by the pixel shader
+	deviceContext->PSSetShaderResources(0, 1, _texture.GetAddressOf());
+}
+
 ComPtr<ID3D11ShaderResourceView> Material::GetTexture() const
 {
 	return _texture;

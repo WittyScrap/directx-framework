@@ -35,15 +35,10 @@ void MeshNode::Render()
 	cBuffer.CompleteTransformation = completeTransformation;
 	cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
 	cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 01.0f, 1.0f, 0.0f));
+	cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
 	cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// Update the constant buffer 
-	GetDeviceContext()->VSSetConstantBuffers(0, 1, _material->GetShader().GetConstantBuffer().GetAddressOf());
-	GetDeviceContext()->UpdateSubresource(_material->GetShader().GetConstantBuffer().Get(), 0, 0, &cBuffer, 0, 0);
-
-	// Set the texture to be used by the pixel shader
-	GetDeviceContext()->PSSetShaderResources(0, 1, _material->GetTexture().GetAddressOf());
+	_material->Update(&cBuffer);
 
 	// Now render the cube
 	UINT stride = sizeof(Vertex);

@@ -7,11 +7,6 @@ cbuffer ConstantBuffer
 
 Texture2D Texture;
 
-cbuffer ConstantBuffer
-{
-	matrix worldViewProj;
-};
-
 struct VertexIn
 {
 	float3 InputPosition : POSITION;

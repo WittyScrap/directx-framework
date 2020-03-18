@@ -52,51 +52,62 @@ void Mesh::AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c)
 	_triangles.push_back((int)(++lastIndex));
 	_triangles.push_back((int)(++lastIndex));
 	_triangles.push_back((int)(++lastIndex));
+
+	_ready = false;
 }
 
 void Mesh::AddVertex(const Vector3& vertex)
 {
 	_vertices.push_back(vertex);
+	_ready = false;
 }
 
 void Mesh::AddNormal(const Vector3& normal)
 {
 	_normals.push_back(normal);
+	_ready = false;
 }
 
 void Mesh::AddIndex(const int& index)
 {
 	_triangles.push_back(index);
+	_ready = false;
 }
 
 void Mesh::SetVertices(const vector<Vector3>& vertices)
 {
 	_vertices = vertices;
+	_ready = false;
 }
 
 void Mesh::SetNormals(const vector<Vector3>& normals)
 {
 	_normals = normals;
+	_ready = false;
 }
 
 void Mesh::SetIndices(const vector<int>& indices)
 {
 	_triangles = indices;
+	_ready = false;
 }
 
 void Mesh::ClearVertices()
 {
 	_vertices.clear();
+	_ready = false;
 }
 
 void Mesh::ClearNormals()
 {
 	_normals.clear();
+	_ready = false;
 }
 
 void Mesh::ClearIndices()
 {
 	_triangles.clear();
+	_ready = false;
 }
 
 void Mesh::ClearBuffers()
@@ -107,6 +118,8 @@ void Mesh::ClearBuffers()
 	
 	DELETE_ARR(_rawVertices);
 	DELETE_ARR(_rawIndices);
+
+	_ready = false;
 }
 
 void Mesh::Clear()
@@ -198,6 +211,8 @@ void Mesh::Apply()
 			_constantBuffer.GetAddressOf()
 		)
 	);
+
+	_ready = true;
 }
 
 ID3D11Buffer* const * Mesh::GetVertexBufferPointer() const
@@ -228,6 +243,11 @@ ID3D11Buffer* const Mesh::GetIndexBuffer() const
 ID3D11Buffer* const Mesh::GetConstantBuffer() const
 {
 	return _constantBuffer.Get();
+}
+
+const bool& Mesh::IsReady() const
+{
+	return _ready;
 }
 
 DirectXFramework* Mesh::GetFramework()

@@ -4,6 +4,8 @@
 #include "DirectXCore.h"
 #include "WICTextureLoader.h"
 
+struct Vertex;
+
 class Graphics2 : public Framework
 {
 public:
@@ -56,7 +58,8 @@ private:
 	float							_rotationAngle;
 
 	bool GetDeviceAndSwapChain();
-	void BuildGeometryBuffers();
+	void CreateShape();
+	void BuildGeometryBuffers(Vertex vertices[], UINT indices[], ComPtr<ID3D11Buffer> vertexTarget, ComPtr<ID3D11Buffer> indexTarget);
 	void BuildShaders();
 	void BuildVertexLayout();
 	void BuildConstantBuffer();

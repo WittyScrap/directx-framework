@@ -11,7 +11,7 @@ bool CubeNode::Initialise()
 
 void CubeNode::Update(FXMMATRIX& m)
 {
-	XMStoreFloat4x4(&_worldTransformation, XMMatrixRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), _currentRotation * 0.5f * XM_PI / 180.0f));
+	_rotation = Vector3::UpVector * _currentRotation;
 	_currentRotation += _rotationSpeed;
 
 	MeshNode::Update(m);

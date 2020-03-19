@@ -1,6 +1,11 @@
 #pragma once
 #include "DirectXCore.h"
 
+// Shorthand
+#define X		GetX()
+#define Y		GetY()
+#define Z		GetZ()
+
 /**
  * Represents a 3D vector.
  */

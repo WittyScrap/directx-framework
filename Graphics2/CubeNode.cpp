@@ -11,7 +11,7 @@ bool CubeNode::Initialise()
 
 void CubeNode::Update(FXMMATRIX& m)
 {
-	_rotation = Vector3::UpVector * _currentRotation;
+	GetRotation() = Vector3::UpVector * _currentRotation;
 	_currentRotation += _rotationSpeed;
 
 	MeshNode::Update(m);

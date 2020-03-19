@@ -42,6 +42,14 @@ public:
 	void SetRotation(const Vector3& rotation) { _rotation = rotation; }
 	void SetScale(const Vector3& scale) { _scale = scale; }
 
+	const Vector3& GetPosition() const { return _position; }
+	const Vector3& GetRotation() const { return _rotation; }
+	const Vector3& GetScale()	 const { return _scale; }
+
+	Vector3& GetPosition() { return _position; }
+	Vector3& GetRotation() { return _rotation; }
+	Vector3& GetScale()	   { return _scale; }
+
 protected:
 	XMFLOAT4X4			_worldTransformation;
 	XMFLOAT4X4			_combinedWorldTransformation;

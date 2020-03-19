@@ -19,6 +19,7 @@ public:
 
     virtual      ~MeshNode()                                              {}
 
+    virtual bool Initialise()                                   override { return true; }
     virtual void Update(FXMMATRIX& currentWorldTransformation)  override;
     virtual void Render()                                       override;
     virtual void Shutdown()                                     override;

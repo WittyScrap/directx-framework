@@ -20,7 +20,7 @@ public:
 
             const Shader& GetShader() const;
 
-            void          Activate();
+            bool          Activate();
             void          Update(CBUFFER* cbuf);
 
             ComPtr<ID3D11ShaderResourceView> GetTexture() const;

@@ -23,32 +23,33 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
-	_material->Activate();
+	if (_material && _material->Activate())
+	{
+		DirectXFramework* framework = DirectXFramework::GetDXFramework();
 
-	DirectXFramework* framework = DirectXFramework::GetDXFramework();
+		// Calculate the world x view x projection transformation
+		XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
 
-	// Calculate the world x view x projection transformation
-	XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
+		// Draw the first cube
+		CBUFFER cBuffer;
+		cBuffer.CompleteTransformation = completeTransformation;
+		cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
+		cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+		cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
+		cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// Draw the first cube
-	CBUFFER cBuffer;
-	cBuffer.CompleteTransformation = completeTransformation;
-	cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-	cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
-	cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		_material->Update(&cBuffer);
 
-	_material->Update(&cBuffer);
+		// Now render the mesh
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
 
-	// Now render the mesh
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-
-	// Set up buffers and render mesh data
-	GetDeviceContext()->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-	GetDeviceContext()->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	GetDeviceContext()->DrawIndexed(_indicesCount, 0, 0);
+		// Set up buffers and render mesh data
+		GetDeviceContext()->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+		GetDeviceContext()->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		GetDeviceContext()->DrawIndexed(_indicesCount, 0, 0);
+	}
 }
 
 /**

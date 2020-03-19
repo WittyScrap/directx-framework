@@ -60,6 +60,8 @@ bool Material::Activate()
 		return false;
 	}
 
+	_shader->CompileOnce();
+
 	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
 	deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);

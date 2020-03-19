@@ -33,8 +33,8 @@ VertexOut VS(VertexIn vin)
 	vout.Position = mul(worldViewProj, float4(vin.Position, 1.0f));
 	
 	// calculate the diffuse light and add it to the ambient light
-	float4 vectorBackToLight = -lightVector;
-	float4 adjustedNormal = normalize(mul(world, float4(vin.Normal, 1.0f)));
+	float3 vectorBackToLight = -lightVector.xyz;
+	float3 adjustedNormal = normalize(vin.Normal);
 	float diffusebrightness = saturate(dot(adjustedNormal, vectorBackToLight));
 	vout.Colour = saturate(ambientColour + lightColour * diffusebrightness);
 

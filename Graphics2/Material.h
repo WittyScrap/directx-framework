@@ -11,6 +11,7 @@ class Material
 public:
                           Material()                                                        {}
                           Material(wstring source) : _shader(make_shared<Shader>(source))   { _shader->CompileOnce(); }
+                          Material(shared_ptr<Shader> source) : _shader(source)             { _shader->CompileOnce(); }
 
     virtual               ~Material()                                                       {}
 
@@ -20,7 +21,7 @@ public:
 
             const Shader& GetShader() const;
 
-            void          Activate();
+            bool          Activate();
             void          Update(CBUFFER* cbuf);
 
             ComPtr<ID3D11ShaderResourceView> GetTexture() const;

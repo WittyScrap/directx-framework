@@ -19,7 +19,7 @@ void SceneGraph::Update(FXMMATRIX& currentWorldTransformation)
 
 	for (SceneNodePointer& child : _children)
 	{
-		child->Update(currentWorldTransformation);
+		child->Update(XMLoadFloat4x4(&_combinedWorldTransformation));
 	}
 }
 

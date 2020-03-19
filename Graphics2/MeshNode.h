@@ -2,6 +2,7 @@
 #include "SceneNode.h"
 #include "DirectXCore.h"
 #include "Material.h"
+#include "Mesh.h"
 #include <vector>
 
 /**
@@ -13,34 +14,29 @@ class MeshNode : public SceneNode
 {
 public:
     /* --- Constructors --- */
-                 MeshNode()                     : SceneNode(L"Mesh Node"), _indicesCount { 0 } {}
-                 MeshNode(const wstring& name)  : SceneNode(name), _indicesCount{ 0 }          {}
+                 MeshNode()                     : SceneNode(L"Mesh Node") {}
+                 MeshNode(const wstring& name)  : SceneNode(name)         {}
 
     virtual      ~MeshNode()                                              {}
 
-    virtual bool Initialise()                                   override;
+    virtual bool Initialise()                                   override { return true; }
     virtual void Update(FXMMATRIX& currentWorldTransformation)  override;
     virtual void Render()                                       override;
     virtual void Shutdown()                                     override;
 
-            void SetShader(const wstring& fileName);
-            void SetTexture(const wstring& textureName);
+            void SetMaterial(const shared_ptr<Material>& material);
+            void SetMesh(const shared_ptr<Mesh>& mesh);
+
+            const shared_ptr<Mesh>      GetMesh() const;
+            const shared_ptr<Material>  GetMaterial() const;
 
 protected:
-            void BuildBuffers();
 
     static  ComPtr<ID3D11Device>                GetDevice();
     static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
-    virtual vector<Vertex>                      MeshVertices()          = 0;
-    virtual vector<UINT>                        MeshIndices()           = 0;
-
 private:
-            ComPtr<ID3D11Buffer>                _vertexBuffer;
-            ComPtr<ID3D11Buffer>                _indexBuffer;
-
+            shared_ptr<Mesh>                    _mesh = nullptr;
             shared_ptr<Material>                _material = nullptr;
-
-            UINT                                _indicesCount;
 };
 

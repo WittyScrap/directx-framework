@@ -53,13 +53,22 @@ const Shader& Material::GetShader() const
 	return *_shader;
 }
 
-void Material::Activate()
+bool Material::Activate()
 {
+	if (!_shader)
+	{
+		return false;
+	}
+
+	_shader->CompileOnce();
+
 	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
 	deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
 	deviceContext->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
 	deviceContext->IASetInputLayout(_shader->GetInputLayout().Get());
+
+	return true;
 }
 
 void Material::Update(CBUFFER* cbuf)

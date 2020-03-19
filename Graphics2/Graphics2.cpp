@@ -1,20 +1,15 @@
 #include "Graphics2.h"
-#include "CubeNode.h"
+#include "RobotNode.h"
 
 Graphics2 app;
 
 void Graphics2::CreateSceneGraph()
 {
 	SceneGraphPointer sceneGraph = GetSceneGraph();
-	
-	// Construct all meshes...
-	shared_ptr<CubeNode> cubeTest = SceneGraph::Create<CubeNode>(L"Testing Cube");
-	cubeTest->SetShader(L"shader.hlsl");
-	cubeTest->SetTexture(L"Concrete.png");
+	shared_ptr<RobotNode> robot = SceneGraph::Create<RobotNode>(L"Robot");
 
-	
-	// Add them to the scene graph...
-	sceneGraph->Add(cubeTest);
+	robot->SetPosition({ 0, 0, -30 });
+	sceneGraph->Add(robot);
 }
 
 void Graphics2::UpdateSceneGraph()

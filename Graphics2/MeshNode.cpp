@@ -1,17 +1,11 @@
 #include "MeshNode.h"
 #include "DirectXFramework.h"
 
+
 /**
- * Initializes this mesh node.
+ * Carries the transformation matrix through.
  *
  */
-bool MeshNode::Initialise()
-{
-	this->BuildBuffers();
-
-	return true;
-}
-
 void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
 {
 	SceneNode::Update(currentWorldTransformation);
@@ -23,7 +17,7 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
-	if (_material && _material->Activate())
+	if (_mesh && _material && _material->Activate())
 	{
 		DirectXFramework* framework = DirectXFramework::GetDXFramework();
 
@@ -39,16 +33,7 @@ void MeshNode::Render()
 		cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		_material->Update(&cBuffer);
-
-		// Now render the mesh
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		// Set up buffers and render mesh data
-		GetDeviceContext()->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-		GetDeviceContext()->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		GetDeviceContext()->DrawIndexed(_indicesCount, 0, 0);
+        _mesh->Render();
 	}
 }
 
@@ -61,81 +46,39 @@ void MeshNode::Shutdown()
 }
 
 /**
- * Configures the shader from which to take the source code
- * for this mesh.
+ * Sets the material associated with this mesh node.
  *
  */
-void MeshNode::SetShader(const wstring& fileName)
+void MeshNode::SetMaterial(const shared_ptr<Material>& material)
 {
-	if (!this->_material)
-	{
-		this->_material = make_shared<Material>(fileName);
-	}
-	else
-	{
-		this->_material->SetShader(fileName);
-	}
+    _material = material;
 }
 
 /**
- * Configures the texture to feed the shader to display in
- * this mesh.
+ * Sets the mesh to be rendered by this node.
  *
  */
-void MeshNode::SetTexture(const wstring& textureName)
+void MeshNode::SetMesh(const shared_ptr<Mesh>& mesh)
 {
-    this->_material->SetTexture(textureName);
+    _mesh = mesh;
 }
 
 /**
- * Builds the mesh buffers.
+ * Returns the mesh associated with this node.
  *
  */
-void MeshNode::BuildBuffers()
+const shared_ptr<Mesh> MeshNode::GetMesh() const
 {
-    vector<Vertex> verticesVector = MeshVertices();
-    vector<UINT> indicesVector = MeshIndices();
+    return _mesh;
+}
 
-    Vertex* vertices = verticesVector.data();
-    UINT* indices = indicesVector.data();
-
-	_indicesCount = (UINT)indicesVector.size();
-
-    // Setup the structure that specifies how big the vertex 
-	// buffer should be
-	D3D11_BUFFER_DESC vertexBufferDescriptor;
-	vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * (UINT)verticesVector.size();
-	vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDescriptor.CPUAccessFlags = 0;
-	vertexBufferDescriptor.MiscFlags = 0;
-	vertexBufferDescriptor.StructureByteStride = 0;
-
-	// Now set up a structure that tells DirectX where to get the
-	// data for the vertices from
-	D3D11_SUBRESOURCE_DATA vertexInitialisationData;
-	vertexInitialisationData.pSysMem = vertices;
-
-	// and create the vertex buffer
-	ThrowIfFailed(GetDevice()->CreateBuffer(&vertexBufferDescriptor, &vertexInitialisationData, _vertexBuffer.GetAddressOf()));
-
-	// Setup the structure that specifies how big the index 
-	// buffer should be
-	D3D11_BUFFER_DESC indexBufferDescriptor;
-	indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDescriptor.ByteWidth = sizeof(UINT) * (UINT)indicesVector.size();
-	indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDescriptor.CPUAccessFlags = 0;
-	indexBufferDescriptor.MiscFlags = 0;
-	indexBufferDescriptor.StructureByteStride = 0;
-
-	// Now set up a structure that tells DirectX where to get the
-	// data for the indices from
-	D3D11_SUBRESOURCE_DATA indexInitialisationData;
-	indexInitialisationData.pSysMem = indices;
-
-	// and create the index buffer
-	ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
+/**
+ * Returns the material associated with this node.
+ *
+ */
+const shared_ptr<Material> MeshNode::GetMaterial() const
+{
+    return _material;
 }
 
 /**

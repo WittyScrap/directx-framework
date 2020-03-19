@@ -12,13 +12,14 @@ public:
     CubeNode()              : MeshNode(L"Cube Node")     {}
     CubeNode(wstring name)  : MeshNode(name)             {}
 
-    virtual vector<Vertex>  MeshVertices()      override;
-    virtual vector<UINT>    MeshIndices()       override;
-
+    virtual bool Initialise()                   override;
     virtual void Update(FXMMATRIX& m)           override;
 
     void SetRotationSpeed(const float& speed);
-    const float& GetRotationSpeed() const;
+	const float& GetRotationSpeed() const;
+
+	static  vector<Vertex> GetVertices();
+	static  vector<UINT>   GetIndices();
 
 private:
     float           _currentRotation{ 0 };

@@ -83,6 +83,11 @@ void Mesh::Apply()
 	ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
 
 	b_isApplied = true;
+
+	for (shared_ptr<Mesh>& subMesh : _subMeshes)
+	{
+		subMesh->Apply();
+	}
 }
 
 void Mesh::Render() const
@@ -99,6 +104,47 @@ void Mesh::Render() const
 		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		GetDeviceContext()->DrawIndexed((UINT)_indices.size(), 0, 0);
 	}
+
+	for (const shared_ptr<Mesh>& subMesh : _subMeshes)
+	{
+		subMesh->Render();
+	}
+}
+
+void Mesh::AddSubmesh(shared_ptr<Mesh>& subMesh)
+{
+	_subMeshes.push_back(subMesh);
+}
+
+void Mesh::RemoveSubmesh(shared_ptr<Mesh>& subMesh)
+{
+	vector<shared_ptr<Mesh>>::iterator it = find(_subMeshes.begin(), _subMeshes.end(), subMesh);
+
+	if (it != _subMeshes.end())
+	{
+		_subMeshes.erase(it);
+	}
+}
+
+void Mesh::RemoveSubmesh(const int& index)
+{
+	if (index >= 0 && index < _subMeshes.size())
+	{
+		_subMeshes.erase(_subMeshes.begin() + index);
+	}
+}
+
+shared_ptr<Mesh> Mesh::GetSubmesh(const int& index) const
+{
+	if (index >= 0 && index < _subMeshes.size())
+	{
+		return _subMeshes[index];
+	}
+}
+
+size_t Mesh::GetSubmeshCount() const
+{
+	return _subMeshes.size();
 }
 
 ComPtr<ID3D11Device> Mesh::GetDevice()

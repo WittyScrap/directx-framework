@@ -35,17 +35,25 @@ public:
 			void								Apply();
 			void								Render() const;
 
+			void								AddSubmesh(shared_ptr<Mesh>& subMesh);
+			void								RemoveSubmesh(shared_ptr<Mesh>& subMesh);
+			void								RemoveSubmesh(const int& index);
+
+			shared_ptr<Mesh>					GetSubmesh(const int& index) const;
+			size_t								GetSubmeshCount() const;
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();
 	static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
 private:
+			vector<shared_ptr<Mesh>>			_subMeshes;
+
 			ComPtr<ID3D11Buffer>                _vertexBuffer;
 			ComPtr<ID3D11Buffer>                _indexBuffer;
 
-			std::vector<Vertex>					_vertices;
-			std::vector<UINT>					_indices;
+			vector<Vertex>						_vertices;
+			vector<UINT>						_indices;
 
 			bool								b_isApplied = false;
 };

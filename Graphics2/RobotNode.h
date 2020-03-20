@@ -1,6 +1,5 @@
 #pragma once
 #include "SceneGraph.h"
-#include "assimp/camera.h"
 
 /**
  * Simple testing demonstration robot shape.

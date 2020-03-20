@@ -48,9 +48,9 @@ void Material::SetTexture(const wstring& textureName)
 	}
 }
 
-const Shader& Material::GetShader() const
+shared_ptr<Shader> Material::GetShader() const
 {
-	return *_shader;
+	return _shader;
 }
 
 bool Material::Activate()

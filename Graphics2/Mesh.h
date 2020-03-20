@@ -7,6 +7,20 @@ struct Vertex;
 struct CBUFFER;
 
 /**
+ * Defines in which way a mesh should be rendered.
+ *
+ */
+enum class MeshMode
+{
+	None			= D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
+	PointList		= D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
+	LineList		= D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+	LineStrip		= D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP,
+	TriangleList	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+	TriangleStrip	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+};
+
+/**
  * Represents a collection of vertices and triangles.
  *
  */
@@ -45,6 +59,10 @@ public:
 
 			void								SetReferenceMaterial(const shared_ptr<Material>& material);
 			const shared_ptr<Material>&			GetReferenceMaterial() const;
+
+	inline  void								SetMode(const MeshMode& mode)												{ _mode = mode; }
+	inline  const MeshMode&						GetMode() const																{ return _mode; }
+
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();
@@ -59,6 +77,8 @@ private:
 
 			vector<Vertex>						_vertices;
 			vector<UINT>						_indices;
+
+			MeshMode							_mode{ MeshMode::TriangleList };
 
 			bool								b_isApplied = false;
 };

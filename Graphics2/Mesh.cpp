@@ -104,7 +104,7 @@ void Mesh::Render() const
 		// Set up buffers and render mesh data
 		GetDeviceContext()->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
 		GetDeviceContext()->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		GetDeviceContext()->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)_mode);
 		GetDeviceContext()->DrawIndexed((UINT)_indices.size(), 0, 0);
 	}
 

@@ -6,9 +6,7 @@ Graphics2 app;
 void Graphics2::CreateSceneGraph()
 {
 	SceneGraphPointer sceneGraph = GetSceneGraph();
-	shared_ptr<RobotNode> robot = SceneGraph::Create<RobotNode>(L"Robot");
 
-	robot->SetPosition({ 0, 0, -30 });
 	sceneGraph->Add(robot);
 }
 

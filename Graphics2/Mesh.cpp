@@ -140,11 +140,23 @@ shared_ptr<Mesh> Mesh::GetSubmesh(const int& index) const
 	{
 		return _subMeshes[index];
 	}
+
+	return nullptr;
 }
 
 size_t Mesh::GetSubmeshCount() const
 {
 	return _subMeshes.size();
+}
+
+void Mesh::SetReferenceMaterial(const shared_ptr<Material>& material)
+{
+	_referencedMaterial = material;
+}
+
+const shared_ptr<Material>& Mesh::GetReferenceMaterial() const
+{
+	return _referencedMaterial;
 }
 
 ComPtr<ID3D11Device> Mesh::GetDevice()

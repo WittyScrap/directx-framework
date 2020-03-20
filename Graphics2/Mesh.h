@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCore.h"
 #include "DirectXFramework.h"
+#include "Material.h"
 
 struct Vertex;
 struct CBUFFER;
@@ -41,12 +42,16 @@ public:
 
 			shared_ptr<Mesh>					GetSubmesh(const int& index) const;
 			size_t								GetSubmeshCount() const;
+
+			void								SetReferenceMaterial(const shared_ptr<Material>& material);
+			const shared_ptr<Material>&			GetReferenceMaterial() const;
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();
 	static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
 private:
+			shared_ptr<Material>				_referencedMaterial = nullptr;
 			vector<shared_ptr<Mesh>>			_subMeshes;
 
 			ComPtr<ID3D11Buffer>                _vertexBuffer;

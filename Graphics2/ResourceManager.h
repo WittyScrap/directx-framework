@@ -3,24 +3,10 @@
 #include "Material.h"
 #include "Shader.h"
 #include <map>
-#include "assimp\importer.hpp"
-#include "assimp\scene.h"
-#include "assimp\postprocess.h"
+#include <assimp\importer.hpp>
+#include <assimp\scene.h>
+#include <assimp\postprocess.h>
 #include "DirectXCore.h"
-
-/**
- * Represents a mesh group, usually loaded from a file.
- * This retains information on materials that are associated with a mesh, without
- * grouping them together into an atomic class. This leaves room for the mesh to be used
- * with different materials, or the materials to be used on different meshes, without
- * creating clones.
- *
- */
-struct MeshGroup
-{
-	shared_ptr<Mesh>				Mesh;
-	vector<shared_ptr<Material>>	Materials;
-};
 
 /**
  * Mesh resource tracker structure.
@@ -79,7 +65,7 @@ public:
 	void										ReleaseMaterial(wstring materialName);
 	void										ReleaseShader(wstring shaderName);
 
-	MeshGroup									LoadModelFromFile(wstring modelName);
+	shared_ptr<Mesh>							LoadModelFromFile(wstring modelName);
 
 private:
 	MeshResourceMap								_meshResources;

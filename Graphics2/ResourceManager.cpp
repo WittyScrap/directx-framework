@@ -5,7 +5,7 @@
 #include <locale>
 #include <codecvt>
 
-#pragma comment(lib, "../Assimp/lib/release/assimp-vc140-mt.lib")
+#pragma comment(lib, "Assimp/lib/assimp-vc142-mt.lib")
 
 using namespace Assimp;
 
@@ -95,16 +95,16 @@ shared_ptr<Mesh> ResourceManager::GetMesh(wstring modelName)
 	{
 		// This is the first request for this model.  Load the mesh and
 		// save a reference to it.
-		MeshGroup meshGroup = LoadModelFromFile(modelName);
+		shared_ptr<Mesh> mesh = LoadModelFromFile(modelName);
 
-		if (meshGroup.Mesh != nullptr)
+		if (mesh != nullptr)
 		{
 			MeshResourceStruct resourceStruct;
 			resourceStruct.ReferenceCount = 1;
-			resourceStruct.MeshPointer = meshGroup.Mesh;
+			resourceStruct.MeshPointer = mesh;
 
 			_meshResources[modelName] = resourceStruct;
-			return meshGroup.Mesh;
+			return mesh;
 		}
 		else
 		{
@@ -181,7 +181,7 @@ void ResourceManager::ReleaseShader(wstring shaderName)
 	}
 }
 
-MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
+shared_ptr<Mesh> ResourceManager::LoadModelFromFile(wstring modelName)
 {
     wstring* materials = nullptr;
 	Importer importer;
@@ -195,16 +195,14 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
 	if (!scene)
 	{
         // If failed to load, there is nothing to do
-		return MeshGroup{ nullptr };
+		return nullptr;
 	}
 
     if (!scene->HasMeshes())
     {
         //If there are no meshes, then there is nothing to do.
-		return MeshGroup{ nullptr };
+		return nullptr;
     }
-
-	MeshGroup result;
 
     if (scene->HasMaterials())
     {
@@ -285,7 +283,7 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
 			string materialName = materialNameStream.str();
 			wstring materialNameWS = s2ws(materialName);
 
-			shared_ptr<Material> materialObject = make_shared<Material>(materialNameWS, "shader.hlsl");
+			shared_ptr<Material> materialObject = make_shared<Material>(materialNameWS, GetShader(L"shader.hlsl"));
 			materialObject->SetTexture(s2ws(fullTextureNamePath));
 			materialObject->SetAlbedo({ diffuseColour.r, diffuseColour.g, diffuseColour.b, 1.0f });
 			materialObject->SetSpecularColor({ specularColour.r, specularColour.g, specularColour.b, 1.0f });
@@ -306,6 +304,7 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
     for (unsigned int sm = 0; sm < scene->mNumMeshes; sm++)
     {
 	    aiMesh * subMesh = scene->mMeshes[sm];
+		shared_ptr<Mesh> resourceSubmesh = make_shared<Mesh>();
 
 	    unsigned int numVertices = subMesh->mNumVertices;
 	    bool hasNormals = subMesh->HasNormals();
@@ -313,7 +312,7 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
 
 	    if (numVertices == 0 || !hasNormals)
 	    {
-		    return MeshGroup{ nullptr };
+		    return nullptr;
 	    }
 
 	    // Build up our vertex structure
@@ -365,7 +364,7 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
 		        subMeshTexCoords++;
             }
 
-			resourceMesh->AddVertex(currentVertex);
+			resourceSubmesh->AddVertex(currentVertex);
 	    }
 
 	    // Now extract the indices from the file
@@ -376,14 +375,14 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
 	    if (subMeshFaces->mNumIndices != 3)
 	    {
 		    // We are not dealing with triangles, so we cannot handle it
-			return MeshGroup{ nullptr };
+			return nullptr;
 	    }
 
 	    for (unsigned int i = 0; i < numberOfFaces; i++)
 	    {
-		    resourceMesh->AddIndex(subMeshFaces->mIndices[0]);
-			resourceMesh->AddIndex(subMeshFaces->mIndices[1]);
-			resourceMesh->AddIndex(subMeshFaces->mIndices[2]);
+			resourceSubmesh->AddIndex(subMeshFaces->mIndices[0]);
+			resourceSubmesh->AddIndex(subMeshFaces->mIndices[1]);
+			resourceSubmesh->AddIndex(subMeshFaces->mIndices[2]);
 
 		    subMeshFaces++;
 	    }
@@ -395,9 +394,11 @@ MeshGroup ResourceManager::LoadModelFromFile(wstring modelName)
         {
             material = GetMaterial(materials[subMesh->mMaterialIndex]);
         }
+
+		resourceSubmesh->SetReferenceMaterial(material);
+		resourceMesh->AddSubmesh(resourceSubmesh);
     }
 
 	delete[] materials;
-
-
+	return resourceMesh;
 }

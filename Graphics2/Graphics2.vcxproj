@@ -159,13 +159,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AmbientLight.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CubeNode.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="DirectXCore.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
     <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="ILight.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshNode.h" />

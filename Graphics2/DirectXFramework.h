@@ -4,10 +4,12 @@
 #include "DirectXCore.h"
 #include "SceneGraph.h"
 #include "ResourceManager.h"
+#include "ILight.h"
 
-#define DEVICE			DirectXFramework::GetDXFramework()->GetDevice()
-#define DEVICE_CONTEXT	DirectXFramework::GetDXFramework()->GetDeviceContext()
-#define RESOURCES		DirectXFramework::GetDXFramework()->GetResourceManager()
+#define FRAMEWORK		DirectXFramework::GetDXFramework()
+#define DEVICE			FRAMEWORK->GetDevice()
+#define DEVICE_CONTEXT	FRAMEWORK->GetDeviceContext()
+#define RESOURCES		FRAMEWORK->GetResourceManager()
 
 class DirectXFramework : public Framework
 {
@@ -35,6 +37,22 @@ public:
 	XMMATRIX							GetProjectionTransformation();
 
 	void								SetBackgroundColour(XMFLOAT4 backgroundColour);
+	XMFLOAT4							GetCameraPosition() const { return _eyePosition; }
+
+										template<typename _TLight>
+	inline shared_ptr<_TLight>			AddLight() { shared_ptr<_TLight> l = make_shared<_TLight>(); _sceneLights.push_back(l); return l; }
+
+										template<typename _TLight>
+	inline shared_ptr<_TLight>			GetLight() { 
+											const auto& it = find_if(_sceneLights.begin(), _sceneLights.end(), [](const shared_ptr<ILight>& l) { return dynamic_cast<_TLight*>(l.get()); });
+
+											if (it != _sceneLights.end())
+											{
+												return dynamic_pointer_cast<_TLight>(*it);
+											}
+
+											return nullptr;
+										}
 
 private:
 	ComPtr<ID3D11Device>				_device;
@@ -62,6 +80,7 @@ private:
 
 	SceneGraphPointer					_sceneGraph;
 	shared_ptr<ResourceManager>			_resourceManager;
+	vector<shared_ptr<ILight>>			_sceneLights;
 
 	float							    _backgroundColour[4];
 

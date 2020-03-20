@@ -1,5 +1,7 @@
 #include "MeshNode.h"
 #include "DirectXFramework.h"
+#include "DirectionalLight.h"
+#include "AmbientLight.h"
 
 
 /**
@@ -139,13 +141,21 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         // Calculate the world x view x projection transformation
         XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
 
-        // Draw the first cube
+        // Get lights
+        shared_ptr<DirectionalLight> directional = FRAMEWORK->GetLight<DirectionalLight>();
+        shared_ptr<AmbientLight> ambient = FRAMEWORK->GetLight<AmbientLight>();
+
+        // Generate constant buffer for handing data to GPU
         CBUFFER cBuffer;
         cBuffer.CompleteTransformation = completeTransformation;
         cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-        cBuffer.AmbientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-        cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
-        cBuffer.LightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+        cBuffer.CameraPosition = FRAMEWORK->GetCameraPosition();
+        cBuffer.LightVector = XMVector4Normalize(directional->GetDirection());
+        cBuffer.LightColor = directional->GetColor();
+        cBuffer.AmbientColor = ambient->GetColor();
+        cBuffer.DiffuseCoefficient = material->GetAlbedo();
+        cBuffer.SpecularCoefficient = material->GetSpecularColor();
+        cBuffer.Shininess = material->GetShininess();
 
         material->Update(&cBuffer);
         mesh->Render();

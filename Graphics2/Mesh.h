@@ -38,9 +38,9 @@ public:
 
 			void								AddSubmesh(shared_ptr<Mesh>& subMesh);
 			void								RemoveSubmesh(shared_ptr<Mesh>& subMesh);
-			void								RemoveSubmesh(const int& index);
+			void								RemoveSubmesh(const size_t& index);
 
-			shared_ptr<Mesh>					GetSubmesh(const int& index) const;
+			shared_ptr<Mesh>					GetSubmesh(const size_t& index) const;
 			size_t								GetSubmeshCount() const;
 
 			void								SetReferenceMaterial(const shared_ptr<Material>& material);

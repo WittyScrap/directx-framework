@@ -1,12 +1,14 @@
 #pragma once
-#include "Mesh.h"
-#include "Material.h"
-#include "Shader.h"
 #include <map>
 #include <assimp\importer.hpp>
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 #include "DirectXCore.h"
+#include "HelperFunctions.h"
+
+class Mesh;
+class Material;
+class Shader;
 
 /**
  * Mesh resource tracker structure.
@@ -60,12 +62,14 @@ public:
 	shared_ptr<Shader>							GetShader(wstring shaderName);
 	shared_ptr<Mesh>							GetMesh(wstring modelName);
 	shared_ptr<Material>						GetMaterial(wstring materialName);
+	shared_ptr<Material>						GetDefaultMaterial();
 
 	void										ReleaseMesh(wstring modelName);
 	void										ReleaseMaterial(wstring materialName);
 	void										ReleaseShader(wstring shaderName);
 
 	shared_ptr<Mesh>							LoadModelFromFile(wstring modelName);
+	inline ComPtr<ID3D11ShaderResourceView>		GetDefaultTexture() const { return _defaultTexture; }
 
 private:
 	MeshResourceMap								_meshResources;
@@ -76,5 +80,6 @@ private:
 	ComPtr<ID3D11DeviceContext>					_deviceContext;
 
 	ComPtr<ID3D11ShaderResourceView>			_defaultTexture;
+	shared_ptr<Material>						_defaultMaterial;
 };
 

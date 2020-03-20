@@ -3,6 +3,11 @@
 #include "Framework.h"
 #include "DirectXCore.h"
 #include "SceneGraph.h"
+#include "ResourceManager.h"
+
+#define DEVICE			DirectXFramework::GetDXFramework()->GetDevice()
+#define DEVICE_CONTEXT	DirectXFramework::GetDXFramework()->GetDeviceContext()
+#define RESOURCES		DirectXFramework::GetDXFramework()->GetResourceManager()
 
 class DirectXFramework : public Framework
 {
@@ -19,11 +24,12 @@ public:
 	void OnResize(WPARAM wParam);
 	void Shutdown();
 
-	static DirectXFramework *			GetDXFramework();
+	static DirectXFramework*			GetDXFramework();
 
 	inline SceneGraphPointer			GetSceneGraph() { return _sceneGraph; }
 	inline ComPtr<ID3D11Device>			GetDevice() { return _device; }
 	inline ComPtr<ID3D11DeviceContext>	GetDeviceContext() { return _deviceContext; }
+	inline shared_ptr<ResourceManager>	GetResourceManager() { return _resourceManager; }
 
 	XMMATRIX							GetViewTransformation();
 	XMMATRIX							GetProjectionTransformation();
@@ -55,6 +61,7 @@ private:
 	XMFLOAT4X4							_projectionTransformation;
 
 	SceneGraphPointer					_sceneGraph;
+	shared_ptr<ResourceManager>			_resourceManager;
 
 	float							    _backgroundColour[4];
 

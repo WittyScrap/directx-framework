@@ -43,46 +43,49 @@ const vector<UINT>& Mesh::GetIndices() const
 
 void Mesh::Apply()
 {
-	Vertex* vertices = _vertices.data();
-	UINT* indices = _indices.data();
+	if (_vertices.size() && _indices.size())
+	{
+		Vertex* vertices = _vertices.data();
+		UINT* indices = _indices.data();
 
-	// Setup the structure that specifies how big the vertex 
-	// buffer should be
-	D3D11_BUFFER_DESC vertexBufferDescriptor;
-	vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * (UINT)_vertices.size();
-	vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDescriptor.CPUAccessFlags = 0;
-	vertexBufferDescriptor.MiscFlags = 0;
-	vertexBufferDescriptor.StructureByteStride = 0;
+		// Setup the structure that specifies how big the vertex 
+		// buffer should be
+		D3D11_BUFFER_DESC vertexBufferDescriptor;
+		vertexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
+		vertexBufferDescriptor.ByteWidth = sizeof(Vertex) * (UINT)_vertices.size();
+		vertexBufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vertexBufferDescriptor.CPUAccessFlags = 0;
+		vertexBufferDescriptor.MiscFlags = 0;
+		vertexBufferDescriptor.StructureByteStride = 0;
 
-	// Now set up a structure that tells DirectX where to get the
-	// data for the vertices from
-	D3D11_SUBRESOURCE_DATA vertexInitialisationData;
-	vertexInitialisationData.pSysMem = vertices;
+		// Now set up a structure that tells DirectX where to get the
+		// data for the vertices from
+		D3D11_SUBRESOURCE_DATA vertexInitialisationData;
+		vertexInitialisationData.pSysMem = vertices;
 
-	// and create the vertex buffer
-	ThrowIfFailed(GetDevice()->CreateBuffer(&vertexBufferDescriptor, &vertexInitialisationData, _vertexBuffer.GetAddressOf()));
+		// and create the vertex buffer
+		ThrowIfFailed(GetDevice()->CreateBuffer(&vertexBufferDescriptor, &vertexInitialisationData, _vertexBuffer.GetAddressOf()));
 
-	// Setup the structure that specifies how big the index 
-	// buffer should be
-	D3D11_BUFFER_DESC indexBufferDescriptor;
-	indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDescriptor.ByteWidth = sizeof(UINT) * (UINT)_indices.size();
-	indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDescriptor.CPUAccessFlags = 0;
-	indexBufferDescriptor.MiscFlags = 0;
-	indexBufferDescriptor.StructureByteStride = 0;
+		// Setup the structure that specifies how big the index 
+		// buffer should be
+		D3D11_BUFFER_DESC indexBufferDescriptor;
+		indexBufferDescriptor.Usage = D3D11_USAGE_IMMUTABLE;
+		indexBufferDescriptor.ByteWidth = sizeof(UINT) * (UINT)_indices.size();
+		indexBufferDescriptor.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		indexBufferDescriptor.CPUAccessFlags = 0;
+		indexBufferDescriptor.MiscFlags = 0;
+		indexBufferDescriptor.StructureByteStride = 0;
 
-	// Now set up a structure that tells DirectX where to get the
-	// data for the indices from
-	D3D11_SUBRESOURCE_DATA indexInitialisationData;
-	indexInitialisationData.pSysMem = indices;
+		// Now set up a structure that tells DirectX where to get the
+		// data for the indices from
+		D3D11_SUBRESOURCE_DATA indexInitialisationData;
+		indexInitialisationData.pSysMem = indices;
 
-	// and create the index buffer
-	ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
+		// and create the index buffer
+		ThrowIfFailed(GetDevice()->CreateBuffer(&indexBufferDescriptor, &indexInitialisationData, _indexBuffer.GetAddressOf()));
 
-	b_isApplied = true;
+		b_isApplied = true;
+	}
 
 	for (shared_ptr<Mesh>& subMesh : _subMeshes)
 	{
@@ -105,10 +108,10 @@ void Mesh::Render() const
 		GetDeviceContext()->DrawIndexed((UINT)_indices.size(), 0, 0);
 	}
 
-	for (const shared_ptr<Mesh>& subMesh : _subMeshes)
+	/*for (const shared_ptr<Mesh>& subMesh : _subMeshes)
 	{
 		subMesh->Render();
-	}
+	}*/
 }
 
 void Mesh::AddSubmesh(shared_ptr<Mesh>& subMesh)
@@ -126,7 +129,7 @@ void Mesh::RemoveSubmesh(shared_ptr<Mesh>& subMesh)
 	}
 }
 
-void Mesh::RemoveSubmesh(const int& index)
+void Mesh::RemoveSubmesh(const size_t& index)
 {
 	if (index >= 0 && index < _subMeshes.size())
 	{
@@ -134,7 +137,7 @@ void Mesh::RemoveSubmesh(const int& index)
 	}
 }
 
-shared_ptr<Mesh> Mesh::GetSubmesh(const int& index) const
+shared_ptr<Mesh> Mesh::GetSubmesh(const size_t& index) const
 {
 	if (index >= 0 && index < _subMeshes.size())
 	{

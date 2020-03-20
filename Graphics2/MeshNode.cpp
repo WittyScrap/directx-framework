@@ -17,24 +17,15 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
-	if (_mesh && _material && _material->Activate())
-	{
-		DirectXFramework* framework = DirectXFramework::GetDXFramework();
+    InternalRender(_mesh, _material);
 
-		// Calculate the world x view x projection transformation
-		XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
+    for (size_t it = 0; it < _mesh->GetSubmeshCount(); ++it)
+    {
+        shared_ptr<Mesh> mesh = _mesh->GetSubmesh(it);
+        shared_ptr<Material> mat = it >= _materials.size() ? nullptr : _materials[it];
 
-		// Draw the first cube
-		CBUFFER cBuffer;
-		cBuffer.CompleteTransformation = completeTransformation;
-		cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-		cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-		cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
-		cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		_material->Update(&cBuffer);
-        _mesh->Render();
-	}
+        InternalRender(mesh, mat);
+    }
 }
 
 /**
@@ -81,6 +72,33 @@ const shared_ptr<Material> MeshNode::GetMaterial() const
     return _material;
 }
 
+void MeshNode::SetMaterial(const size_t location, const shared_ptr<Material>& material)
+{
+    if (location < 0)
+    {
+        return;
+    }
+
+    size_t diff = location - (_materials.size() - 1);
+
+    while (diff--)
+    {
+        _materials.push_back(nullptr);
+    }
+
+    _materials[location] = material;
+}
+
+const shared_ptr<Material> MeshNode::GetMaterial(const size_t location) const
+{
+    if (location >= 0 && location < _materials.size())
+    {
+        return _materials[location];
+    }
+
+    return nullptr;
+}
+
 /**
  * Returns the Device object currently in use by the framework.
  *
@@ -97,4 +115,55 @@ ComPtr<ID3D11Device> MeshNode::GetDevice()
 ComPtr<ID3D11DeviceContext> MeshNode::GetDeviceContext()
 {
 	return DirectXFramework::GetDXFramework()->GetDeviceContext();
+}
+
+/**
+ * Renders a specific mesh using a specific material.
+ *
+ */
+void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> material)
+{
+    if (mesh)
+    {
+        if (material && material->Activate()) 
+        {
+            ; // NOP
+        }
+        else
+        {
+            material = RESOURCES->GetDefaultMaterial(); material->Activate();
+        }
+
+        DirectXFramework* framework = DirectXFramework::GetDXFramework();
+
+        // Calculate the world x view x projection transformation
+        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
+
+        // Draw the first cube
+        CBUFFER cBuffer;
+        cBuffer.CompleteTransformation = completeTransformation;
+        cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
+        cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+        cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
+        cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        material->Update(&cBuffer);
+        mesh->Render();
+    }
+}
+
+/**
+ * Maps the mesh and all of its submeshes, along with their suggested materials,
+ * to this mesh node.
+ *
+ */
+void MeshNode::Map(shared_ptr<Mesh> mesh)
+{
+    _mesh = mesh;
+    SetMaterial(mesh->GetReferenceMaterial());
+
+    for (size_t it = 0; it < mesh->GetSubmeshCount(); ++it)
+    {
+        SetMaterial(it, mesh->GetSubmesh(it)->GetReferenceMaterial());
+    }
 }

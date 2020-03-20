@@ -1,3 +1,6 @@
+#include "Mesh.h"
+#include "Shader.h"
+#include "Material.h"
 #include "ResourceManager.h"
 #include "DirectXFramework.h"
 #include <sstream>
@@ -5,30 +8,9 @@
 #include <locale>
 #include <codecvt>
 
-#pragma comment(lib, "Assimp/lib/assimp-vc142-mt.lib")
+#pragma comment(lib, "Assimp/lib/assimp-vc140-mt.lib")
 
 using namespace Assimp;
-
-//-------------------------------------------------------------------------------------------
-
-// Utility functions to convert from wstring to string and back
-// Copied from https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
-
-wstring s2ws(const std::string& str)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.from_bytes(str);
-}
-
-string ws2s(const std::wstring& wstr)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.to_bytes(wstr);
-}
 
 //-------------------------------------------------------------------------------------------
 
@@ -149,6 +131,22 @@ shared_ptr<Material> ResourceManager::GetMaterial(wstring materialName)
 	}
 }
 
+shared_ptr<Material> ResourceManager::GetDefaultMaterial()
+{
+	if (!_defaultMaterial)
+	{
+		_defaultMaterial = make_shared<Material>(Shader::Load(L"shader.hlsl"));
+		_defaultMaterial->SetTextureFromSource(GetDefaultTexture());
+	}
+
+	if (!_defaultMaterial->GetTexture())
+	{
+		_defaultMaterial->SetTextureFromSource(GetDefaultTexture());
+	}
+
+	return _defaultMaterial;
+}
+
 void ResourceManager::ReleaseMaterial(wstring materialName)
 {
 	MaterialResourceMap::iterator it = _materialResources.find(materialName);
@@ -209,7 +207,7 @@ shared_ptr<Mesh> ResourceManager::LoadModelFromFile(wstring modelName)
         // We need to find the directory part of the model name since we will need to add it to any texture names. 
         // There is definately a more elegant and accurate way to do this using Windows API calls, but this is a quick
         // and dirty approach
-        string::size_type slashIndex = modelNameUTF8.find_last_of("\\");
+        string::size_type slashIndex = modelNameUTF8.find_last_of("/");
         string directory;
 
         if (slashIndex == string::npos) 
@@ -272,7 +270,7 @@ shared_ptr<Mesh> ResourceManager::LoadModelFromFile(wstring modelName)
 				{
 					// Get full path to texture by prepending the same folder as included in the model name. This
 					// does assume that textures are in the same folder as the model files
-					fullTextureNamePath = directory + "\\" + textureName.data;
+					fullTextureNamePath = directory + "/" + textureName.data;
 				}
 			}
 
@@ -398,6 +396,8 @@ shared_ptr<Mesh> ResourceManager::LoadModelFromFile(wstring modelName)
 		resourceSubmesh->SetReferenceMaterial(material);
 		resourceMesh->AddSubmesh(resourceSubmesh);
     }
+
+	resourceMesh->Apply();
 
 	delete[] materials;
 	return resourceMesh;

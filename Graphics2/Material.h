@@ -1,6 +1,8 @@
 #pragma once
 #include "Shader.h"
 
+typedef ComPtr<ID3D11ShaderResourceView> Texture;
+
 /**
  * The Material class will hold and manage a reference to a Shader,
  * as well as any Texture or property that the shader may use.
@@ -28,7 +30,9 @@ public:
             void                 Update(CBUFFER* cbuf);
 
             void                             SetTexture(const wstring& textureName);
-            ComPtr<ID3D11ShaderResourceView> GetTexture() const;
+            void                             SetTextureFromSource(const Texture& textureObj);
+            Texture                          GetTexture() const;
+            Texture                          GetTexture();
 
             void                 SetAlbedo(const XMFLOAT4& albedo)           { _albedo = albedo; }
             const XMFLOAT4&      GetAlbedo() const                           { return _albedo;}
@@ -56,5 +60,7 @@ private:
     XMFLOAT4                            _specular;
     FLOAT                               _shininess;
     FLOAT                               _opacity;
+
+    static Material*                    _activeMaterial;
 };
 

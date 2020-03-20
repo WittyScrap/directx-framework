@@ -33,11 +33,7 @@ public:
 	inline ComPtr<ID3D11DeviceContext>	GetDeviceContext() { return _deviceContext; }
 	inline shared_ptr<ResourceManager>	GetResourceManager() { return _resourceManager; }
 
-	XMMATRIX							GetViewTransformation();
-	XMMATRIX							GetProjectionTransformation();
-
 	void								SetBackgroundColour(XMFLOAT4 backgroundColour);
-	XMFLOAT4							GetCameraPosition() const { return _eyePosition; }
 
 										template<typename _TLight>
 	inline shared_ptr<_TLight>			AddLight() { shared_ptr<_TLight> l = make_shared<_TLight>(); _sceneLights.push_back(l); return l; }
@@ -68,15 +64,6 @@ private:
 	// XMVECTOR and XMMATRIX for class variables since they need
 	// to be aligned on 16-byte boundaries and the compiler cannot
 	// guarantee this for class variables
-
-	// For now, we are storing our camera vectors and matrix here.
-	// We will move it to a separate Camera class later
-	XMFLOAT4							_eyePosition;
-	XMFLOAT4							_focalPointPosition;
-	XMFLOAT4							_upVector;
-
-	XMFLOAT4X4							_viewTransformation;
-	XMFLOAT4X4							_projectionTransformation;
 
 	SceneGraphPointer					_sceneGraph;
 	shared_ptr<ResourceManager>			_resourceManager;

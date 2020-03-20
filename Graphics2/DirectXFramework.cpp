@@ -1,4 +1,5 @@
 #include "DirectXFramework.h"
+#include "CameraNode.h"
 
 // DirectX libraries that are needed
 #pragma comment(lib, "d3d11.lib")
@@ -19,27 +20,11 @@ DirectXFramework::DirectXFramework(unsigned int width, unsigned int height) : Fr
 	_backgroundColour[1] = 0.0f;
 	_backgroundColour[2] = 0.0f;
 	_backgroundColour[3] = 0.0f;
-
-	// Initialise vectors used to create camera.  We will move these
-	// to a separate Camera class later
-	_eyePosition = XMFLOAT4(0.0f, 20.0f, -90.0f, 0.0f);
-	_focalPointPosition = XMFLOAT4(0.0f, 20.0f, 0.0f, 0.0f);
-	_upVector = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
 }
 
 DirectXFramework * DirectXFramework::GetDXFramework()
 {
 	return _dxFramework;
-}
-
-XMMATRIX DirectXFramework::GetViewTransformation()
-{
-	return XMLoadFloat4x4(&_viewTransformation);
-}
-
-XMMATRIX DirectXFramework::GetProjectionTransformation()
-{
-	return XMLoadFloat4x4(&_projectionTransformation);
 }
 
 void DirectXFramework::SetBackgroundColour(XMFLOAT4 backgroundColour)
@@ -75,12 +60,19 @@ bool DirectXFramework::Initialise()
 
 	// Create camera and projection matrices (we will look at how the 
 	// camera matrix is created from vectors later)
-	XMStoreFloat4x4(&_projectionTransformation, XMMatrixPerspectiveFovLH(XM_PIDIV4, (float)GetWindowWidth() / GetWindowHeight(), 1.0f, 10000.0f));
 
 	_resourceManager = make_shared<ResourceManager>();
 	_sceneGraph = make_shared<SceneGraph>();
 	
 	CreateSceneGraph();
+
+	// Create the camera now
+	shared_ptr<CameraNode> camera = SceneGraph::Create<CameraNode>(L"Main Camera");
+	camera->SetMain();
+	camera->SetPosition({ 0, 0, -50 });
+	camera->SetRotation({ 0, -90, 0 });
+
+	_sceneGraph->Add(camera);
 	
 	return _sceneGraph->Initialise();
 }
@@ -103,6 +95,11 @@ void DirectXFramework::Update()
 
 void DirectXFramework::Render()
 {
+	if (!CameraNode::GetMain())
+	{
+		return;
+	}
+
 	// Clear the render target and the depth stencil view
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _backgroundColour);
 	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -114,9 +111,10 @@ void DirectXFramework::Render()
 
 void DirectXFramework::OnResize(WPARAM wParam)
 {
-	// Update view and projection matrices to allow for the window size change
-	XMStoreFloat4x4(&_viewTransformation, XMMatrixLookAtLH(XMLoadFloat4(&_eyePosition), XMLoadFloat4(&_focalPointPosition), XMLoadFloat4(&_upVector)));
-	XMStoreFloat4x4(&_projectionTransformation, XMMatrixPerspectiveFovLH(XM_PIDIV4, (float)GetWindowWidth() / GetWindowHeight(), 1.0f, 10000.0f));
+	if (CameraNode::GetMain())
+	{
+		CameraNode::GetMain()->UpdateMatrices();
+	}
 
 	// This will free any existing render and depth views (which
 	// would be the case if the window was being resized)

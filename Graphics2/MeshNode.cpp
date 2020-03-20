@@ -2,7 +2,7 @@
 #include "DirectXFramework.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
-
+#include "CameraNode.h"
 
 /**
  * Carries the transformation matrix through.
@@ -137,9 +137,10 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         }
 
         DirectXFramework* framework = DirectXFramework::GetDXFramework();
+        const CameraNode* mainCamera = CameraNode::GetMain();
 
         // Calculate the world x view x projection transformation
-        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * framework->GetViewTransformation() * framework->GetProjectionTransformation();
+        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * mainCamera->GetViewTransformation() * mainCamera->GetProjectionTransformation();
 
         // Get lights
         shared_ptr<DirectionalLight> directional = FRAMEWORK->GetLight<DirectionalLight>();
@@ -149,7 +150,7 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         CBUFFER cBuffer;
         cBuffer.CompleteTransformation = completeTransformation;
         cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-        cBuffer.CameraPosition = FRAMEWORK->GetCameraPosition();
+        cBuffer.CameraPosition = mainCamera->GetPosition().ToDX();
         cBuffer.LightVector = XMVector4Normalize(directional->GetDirection());
         cBuffer.LightColor = directional->GetColor();
         cBuffer.AmbientColor = ambient->GetColor();

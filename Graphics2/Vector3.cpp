@@ -185,7 +185,7 @@ const Vector3& Vector3::operator/=(const float& rhs)
 	return *this;
 }
 
-XMFLOAT3 Vector3::ToDX() const
+XMFLOAT4 Vector3::ToDX() const
 {
-	return XMFLOAT3(_x, _y, _z);
+	return XMFLOAT4(_x, _y, _z, 1);
 }

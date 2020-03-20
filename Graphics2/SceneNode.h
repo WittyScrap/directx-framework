@@ -36,32 +36,30 @@ public:
 	virtual void Remove(SceneNodePointer node) {};
 	virtual	SceneNodePointer Find(wstring name) { return (_name == name) ? shared_from_this() : nullptr; }
 
-	void SetPosition(const Vector3& position) { _position = position; }
-	void SetRotation(const Vector3& rotation) { _rotation = rotation; }
-	void SetScale(const Vector3& scale) { _scale = scale; }
+	virtual void SetPosition(const Vector3& position) { _position = position; }
+	virtual void SetRotation(const Vector3& rotation) { _rotation = rotation; }
+	virtual void SetScale(const Vector3& scale) { _scale = scale; }
 
 	const Vector3& GetPosition() const { return _position; }
 	const Vector3& GetRotation() const { return _rotation; }
 	const Vector3& GetScale()	 const { return _scale; }
 
-	Vector3& GetPosition() { return _position; }
-	Vector3& GetRotation() { return _rotation; }
-	Vector3& GetScale()	   { return _scale; }
+	const XMMATRIX GetTranslationMatrix() { return XMMatrixTranslation(XYZ(_position)); }
+	const XMMATRIX GetRotationMatrix()	  { return XMMatrixRotationRollPitchYaw(RPY(_rotation)); }
+	const XMMATRIX GetScaleMatrix()		  { return XMMatrixScaling(XYZ(_scale)); }
 
 protected:
 	XMFLOAT4X4			_combinedWorldTransformation;
 	wstring				_name;
 
-	Vector3				_position;
-	Vector3				_rotation;
+	Vector3				_position{ 0, 0, 0 };
+	Vector3				_rotation{ 0, 0, 0 };
 	Vector3				_scale{ 1, 1, 1 };
+
+	Vector3& GetPosition() { return _position; }
+	Vector3& GetRotation() { return _rotation; }
+	Vector3& GetScale() { return _scale; }
 
 public:
 	static XMMATRIX GetTRS(const Vector3& t, const Vector3& r, const Vector3& s) { return XMMatrixScaling(XYZ(s)) * XMMatrixRotationRollPitchYaw(RPY(r)) * XMMatrixTranslation(XYZ(t)); }
 };
-
-// Remove contextual #define macros, as they can almost certainly
-// not be used as they are intended in any other situation.
-#undef RPY
-#undef XYZ
-#undef TRS

@@ -96,6 +96,9 @@
     <ClInclude Include="AmbientLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CameraNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -154,6 +157,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlaneNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

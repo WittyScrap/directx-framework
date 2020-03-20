@@ -53,7 +53,7 @@ public:
     const Vector3& operator*=(const float& rhs);
     const Vector3& operator/=(const float& rhs);
 
-    XMFLOAT3 ToDX() const;
+    XMFLOAT4 ToDX() const;
 
     static const Vector3 UpVector;
     static const Vector3 DownVector;

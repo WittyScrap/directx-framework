@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AmbientLight.h" />
+    <ClInclude Include="CameraNode.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CubeNode.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -191,6 +192,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CameraNode.cpp" />
     <ClCompile Include="CubeNode.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />

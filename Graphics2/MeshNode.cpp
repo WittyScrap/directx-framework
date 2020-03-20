@@ -157,7 +157,7 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
  * to this mesh node.
  *
  */
-void MeshNode::Map(shared_ptr<Mesh> mesh)
+void MeshNode::Build(shared_ptr<Mesh> mesh)
 {
     _mesh = mesh;
     SetMaterial(mesh->GetReferenceMaterial());

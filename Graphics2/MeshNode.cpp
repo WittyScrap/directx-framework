@@ -143,9 +143,9 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         CBUFFER cBuffer;
         cBuffer.CompleteTransformation = completeTransformation;
         cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-        cBuffer.AmbientColour = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+        cBuffer.AmbientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
         cBuffer.LightVector = XMVector4Normalize(XMVectorSet(0.0f, 1.0f, 1.0f, 0.0f));
-        cBuffer.LightColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+        cBuffer.LightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
         material->Update(&cBuffer);
         mesh->Render();

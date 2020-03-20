@@ -8,8 +8,11 @@ Graphics2 app;
 
 void Graphics2::CreateSceneGraph()
 {
-	AddLight<AmbientLight>();
-	AddLight<DirectionalLight>();
+	shared_ptr<AmbientLight> ambientLight = AddLight<AmbientLight>();
+	shared_ptr<DirectionalLight> directionalLight = AddLight<DirectionalLight>();
+
+	directionalLight->SetDirection({ -1, 1, 0 });
+	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
 	SceneGraphPointer sceneGraph = GetSceneGraph();
 	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaoww");

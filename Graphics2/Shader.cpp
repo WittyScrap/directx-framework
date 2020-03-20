@@ -90,9 +90,9 @@ const Shader& Shader::operator=(const Shader& rhs)
 	return *this;
 }
 
-const Shader Shader::Load(const wstring& file)
+shared_ptr<Shader> Shader::Load(const wstring& file)
 {
-	return Shader(file);
+	return make_shared<Shader>(file);
 }
 
 bool Shader::CompileVertex(DWORD flags)

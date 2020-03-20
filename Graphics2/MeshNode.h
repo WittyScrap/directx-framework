@@ -30,13 +30,21 @@ public:
             const shared_ptr<Mesh>      GetMesh() const;
             const shared_ptr<Material>  GetMaterial() const;
 
+            void                        SetMaterial(const size_t location, const shared_ptr<Material>& material);
+            const shared_ptr<Material>  GetMaterial(const size_t location) const;
+
 protected:
 
     static  ComPtr<ID3D11Device>                GetDevice();
     static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
+            void InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> material);
+            void Map(shared_ptr<Mesh> mesh);
+
 private:
             shared_ptr<Mesh>                    _mesh = nullptr;
             shared_ptr<Material>                _material = nullptr;
+
+            vector<shared_ptr<Material>>        _materials;
 };
 

@@ -1,15 +1,15 @@
 #include "Graphics2.h"
 #include "RobotNode.h"
+#include "PlaneNode.h"
 
 Graphics2 app;
 
 void Graphics2::CreateSceneGraph()
 {
 	SceneGraphPointer sceneGraph = GetSceneGraph();
-	shared_ptr<RobotNode> robot = SceneGraph::Create<RobotNode>(L"Robot");
+	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaoww");
 
-	robot->SetPosition({ 0, 0, -30 });
-	sceneGraph->Add(robot);
+	sceneGraph->Add(plane);
 }
 
 void Graphics2::UpdateSceneGraph()

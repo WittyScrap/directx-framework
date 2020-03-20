@@ -55,7 +55,7 @@ public:
     ComPtr<ID3D11Buffer>       GetConstantBuffer() const;
 
     const Shader& operator=(const Shader& rhs);
-    static const Shader Load(const wstring& file);
+    static shared_ptr<Shader> Load(const wstring& file);
 
 protected:
     bool CompileVertex(DWORD flags);

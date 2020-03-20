@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCore.h"
 #include "DirectXFramework.h"
+#include "Material.h"
 
 struct Vertex;
 struct CBUFFER;
@@ -35,17 +36,29 @@ public:
 			void								Apply();
 			void								Render() const;
 
+			void								AddSubmesh(shared_ptr<Mesh>& subMesh);
+			void								RemoveSubmesh(shared_ptr<Mesh>& subMesh);
+			void								RemoveSubmesh(const size_t& index);
+
+			shared_ptr<Mesh>					GetSubmesh(const size_t& index) const;
+			size_t								GetSubmeshCount() const;
+
+			void								SetReferenceMaterial(const shared_ptr<Material>& material);
+			const shared_ptr<Material>&			GetReferenceMaterial() const;
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();
 	static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
 private:
+			shared_ptr<Material>				_referencedMaterial = nullptr;
+			vector<shared_ptr<Mesh>>			_subMeshes;
+
 			ComPtr<ID3D11Buffer>                _vertexBuffer;
 			ComPtr<ID3D11Buffer>                _indexBuffer;
 
-			std::vector<Vertex>					_vertices;
-			std::vector<UINT>					_indices;
+			vector<Vertex>						_vertices;
+			vector<UINT>						_indices;
 
 			bool								b_isApplied = false;
 };

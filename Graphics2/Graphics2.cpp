@@ -17,13 +17,16 @@ void Graphics2::CreateSceneGraph()
 
 	SceneGraphPointer sceneGraph = GetSceneGraph();
 	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaoww");
+	shared_ptr<RobotNode> robot = SceneGraph::Create<RobotNode>(L"Beep boop");
 	shared_ptr<CameraNode> camera = SceneGraph::Create<CameraNode>(L"Main Camera");
 
+	plane->Add(camera);
 	camera->SetPosition({ 0, 0, -50 });
 	camera->SetMain();
+	robot->SetPosition({ 0, -25, 75 });
 
 	sceneGraph->Add(plane);
-	sceneGraph->Add(camera);
+	sceneGraph->Add(robot);
 }
 
 void Graphics2::UpdateSceneGraph()
@@ -31,5 +34,5 @@ void Graphics2::UpdateSceneGraph()
 	SceneGraphPointer sceneGraph = GetSceneGraph();
 
 	// This is where you make any changes to the local world transformations to nodes
-	// in the scene graph
+	// in the scene graph.
 }

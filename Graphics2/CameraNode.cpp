@@ -44,7 +44,7 @@ void CameraNode::UpdateMatrices()
 {
 	XMStoreFloat4x4(&_projectionTransformation,
 		XMMatrixPerspectiveFovLH(
-			XM_PIDIV4,
+			_fieldOfView * D2R,
 			(float)FRAMEWORK->GetWindowWidth() / FRAMEWORK->GetWindowHeight(),
 			_nearClipPlane,
 			_farClipPlane

@@ -14,7 +14,7 @@ bool PlaneNode::Initialise()
 void PlaneNode::Update(FXMMATRIX& m)
 {
 	Vector3 rotation = GetRotation();
-	rotation += Vector3::UpVector * 1;
+	rotation += Vector3::UpVector * RotationSpeed;
 	SetRotation(rotation);
 
 	SceneGraph::Update(m);

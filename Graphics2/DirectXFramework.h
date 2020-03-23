@@ -10,6 +10,7 @@
 #define DEVICE			FRAMEWORK->GetDevice()
 #define DEVICE_CONTEXT	FRAMEWORK->GetDeviceContext()
 #define RESOURCES		FRAMEWORK->GetResourceManager()
+#define ISNULL(x)		(x == nullptr)
 
 class DirectXFramework : public Framework
 {

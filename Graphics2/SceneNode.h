@@ -56,10 +56,6 @@ protected:
 	Vector3				_rotation{ 0, 0, 0 };
 	Vector3				_scale{ 1, 1, 1 };
 
-	Vector3& GetPosition() { return _position; }
-	Vector3& GetRotation() { return _rotation; }
-	Vector3& GetScale() { return _scale; }
-
 public:
 	static XMMATRIX GetTRS(const Vector3& t, const Vector3& r, const Vector3& s) { return XMMatrixScaling(XYZ(s)) * XMMatrixRotationRollPitchYaw(RPY(r)) * XMMatrixTranslation(XYZ(t)); }
 };

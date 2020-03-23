@@ -3,6 +3,7 @@
 #include "PlaneNode.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
+#include "CameraNode.h"
 
 Graphics2 app;
 
@@ -16,8 +17,13 @@ void Graphics2::CreateSceneGraph()
 
 	SceneGraphPointer sceneGraph = GetSceneGraph();
 	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaoww");
+	shared_ptr<CameraNode> camera = SceneGraph::Create<CameraNode>(L"Main Camera");
+
+	camera->SetPosition({ 0, 0, -50 });
+	camera->SetMain();
 
 	sceneGraph->Add(plane);
+	sceneGraph->Add(camera);
 }
 
 void Graphics2::UpdateSceneGraph()

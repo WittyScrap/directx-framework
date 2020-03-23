@@ -45,3 +45,6 @@ private:
     FLOAT                               _farClipPlane{ 10000.f };
 };
 
+#define MAIN_CAMERA     CameraNode::GetMain()
+#define NO_MAIN_CAMERA  CameraNode::GetMain() == nullptr
+#define HAS_MAIN_CAMERA CameraNode::GetMain() != nullptr

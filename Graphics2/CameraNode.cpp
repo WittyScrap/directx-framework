@@ -14,18 +14,20 @@ void CameraNode::Update(FXMMATRIX& m)
 {
 	SceneGraph::Update(m);
 
-	XMFLOAT4X4& transform = _combinedWorldTransformation;
+	XMMATRIX matrix = XMLoadFloat4x4(&_combinedWorldTransformation);
+	XMVECTOR determinant = XMMatrixDeterminant(matrix);
+	XMMATRIX transform = XMMatrixInverse(&determinant, matrix);
 
-	XMFLOAT4 up(transform._12, transform._22, transform._32, 1);
+	/*XMFLOAT4 up(transform._12, transform._22, transform._32, 1);
 	XMFLOAT4 forward(transform._13, transform._23, transform._33, 1);
 	
 	XMMATRIX view = XMMatrixLookAtLH(
 		XMLoadFloat4(&GetPosition().ToDX()),
 		XMLoadFloat4(&forward),
 		XMLoadFloat4(&up)
-	);
+	);*/
 
-	XMStoreFloat4x4(&_viewTransformation, view);
+	XMStoreFloat4x4(&_viewTransformation, transform);
 }
 
 XMMATRIX CameraNode::GetViewTransformation() const

@@ -70,10 +70,7 @@ bool DirectXFramework::Initialise()
 	{
 		// Create the camera now
 		shared_ptr<CameraNode> camera = SceneGraph::Create<CameraNode>(L"Default Camera");
-
 		camera->SetMain();
-		camera->SetPosition({ 0, 0, -50 });
-		camera->SetRotation({ 0, -90, 0 });
 
 		_sceneGraph->Add(camera);
 	}

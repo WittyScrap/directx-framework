@@ -6,12 +6,6 @@
 #include "ResourceManager.h"
 #include "ILight.h"
 
-#define FRAMEWORK		DirectXFramework::GetDXFramework()
-#define DEVICE			FRAMEWORK->GetDevice()
-#define DEVICE_CONTEXT	FRAMEWORK->GetDeviceContext()
-#define RESOURCES		FRAMEWORK->GetResourceManager()
-#define ISNULL(x)		(x == nullptr)
-
 class DirectXFramework : public Framework
 {
 public:
@@ -75,3 +69,9 @@ private:
 	bool GetDeviceAndSwapChain();
 };
 
+#define FRAMEWORK		DirectXFramework::GetDXFramework()
+#define DEVICE			FRAMEWORK->GetDevice()
+#define DEVICE_CONTEXT	FRAMEWORK->GetDeviceContext()
+#define RESOURCES		FRAMEWORK->GetResourceManager()
+#define SCENE			FRAMEWORK->GetSceneGraph()
+#define ISNULL(x)		(x == nullptr)

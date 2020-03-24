@@ -99,6 +99,9 @@
     <ClInclude Include="CubeNode.h">
       <Filter>Header Files\Scene Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -161,6 +164,9 @@
     </ClCompile>
     <ClCompile Include="SceneNode.cpp">
       <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainNode.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

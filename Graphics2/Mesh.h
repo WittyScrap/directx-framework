@@ -36,9 +36,9 @@ public:
 
 												~Mesh()																		{}
 
-			void								AddVertex(const Vertex& v);
+			void								AddVertex(Vertex v);
 			void								AddVertices(const vector<Vertex>& vertices);
-			void								AddIndex(const UINT& i);
+			void								AddIndex(UINT i);
 			void								AddIndices(const vector<UINT>& indices);
 
 			void								SetVertices(const vector<Vertex>& vertices);

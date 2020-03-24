@@ -1,7 +1,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 
-void Mesh::AddVertex(const Vertex& v)
+void Mesh::AddVertex(Vertex v)
 {
 	_vertices.push_back(v);
 }
@@ -11,7 +11,7 @@ void Mesh::AddVertices(const vector<Vertex>& vertices)
 	_vertices.insert(_vertices.end(), vertices.begin(), vertices.end());
 }
 
-void Mesh::AddIndex(const UINT& i)
+void Mesh::AddIndex(UINT i)
 {
 	_indices.push_back(i);
 }

@@ -3,6 +3,7 @@
 #include "PlaneNode.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
+#include "TerrainNode.h"
 #include "CameraNode.h"
 
 Graphics2 app;
@@ -15,18 +16,15 @@ void Graphics2::CreateSceneGraph()
 	directionalLight->SetDirection({ -1, 1, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
-	SceneGraphPointer sceneGraph = GetSceneGraph();
-	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaoww");
-	shared_ptr<RobotNode> robot = SceneGraph::Create<RobotNode>(L"Beep boop");
-	shared_ptr<CameraNode> camera = SceneGraph::Create<CameraNode>(L"Main Camera");
+	shared_ptr<TerrainNode> terrain = SceneGraph::Create<TerrainNode>(L"Terrain");
+	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
 
-	plane->Add(camera);
-	camera->SetPosition({ 0, 0, -50 });
-	camera->SetMain();
-	robot->SetPosition({ 0, -25, 75 });
+	terrain->SetDrawMode(MeshMode::LineList);
+	mainCam->SetPosition({ 0, 2, 0 });
+	mainCam->SetMain();
 
-	sceneGraph->Add(plane);
-	sceneGraph->Add(robot);
+	SCENE->Add(terrain);
+	SCENE->Add(mainCam);
 }
 
 void Graphics2::UpdateSceneGraph()

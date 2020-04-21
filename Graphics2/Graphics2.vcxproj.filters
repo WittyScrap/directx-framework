@@ -63,16 +63,10 @@
     <ClInclude Include="WICTextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CubeNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RobotNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
@@ -84,7 +78,31 @@
     <ClInclude Include="DirectXFramework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ILight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AmbientLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PlaneNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="RobotNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -123,9 +141,6 @@
     <ClCompile Include="WICTextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CubeNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -135,16 +150,28 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SceneNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RobotNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CameraNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
     <ClCompile Include="PlaneNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="RobotNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

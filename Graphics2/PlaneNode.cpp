@@ -3,12 +3,19 @@
 bool PlaneNode::Initialise()
 {
 	shared_ptr<Mesh> planeMesh = RESOURCES->GetMesh(L"Plane/Bonanza.3ds");
-	Map(planeMesh);
+	shared_ptr<MeshNode> plane = SceneGraph::Create<MeshNode>(L"Plane Geometry");
 
-	return MeshNode::Initialise();
+	plane->Build(planeMesh);
+	Add(plane);
+
+	return SceneGraph::Initialise();
 }
 
 void PlaneNode::Update(FXMMATRIX& m)
 {
-	MeshNode::Update(m);
+	Vector3 rotation = GetRotation();
+	rotation += Vector3::UpVector * RotationSpeed;
+	SetRotation(rotation);
+
+	SceneGraph::Update(m);
 }

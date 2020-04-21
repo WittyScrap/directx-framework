@@ -5,18 +5,17 @@
  * Plane mesh imported as a node object.
  *
  */
-class PlaneNode : public MeshNode
+class PlaneNode : public SceneGraph
 {
 public:
-    PlaneNode() : MeshNode(L"Plane") {}
-    PlaneNode(wstring name) : MeshNode(name) {}
+    PlaneNode() : SceneGraph(L"Plane") {}
+    PlaneNode(wstring name) : SceneGraph(name) {}
 
     virtual ~PlaneNode() {}
 
     virtual bool Initialise() override;
     virtual void Update(FXMMATRIX& m) override;
 
-private:
-
+    float RotationSpeed{ 1 };
 };
 

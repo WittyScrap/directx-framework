@@ -3,6 +3,15 @@
 #include <locale>
 #include <codecvt>
 
+// Helper macros
+
+#define Property(type, var) \
+private: \
+    type _##var; \
+public: \
+    type Get##var() { return _##var; }\
+    void Set##var(type val) { _##var = val; }
+
 // Various helper functions
 
 using namespace std;

@@ -18,13 +18,20 @@ struct Vertex
  * data to be transported to the shader program.
  *
  */
+
 struct CBUFFER
 {
     XMMATRIX    CompleteTransformation;
     XMMATRIX	WorldTransformation;
+    XMFLOAT4	CameraPosition;
     XMVECTOR    LightVector;
-    XMFLOAT4    LightColour;
-    XMFLOAT4    AmbientColour;
+    XMFLOAT4    LightColor;
+    XMFLOAT4    AmbientColor;
+    XMFLOAT4    DiffuseCoefficient;
+    XMFLOAT4	SpecularCoefficient;
+    float		Shininess;
+    float		Opacity;
+    float       Padding[2];
 };
 
 /**

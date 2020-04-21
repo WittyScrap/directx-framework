@@ -61,6 +61,20 @@ const float Vector3::SqrLength() const
 	return (_x * _x) + (_y * _y) + (_z * _z);
 }
 
+void Vector3::Normalize()
+{
+	const float& length = Length();
+
+	_x /= length;
+	_y /= length;
+	_z /= length;
+}
+
+const Vector3 Vector3::Normalized() const
+{
+	return Vector3(*this / Length());
+}
+
 const float Vector3::Dot(const Vector3& lhs, const Vector3& rhs)
 {
 	return (lhs._x * rhs._x) + (lhs._y * rhs._y) + (lhs._z * rhs._z);
@@ -185,7 +199,12 @@ const Vector3& Vector3::operator/=(const float& rhs)
 	return *this;
 }
 
-XMFLOAT3 Vector3::ToDX() const
+XMFLOAT4 Vector3::ToDX() const
+{
+	return XMFLOAT4(_x, _y, _z, 1);
+}
+
+XMFLOAT3 Vector3::ToDX3() const
 {
 	return XMFLOAT3(_x, _y, _z);
 }

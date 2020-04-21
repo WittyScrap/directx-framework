@@ -4,10 +4,7 @@
 #include "DirectXCore.h"
 #include "SceneGraph.h"
 #include "ResourceManager.h"
-
-#define DEVICE			DirectXFramework::GetDXFramework()->GetDevice()
-#define DEVICE_CONTEXT	DirectXFramework::GetDXFramework()->GetDeviceContext()
-#define RESOURCES		DirectXFramework::GetDXFramework()->GetResourceManager()
+#include "ILight.h"
 
 class DirectXFramework : public Framework
 {
@@ -31,10 +28,22 @@ public:
 	inline ComPtr<ID3D11DeviceContext>	GetDeviceContext() { return _deviceContext; }
 	inline shared_ptr<ResourceManager>	GetResourceManager() { return _resourceManager; }
 
-	XMMATRIX							GetViewTransformation();
-	XMMATRIX							GetProjectionTransformation();
-
 	void								SetBackgroundColour(XMFLOAT4 backgroundColour);
+
+										template<typename _TLight>
+	inline shared_ptr<_TLight>			AddLight() { shared_ptr<_TLight> l = make_shared<_TLight>(); _sceneLights.push_back(l); return l; }
+
+										template<typename _TLight>
+	inline shared_ptr<_TLight>			GetLight() { 
+											const auto& it = find_if(_sceneLights.begin(), _sceneLights.end(), [](const shared_ptr<ILight>& l) { return dynamic_cast<_TLight*>(l.get()); });
+
+											if (it != _sceneLights.end())
+											{
+												return dynamic_pointer_cast<_TLight>(*it);
+											}
+
+											return nullptr;
+										}
 
 private:
 	ComPtr<ID3D11Device>				_device;
@@ -51,20 +60,18 @@ private:
 	// to be aligned on 16-byte boundaries and the compiler cannot
 	// guarantee this for class variables
 
-	// For now, we are storing our camera vectors and matrix here.
-	// We will move it to a separate Camera class later
-	XMFLOAT4							_eyePosition;
-	XMFLOAT4							_focalPointPosition;
-	XMFLOAT4							_upVector;
-
-	XMFLOAT4X4							_viewTransformation;
-	XMFLOAT4X4							_projectionTransformation;
-
 	SceneGraphPointer					_sceneGraph;
 	shared_ptr<ResourceManager>			_resourceManager;
+	vector<shared_ptr<ILight>>			_sceneLights;
 
 	float							    _backgroundColour[4];
 
 	bool GetDeviceAndSwapChain();
 };
 
+#define FRAMEWORK		DirectXFramework::GetDXFramework()
+#define DEVICE			FRAMEWORK->GetDevice()
+#define DEVICE_CONTEXT	FRAMEWORK->GetDeviceContext()
+#define RESOURCES		FRAMEWORK->GetResourceManager()
+#define SCENE			FRAMEWORK->GetSceneGraph()
+#define ISNULL(x)		(x == nullptr)

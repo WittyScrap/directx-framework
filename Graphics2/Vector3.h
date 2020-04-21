@@ -30,6 +30,9 @@ public:
     const float Length() const;
     const float SqrLength() const;
 
+    void Normalize();
+    const Vector3 Normalized() const;
+
     static const float Dot(const Vector3& lhs, const Vector3& rhs);
     static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
 
@@ -54,6 +57,7 @@ public:
     const Vector3& operator/=(const float& rhs);
 
     XMFLOAT4 ToDX() const;
+    XMFLOAT3 ToDX3() const;
 
     static const Vector3 UpVector;
     static const Vector3 DownVector;

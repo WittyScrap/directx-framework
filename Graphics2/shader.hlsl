@@ -63,7 +63,7 @@ float4 PS(VertexOut input) : SV_Target
 	float4 ambientLight = ambientColor * diffCoefficient;
 
 	// Combine all components
-	float4 color = saturate((ambientLight + diffuse + specular) * Texture.Sample(ss, input.TexCoord));
+	float4 color = saturate((ambientLight + diffuse/* + specular*/) * Texture.Sample(ss, input.TexCoord));
 	color.a = saturate(opacity);
 
 	return color;

@@ -1,4 +1,5 @@
 #pragma once
+#include "FastNoise.h"
 #include "MeshNode.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -10,7 +11,7 @@
 enum class TerrainMode
 {
     TextureSample,
-    PerlinNoise,
+    Procedural,
     Flat
 };
 
@@ -28,8 +29,8 @@ enum class TerrainMode
 class TerrainNode : public MeshNode
 {
 public:
-                                    TerrainNode() : MeshNode(L"Terrain")                {}
-                                    TerrainNode(wstring name) : MeshNode(name)          {}
+                                    TerrainNode() : MeshNode(L"Terrain")                { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
+                                    TerrainNode(wstring name) : MeshNode(name)          { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
 
     virtual                        ~TerrainNode()                                       {}
 
@@ -47,27 +48,32 @@ public:
      inline  FLOAT                  GetPeakHeight() const                           { return _peakHeight; }
      inline  void                   SetPeakHeight(FLOAT value)                      { _peakHeight = value; }
 
-     inline  FLOAT                  GetPerlinStartX() const                         { return _perlinStartX; }
-     inline  FLOAT                  GetPerlinStartY() const                         { return _perlinStartY; }
+     inline  FLOAT                  GetPerlinStartX() const                         { return _noiseOffsetX; }
+     inline  FLOAT                  GetPerlinStartY() const                         { return _noiseOffsetY; }
 
-     inline  void                   SetPerlinStartX(const FLOAT& value)             { _perlinStartX = value; }
-     inline  void                   SetPerlinStartY(const FLOAT& value)             { _perlinStartY = value; }
+     inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
+     inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
 
              bool                   LoadHeightMap(wstring heightMapFilename);
+             void                   SetNoise(FastNoise&& noise)                     { _noise = noise; }
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
 
      inline  TerrainMode            GetMode()                                       { return _mode; }
-     inline  void                   SetMode(TerrainMode value)                       { _mode = value; }
+     inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
 
              bool                   Generate();
 
 protected:
              FLOAT                  GenerateFromTexture(size_t it_x, size_t it_y);
-             FLOAT                  GenerateFromPerlin(size_t it_x, size_t it_y);
+             FLOAT                  GenerateFromNoise(size_t it_x, size_t it_y);
              FLOAT                  GenerateFlat(size_t it_x, size_t it_y);
 
+             FLOAT                  GetHeight(size_t it_x, size_t it_y);
+
 private:
+    FastNoise                       _noise;
+
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
 
@@ -75,10 +81,10 @@ private:
     UINT                            _height{ 1024 };
 
     FLOAT                           _constantValue{ 0 };
-    FLOAT                           _peakHeight{ 512 };
+    FLOAT                           _peakHeight{ 256 };
 
-    FLOAT                           _perlinStartX{ 0 };
-    FLOAT                           _perlinStartY{ 0 };
+    FLOAT                           _noiseOffsetX{ 0 };
+    FLOAT                           _noiseOffsetY{ 0 };
 
     vector<float>                   _heightMap;
 };

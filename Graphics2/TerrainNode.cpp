@@ -1,6 +1,8 @@
 #include "TerrainNode.h"
 #include <fstream>
 
+#define clamp(a, x, y) { a = ((a) > (x) ? ((a) < (y) ? (a) : (y)) : (x)); }
+
 bool TerrainNode::Initialise()
 {
 	return Generate();
@@ -18,27 +20,24 @@ bool TerrainNode::Generate()
 			float x = static_cast<float>(it_x) - static_cast<float>(_width) / 2.f;
 			float y = static_cast<float>(it_y) - static_cast<float>(_height) / 2.f;
 
-			float height = 0;
+			float&& height	= GetHeight(it_x, it_y);
 
-			switch (_mode)
-			{
-			case TerrainMode::Flat:
-				height = GenerateFlat(it_x, it_y);
-				break;
+			float&& left	= GetHeight(it_x - 1, it_y);
+			float&& right	= GetHeight(it_x + 1, it_y);
+			float&& down	= GetHeight(it_x, it_y + 1);
+			float&& up		= GetHeight(it_x, it_y - 1);
 
-			case TerrainMode::PerlinNoise:
-				height = GenerateFromPerlin(it_x, it_y);
-				break;
+			Vector3 normal;
 
-			case TerrainMode::TextureSample:
-				height = GenerateFromTexture(it_x, it_y);
-				break;
-			}
-
+			normal.SetX(left - right);
+			normal.SetY(down - up);
+			normal.SetZ(2.f);
+			normal.Normalize();
+			
 			terrainData->AddVertex(Vertex{
 				XMFLOAT3{ x, height, y },
-				XMFLOAT3{ 0, 1, 0},
-				XMFLOAT2{ 0, 0 }
+				normal.ToDX3(),
+				XMFLOAT2{ (float)it_x / _width, (float)it_y / _height }
 			});
 		}
 	}
@@ -59,15 +58,15 @@ bool TerrainNode::Generate()
 
 			/* First triangle */
 
-			terrainData->AddIndex((UINT)it);
-			terrainData->AddIndex((UINT)it_left);
 			terrainData->AddIndex((UINT)it_bottomLeft);
+			terrainData->AddIndex((UINT)it_left);
+			terrainData->AddIndex((UINT)it);
 
 			/* Second triangle */
 
-			terrainData->AddIndex((UINT)it_bottomLeft);
-			terrainData->AddIndex((UINT)it_bottom);
 			terrainData->AddIndex((UINT)it);
+			terrainData->AddIndex((UINT)it_bottom);
+			terrainData->AddIndex((UINT)it_bottomLeft);
 		}
 	}
 
@@ -79,18 +78,39 @@ bool TerrainNode::Generate()
 
 FLOAT TerrainNode::GenerateFromTexture(size_t it_x, size_t it_y)
 {
+	clamp(it_x, 0, _width - 1);
+	clamp(it_y, 0, _height - 1);
+
 	size_t it = (it_x * _width) + it_y;
 	return _heightMap[it] * _peakHeight;
 }
 
-FLOAT TerrainNode::GenerateFromPerlin(size_t it_x, size_t it_y)
+FLOAT TerrainNode::GenerateFromNoise(size_t it_x, size_t it_y)
 {
-	return 0;
+	return (FLOAT)_noise.GetPerlin((FN_DECIMAL)it_x + _noiseOffsetX, (FN_DECIMAL)it_y + _noiseOffsetY) * _peakHeight;
 }
 
 FLOAT TerrainNode::GenerateFlat(size_t it_x, size_t it_y)
 {
 	return _constantValue;
+}
+
+FLOAT TerrainNode::GetHeight(size_t it_x, size_t it_y)
+{
+	switch (_mode) 
+	{
+	case TerrainMode::Flat:
+		return GenerateFlat(it_x, it_y);
+
+	case TerrainMode::Procedural:
+		return GenerateFromNoise(it_x, it_y);
+
+	case TerrainMode::TextureSample:
+		return GenerateFromTexture(it_x, it_y);
+
+	default:
+		return 0;
+	}
 }
 
 bool TerrainNode::LoadHeightMap(wstring heightMapFilename)
@@ -107,7 +127,7 @@ bool TerrainNode::LoadHeightMap(wstring heightMapFilename)
 		return false;
 	}
 
-	inputHeightMap.read((char*)rawFileValues, mapSize * 2);
+	inputHeightMap.read((char*)rawFileValues, (long long)mapSize * 2);
 	inputHeightMap.close();
 
 	// Normalise BYTE values to the range 0.0f - 1.0f;

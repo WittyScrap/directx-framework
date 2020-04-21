@@ -21,9 +21,19 @@ void Graphics2::CreateSceneGraph()
 
 	terrain->SetDrawMode(MeshMode::TriangleList);
 	terrain->LoadHeightMap(L"Example_HeightMap.raw");
-	terrain->SetMode(TerrainMode::TextureSample);
+	terrain->SetMode(TerrainMode::Procedural);
 
-	mainCam->SetPosition({ 0, 256, 0 });
+	FastNoise terrainNoise;
+
+	terrainNoise.SetNoiseType(FastNoise::PerlinFractal);
+	terrainNoise.SetFractalGain(0.45);
+	terrainNoise.SetFractalOctaves(10);
+
+	terrain->SetNoise(terrainNoise);
+	terrain->SetNoiseScale(0.25f);
+	terrain->SetPeakHeight(300.f);
+
+	mainCam->SetPosition({ 0, 128, 0 });
 	mainCam->SetMain();
 
 	SCENE->Add(terrain);

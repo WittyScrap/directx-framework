@@ -87,7 +87,11 @@ FLOAT TerrainNode::GenerateFromTexture(size_t it_x, size_t it_y)
 
 FLOAT TerrainNode::GenerateFromNoise(size_t it_x, size_t it_y)
 {
-	return (FLOAT)_noise.GetPerlin((FN_DECIMAL)it_x + _noiseOffsetX, (FN_DECIMAL)it_y + _noiseOffsetY) * _peakHeight;
+	return (FLOAT)_noise.GetNoise
+	(
+		(FN_DECIMAL)(((FLOAT)it_x + _noiseOffsetX) * _noiseScale),
+		(FN_DECIMAL)(((FLOAT)it_y + _noiseOffsetY) * _noiseScale)
+	) * _peakHeight;
 }
 
 FLOAT TerrainNode::GenerateFlat(size_t it_x, size_t it_y)

@@ -55,7 +55,9 @@ public:
      inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
 
              bool                   LoadHeightMap(wstring heightMapFilename);
-             void                   SetNoise(FastNoise&& noise)                     { _noise = noise; }
+     inline  void                   SetNoise(FastNoise&& noise)                     { _noise = noise; }
+     inline  void                   SetNoise(const FastNoise& noise)                { _noise = noise; }
+     inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
 
@@ -85,6 +87,8 @@ private:
 
     FLOAT                           _noiseOffsetX{ 0 };
     FLOAT                           _noiseOffsetY{ 0 };
+
+    FLOAT                           _noiseScale{ 1 };
 
     vector<float>                   _heightMap;
 };

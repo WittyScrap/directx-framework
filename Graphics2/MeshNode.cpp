@@ -127,11 +127,7 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
 {
     if (mesh)
     {
-        if (material && material->Activate()) 
-        {
-            ; // NOP
-        }
-        else
+        if (!material || !material->Activate()) 
         {
             material = RESOURCES->GetDefaultMaterial(); material->Activate();
         }

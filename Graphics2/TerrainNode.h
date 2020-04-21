@@ -9,9 +9,9 @@
  */
 enum class TerrainMode
 {
-    TM_TextureSample,
-    TM_PerlinNoise,
-    TM_Flat
+    TextureSample,
+    PerlinNoise,
+    Flat
 };
 
 /**
@@ -44,16 +44,21 @@ public:
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
+     inline  FLOAT                  GetPeakHeight() const                           { return _peakHeight; }
+     inline  void                   SetPeakHeight(FLOAT value)                      { _peakHeight = value; }
+
      inline  FLOAT                  GetPerlinStartX() const                         { return _perlinStartX; }
      inline  FLOAT                  GetPerlinStartY() const                         { return _perlinStartY; }
 
      inline  void                   SetPerlinStartX(const FLOAT& value)             { _perlinStartX = value; }
      inline  void                   SetPerlinStartY(const FLOAT& value)             { _perlinStartY = value; }
 
-     inline  Texture                GetSourceTexture() const                        { return _sourceTexture; }
-     inline  void                   SetSourceTexture(const Texture& value)          { _sourceTexture = value; }
+             bool                   LoadHeightMap(wstring heightMapFilename);
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
+
+     inline  TerrainMode            GetMode()                                       { return _mode; }
+     inline  void                   SetMode(TerrainMode value)                       { _mode = value; }
 
              bool                   Generate();
 
@@ -63,17 +68,18 @@ protected:
              FLOAT                  GenerateFlat(size_t it_x, size_t it_y);
 
 private:
-    TerrainMode                     _mode{ TerrainMode::TM_Flat };
+    TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
 
     UINT                            _width{ 1024 };
     UINT                            _height{ 1024 };
 
     FLOAT                           _constantValue{ 0 };
+    FLOAT                           _peakHeight{ 512 };
 
     FLOAT                           _perlinStartX{ 0 };
     FLOAT                           _perlinStartY{ 0 };
 
-    Texture                         _sourceTexture{ nullptr };
+    vector<float>                   _heightMap;
 };
 

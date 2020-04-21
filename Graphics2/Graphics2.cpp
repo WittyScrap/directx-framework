@@ -20,7 +20,10 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
 
 	terrain->SetDrawMode(MeshMode::LineList);
-	mainCam->SetPosition({ 0, 2, 0 });
+	terrain->LoadHeightMap(L"Example_HeightMap.raw");
+	terrain->SetMode(TerrainMode::TextureSample);
+
+	mainCam->SetPosition({ 0, 512, 0 });
 	mainCam->SetMain();
 
 	SCENE->Add(terrain);

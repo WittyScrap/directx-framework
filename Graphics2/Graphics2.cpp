@@ -18,26 +18,31 @@ void Graphics2::CreateSceneGraph()
 
 	shared_ptr<TerrainNode> terrain = SceneGraph::Create<TerrainNode>(L"Terrain");
 	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
+	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaowww");
+
+	//	terrain->LoadHeightMap(L"Example_HeightMap.raw");
 
 	terrain->SetDrawMode(MeshMode::TriangleList);
-	terrain->LoadHeightMap(L"Example_HeightMap.raw");
 	terrain->SetMode(TerrainMode::Procedural);
 
 	FastNoise terrainNoise;
 
 	terrainNoise.SetNoiseType(FastNoise::PerlinFractal);
-	terrainNoise.SetFractalGain(0.45);
+	terrainNoise.SetFractalGain((FN_DECIMAL)0.45);
 	terrainNoise.SetFractalOctaves(10);
 
 	terrain->SetNoise(terrainNoise);
 	terrain->SetNoiseScale(0.25f);
 	terrain->SetPeakHeight(300.f);
 
-	mainCam->SetPosition({ 0, 128, 0 });
+	plane->SetPosition({ 0, 128, -1024 });
+	plane->Add(mainCam);
+
+	mainCam->SetPosition({ 0, 20.f, -50.f });
 	mainCam->SetMain();
 
 	SCENE->Add(terrain);
-	SCENE->Add(mainCam);
+	SCENE->Add(plane);
 }
 
 void Graphics2::UpdateSceneGraph()

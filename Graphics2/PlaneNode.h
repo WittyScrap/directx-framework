@@ -16,6 +16,7 @@ public:
     virtual bool Initialise() override;
     virtual void Update(FXMMATRIX& m) override;
 
-    float RotationSpeed{ 1 };
+    float MovementSpeed{ 1.f };
+    float TurningSpeed{ 0.25f };
 };
 

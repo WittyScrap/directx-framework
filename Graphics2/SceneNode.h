@@ -44,9 +44,20 @@ public:
 	const Vector3& GetRotation() const { return _rotation; }
 	const Vector3& GetScale()	 const { return _scale; }
 
+#define TRANSFORM _combinedWorldTransformation
+
+	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, TRANSFORM._23, TRANSFORM._33).Normalized(); }
+	const Vector3 GetUpVector()				const { return Vector3(-TRANSFORM._12, TRANSFORM._22, TRANSFORM._32).Normalized(); }
+	const Vector3 GetRightVector()			const { return Vector3::Cross(GetForwardVector(), GetUpVector()); }
+
+#undef TRANSFORM
+
 	const XMMATRIX GetTranslationMatrix() { return XMMatrixTranslation(XYZ(_position)); }
 	const XMMATRIX GetRotationMatrix()	  { return XMMatrixRotationRollPitchYaw(RPY(_rotation)); }
 	const XMMATRIX GetScaleMatrix()		  { return XMMatrixScaling(XYZ(_scale)); }
+
+	const int GetKey(const int& keyCode);
+	const int GetKeyDown(const int& keyCode);
 
 protected:
 	XMFLOAT4X4			_combinedWorldTransformation;

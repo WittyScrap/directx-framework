@@ -99,22 +99,48 @@ FLOAT TerrainNode::GenerateFlat(size_t it_x, size_t it_y)
 	return _constantValue;
 }
 
-FLOAT TerrainNode::GetHeight(size_t it_x, size_t it_y)
+FLOAT TerrainNode::GetHeightValue(size_t it_x, size_t it_y)
 {
-	switch (_mode) 
+	switch (_mode)
 	{
 	case TerrainMode::Flat:
-		return GenerateFlat(it_x, it_y);
+		return GenerateFlat(it_x, it_y) * SeaFalloff(it_x, it_y);
 
 	case TerrainMode::Procedural:
-		return GenerateFromNoise(it_x, it_y);
+		return GenerateFromNoise(it_x, it_y) * SeaFalloff(it_x, it_y);
 
 	case TerrainMode::TextureSample:
-		return GenerateFromTexture(it_x, it_y);
+		return GenerateFromTexture(it_x, it_y) * SeaFalloff(it_x, it_y);
 
 	default:
 		return 0;
 	}
+}
+
+FLOAT TerrainNode::GetHeight(size_t it_x, size_t it_y)
+{
+	return max(_seaLevel, GetHeightValue(it_x, it_y));
+}
+
+FLOAT TerrainNode::SeaFalloff(size_t it_x, size_t it_y)
+{
+	if (!_doSeaFalloff)
+	{
+		return 1.f;
+	}
+
+	FLOAT x = (float)it_x / (float)_width;
+	FLOAT y = (float)it_y / (float)_height;
+
+	x = x * 2 - 1;
+	y = y * 2 - 1;
+
+	FLOAT distanceValue = sqrtf(x * x + y * y);
+
+	clamp(distanceValue, 0, 1);
+	distanceValue = 1 - distanceValue;
+
+	return distanceValue;
 }
 
 bool TerrainNode::LoadHeightMap(wstring heightMapFilename)

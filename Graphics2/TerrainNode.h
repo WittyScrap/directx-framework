@@ -59,6 +59,13 @@ public:
      inline  void                   SetNoise(const FastNoise& noise)                { _noise = noise; }
      inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
 
+     inline  FLOAT                  GetSeaLevel() const                             { return _seaLevel; }
+     inline  void                   SetSeaLevel(const FLOAT& seaLevel)              { _seaLevel = seaLevel; }
+     inline  void                   SetSeaLevel(const FLOAT&& seaLevel)             { _seaLevel = seaLevel; }
+
+     inline  void                   DoSeaFalloff(const BOOL& seaFalloff)            { _doSeaFalloff = seaFalloff; }
+     inline  void                   DoSeaFalloff(const BOOL&& seaFalloff)           { _doSeaFalloff = seaFalloff; }
+
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
 
      inline  TerrainMode            GetMode()                                       { return _mode; }
@@ -71,7 +78,9 @@ protected:
              FLOAT                  GenerateFromNoise(size_t it_x, size_t it_y);
              FLOAT                  GenerateFlat(size_t it_x, size_t it_y);
 
+             FLOAT                  GetHeightValue(size_t it_x, size_t it_y);
              FLOAT                  GetHeight(size_t it_x, size_t it_y);
+             FLOAT                  SeaFalloff(size_t it_x, size_t it_y);
 
 private:
     FastNoise                       _noise;
@@ -89,6 +98,8 @@ private:
     FLOAT                           _noiseOffsetY{ 0 };
 
     FLOAT                           _noiseScale{ 1 };
+    FLOAT                           _seaLevel{ 0 };
+    BOOL                            _doSeaFalloff{ true };
 
     vector<float>                   _heightMap;
 };

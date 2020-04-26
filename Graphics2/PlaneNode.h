@@ -16,7 +16,13 @@ public:
     virtual bool Initialise() override;
     virtual void Update(FXMMATRIX& m) override;
 
-    float MovementSpeed{ 1.f };
+    float MovementSpeed{ .5f };
     float TurningSpeed{ 0.25f };
+    float BankingAngle{ 45.f };
+    float PitchingAngle{ 10.f };
+
+private:
+    shared_ptr<SceneGraph> _planeController{ nullptr };
+    float _turningAmount{ 0 };
 };
 

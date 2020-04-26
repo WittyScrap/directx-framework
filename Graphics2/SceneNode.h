@@ -46,8 +46,8 @@ public:
 
 #define TRANSFORM _combinedWorldTransformation
 
-	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, TRANSFORM._23, TRANSFORM._33).Normalized(); }
-	const Vector3 GetUpVector()				const { return Vector3(-TRANSFORM._12, TRANSFORM._22, TRANSFORM._32).Normalized(); }
+	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, -TRANSFORM._23, TRANSFORM._33).Normalized(); }
+	const Vector3 GetUpVector()				const { return Vector3(-TRANSFORM._12, -TRANSFORM._22, TRANSFORM._32).Normalized(); }
 	const Vector3 GetRightVector()			const { return Vector3::Cross(GetForwardVector(), GetUpVector()); }
 
 #undef TRANSFORM

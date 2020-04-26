@@ -20,10 +20,10 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
 	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaowww");
 
-	//	terrain->LoadHeightMap(L"Example_HeightMap.raw");
+	terrain->LoadHeightMap(L"Example_HeightMap.raw");
 
 	terrain->SetDrawMode(MeshMode::TriangleList);
-	terrain->SetMode(TerrainMode::Procedural);
+	terrain->SetMode(TerrainMode::TextureSample);
 
 	FastNoise terrainNoise;
 

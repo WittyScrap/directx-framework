@@ -3,8 +3,9 @@
 #include "PlaneNode.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
-#include "TerrainNode.h"
+#include "PlanetNode.h"
 #include "CameraNode.h"
+#include "PawnNode.h"
 
 Graphics2 app;
 
@@ -16,14 +17,11 @@ void Graphics2::CreateSceneGraph()
 	directionalLight->SetDirection({ -1, 1, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
-	shared_ptr<TerrainNode> terrain = SceneGraph::Create<TerrainNode>(L"Terrain");
-	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
-	shared_ptr<PlaneNode> plane = SceneGraph::Create<PlaneNode>(L"Neaowww");
+	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
+	shared_ptr<PawnNode> mainPawn = SceneGraph::Create<PawnNode>();
 
-	terrain->LoadHeightMap(L"Example_HeightMap.raw");
-
-	terrain->SetDrawMode(MeshMode::TriangleList);
-	terrain->SetMode(TerrainMode::TextureSample);
+	planet->SetDrawMode(MeshMode::TriangleList);
+	planet->SetMode(TerrainMode::Procedural);
 
 	FastNoise terrainNoise;
 
@@ -31,18 +29,15 @@ void Graphics2::CreateSceneGraph()
 	terrainNoise.SetFractalGain((FN_DECIMAL)0.45);
 	terrainNoise.SetFractalOctaves(10);
 
-	terrain->SetNoise(terrainNoise);
-	terrain->SetNoiseScale(0.25f);
-	terrain->SetPeakHeight(300.f);
+	planet->SetNoise(terrainNoise);
+	planet->SetNoiseScale(0.25f);
+	planet->SetPeakHeight(300.f);
 
-	plane->SetPosition({ 0, 128, -1024 });
-	plane->Add(mainCam);
+	mainPawn->SetPosition({ 0, 128, -1024 });
+	mainPawn->SetMain();
 
-	mainCam->SetPosition({ 0, 20.f, -50.f });
-	mainCam->SetMain();
-
-	SCENE->Add(terrain);
-	SCENE->Add(plane);
+	SCENE->Add(planet);
+	SCENE->Add(mainPawn);
 }
 
 void Graphics2::UpdateSceneGraph()

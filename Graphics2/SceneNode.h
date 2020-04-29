@@ -9,6 +9,7 @@
 #define XYZ(v)	v.X, v.Y, v.Z
 #define TRS		_position, _rotation, _scale
 
+
 using namespace std;
 
 // Abstract base class for all nodes of the scene graph.  
@@ -26,7 +27,7 @@ public:
 
 	// Core methods
 	virtual bool Initialise() = 0;
-	virtual void Update(FXMMATRIX& currentWorldTransformation) { XMStoreFloat4x4(&_combinedWorldTransformation, GetTRS(TRS) * currentWorldTransformation); }
+	virtual void Update(FXMMATRIX& currentWorldTransformation) { XMStoreFloat4x4(&_combinedWorldTransformation, GetTRS(TRS) * currentWorldTransformation); ResetMouse(); }
 	virtual void Render() = 0;
 	virtual void Shutdown() = 0;
 		
@@ -59,6 +60,14 @@ public:
 	const int GetKey(const int& keyCode);
 	const int GetKeyDown(const int& keyCode);
 
+	const float GetMouseHorizontal();
+	const float GetMouseVertical();
+
+	void SetMouseLocked(const BOOL& value)		{ _mouseLocked = value; }
+
+private:
+	void ResetMouse();
+
 protected:
 	XMFLOAT4X4			_combinedWorldTransformation;
 	wstring				_name;
@@ -66,6 +75,10 @@ protected:
 	Vector3				_position{ 0, 0, 0 };
 	Vector3				_rotation{ 0, 0, 0 };
 	Vector3				_scale{ 1, 1, 1 };
+
+	BOOL				_mouseLocked{ false };
+	FLOAT				_mouseHorizontalAxis{ 0 };
+	FLOAT				_mouseVerticalAxis{ 0 };
 
 public:
 	static XMMATRIX GetTRS(const Vector3& t, const Vector3& r, const Vector3& s) { return XMMatrixScaling(XYZ(s)) * XMMatrixRotationRollPitchYaw(RPY(r)) * XMMatrixTranslation(XYZ(t)); }

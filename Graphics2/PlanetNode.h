@@ -26,21 +26,18 @@ enum class TerrainMode
  *  C: A constant value
  * Depending on which mode has been selected.
  */
-class TerrainNode : public MeshNode
+class PlanetNode : public MeshNode
 {
 public:
-                                    TerrainNode() : MeshNode(L"Terrain")                { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
-                                    TerrainNode(wstring name) : MeshNode(name)          { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
+                                    PlanetNode() : MeshNode(L"Terrain")                { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
+                                    PlanetNode(wstring name) : MeshNode(name)          { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
 
-    virtual                        ~TerrainNode()                                       {}
+    virtual                        ~PlanetNode()                                       {}
 
     virtual  bool                   Initialise() override;
 
-     inline  UINT                   GetWidth() const                                { return _width; }
-     inline  UINT                   GetHeight() const                               { return _height; }
-
-     inline  void                   SetWidth(const UINT& value)                     { _width = value; }
-     inline  void                   SetHeight(const UINT& value)                    { _height = value; }
+     inline  FLOAT                  GetRadius() const                               { return _radius; }
+     inline  void                   SetRadius(const FLOAT& value)                   { _radius = value; }
 
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
@@ -54,7 +51,6 @@ public:
      inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
      inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
 
-             bool                   LoadHeightMap(wstring heightMapFilename);
      inline  void                   SetNoise(FastNoise&& noise)                     { _noise = noise; }
      inline  void                   SetNoise(const FastNoise& noise)                { _noise = noise; }
      inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
@@ -63,10 +59,9 @@ public:
      inline  void                   SetSeaLevel(const FLOAT& seaLevel)              { _seaLevel = seaLevel; }
      inline  void                   SetSeaLevel(const FLOAT&& seaLevel)             { _seaLevel = seaLevel; }
 
-     inline  void                   DoSeaFalloff(const BOOL& seaFalloff)            { _doSeaFalloff = seaFalloff; }
-     inline  void                   DoSeaFalloff(const BOOL&& seaFalloff)           { _doSeaFalloff = seaFalloff; }
-
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
+     inline  void                   SetResolution(const UINT& value)                { _resolution = value; }
+     inline  void                   SetResolution(const UINT&& value)               { _resolution = value; }
 
      inline  TerrainMode            GetMode()                                       { return _mode; }
      inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
@@ -74,13 +69,10 @@ public:
              bool                   Generate();
 
 protected:
-             FLOAT                  GenerateFromTexture(size_t it_x, size_t it_y);
-             FLOAT                  GenerateFromNoise(size_t it_x, size_t it_y);
-             FLOAT                  GenerateFlat(size_t it_x, size_t it_y);
+             FLOAT                  GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const;
+             void                   GenerateFace(Mesh* const target, Vector3 normal, Vector3 right) const;
 
-             FLOAT                  GetHeightValue(size_t it_x, size_t it_y);
-             FLOAT                  GetHeight(size_t it_x, size_t it_y);
-             FLOAT                  SeaFalloff(size_t it_x, size_t it_y);
+   constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
 private:
     FastNoise                       _noise;
@@ -88,19 +80,17 @@ private:
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
 
-    UINT                            _width{ 1024 };
-    UINT                            _height{ 1024 };
+    FLOAT                           _radius{ 50 };
 
     FLOAT                           _constantValue{ 0 };
     FLOAT                           _peakHeight{ 256 };
+    UINT                            _resolution{ 512 };
 
     FLOAT                           _noiseOffsetX{ 0 };
     FLOAT                           _noiseOffsetY{ 0 };
+    FLOAT                           _noiseOffsetZ{ 0 };
 
     FLOAT                           _noiseScale{ 1 };
     FLOAT                           _seaLevel{ 0 };
-    BOOL                            _doSeaFalloff{ true };
-
-    vector<float>                   _heightMap;
 };
 

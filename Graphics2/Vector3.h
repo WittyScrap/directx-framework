@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCore.h"
 
+
 // Shorthand
 #define X		GetX()
 #define Y		GetY()

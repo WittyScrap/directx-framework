@@ -174,6 +174,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshNode.h" />
+    <ClInclude Include="PawnNode.h" />
     <ClInclude Include="PlaneNode.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -182,7 +183,8 @@
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TerrainNode.h" />
+    <ClInclude Include="PlanetNode.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="WICTextureLoader.h" />
   </ItemGroup>
@@ -209,7 +211,8 @@
     <ClCompile Include="SceneGraph.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="TerrainNode.cpp" />
+    <ClCompile Include="PlanetNode.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
   </ItemGroup>

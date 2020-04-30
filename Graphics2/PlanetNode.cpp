@@ -111,10 +111,10 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 {
 	if (value == 0)
 	{
-		return 0.f;
+		return -1.f;
 	}
 
-	if (value == 1)
+	if (value == range)
 	{
 		return 1.f;
 	}

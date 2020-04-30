@@ -35,7 +35,10 @@ public:
     const Vector3 Normalized() const;
 
     static const float Dot(const Vector3& lhs, const Vector3& rhs);
+    static const float Dot(const XMVECTOR& lhs, const XMVECTOR& rhs);
+
     static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
+    static const XMVECTOR Cross(const XMVECTOR& lhs, const XMVECTOR& rhs);
 
     const Vector3 operator+(const Vector3& rhs) const;
     const Vector3 operator-(const Vector3& rhs) const;

@@ -7,7 +7,7 @@
 #define D2R		(PI / 180.f)
 #define RPY(v)	v.X * D2R, v.Y * D2R, v.Z * D2R
 #define XYZ(v)	v.X, v.Y, v.Z
-#define TRS		_position, _rotation, _scale
+#define TRS		(_scale * XMMatrixRotationQuaternion(_rotation) * _position)
 
 
 using namespace std;
@@ -27,7 +27,7 @@ public:
 
 	// Core methods
 	virtual bool Initialise() = 0;
-	virtual void Update(FXMMATRIX& currentWorldTransformation) { XMStoreFloat4x4(&_combinedWorldTransformation, GetTRS(TRS) * currentWorldTransformation); ResetMouse(); }
+	virtual void Update(FXMMATRIX& currentWorldTransformation) { XMStoreFloat4x4(&_combinedWorldTransformation, TRS * currentWorldTransformation); ResetMouse(); }
 	virtual void Render() = 0;
 	virtual void Shutdown() = 0;
 		
@@ -37,25 +37,26 @@ public:
 	virtual void Remove(SceneNodePointer node) {};
 	virtual	SceneNodePointer Find(wstring name) { return (_name == name) ? shared_from_this() : nullptr; }
 
-	virtual void SetPosition(const Vector3& position) { _position = position; }
-	virtual void SetRotation(const Vector3& rotation) { _rotation = rotation; }
-	virtual void SetScale(const Vector3& scale) { _scale = scale; }
+	virtual void SetPosition(const Vector3& position) { _position = XMMatrixTranslation(XYZ(position)); }
+	virtual void SetRotation(const Vector3& rotation) { _rotation = XMQuaternionRotationRollPitchYaw(RPY(rotation)); }
+	virtual void SetScale(const Vector3& scale)		  { _scale = XMMatrixScaling(XYZ(scale)); }
 
-	const Vector3& GetPosition() const { return _position; }
-	const Vector3& GetRotation() const { return _rotation; }
-	const Vector3& GetScale()	 const { return _scale; }
+	virtual void SetRotation(const XMVECTOR& quat)	  { _rotation = quat; }
+	virtual void SetRotation(const XMMATRIX& rot)	  { _rotation = XMQuaternionRotationMatrix(rot); }
+	virtual void SetRotation(const Vector3& forward, const Vector3& up);
+	virtual void RotateAround(const Vector3& axis, const float& angle);
 
-#define TRANSFORM _combinedWorldTransformation
+	const Vector3  GetPosition() const { XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._41, m._42, m._43 }; }
+	const XMVECTOR GetRotation() const { return _rotation; }
+	const Vector3  GetScale()	 const { XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._11, m._22, m._33 }; }
 
-	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, -TRANSFORM._23,  TRANSFORM._33).Normalized(); }
-	const Vector3 GetUpVector()				const { return Vector3( TRANSFORM._12,  TRANSFORM._22, -TRANSFORM._32).Normalized(); }
+	const Vector3 GetForwardVector() const;
+	const Vector3 GetUpVector() const;
 	const Vector3 GetRightVector()			const { return Vector3::Cross(GetUpVector(), GetForwardVector()); }
 
-#undef TRANSFORM
-
-	const XMMATRIX GetTranslationMatrix() { return XMMatrixTranslation(XYZ(_position)); }
-	const XMMATRIX GetRotationMatrix()	  { return XMMatrixRotationRollPitchYaw(RPY(_rotation)); }
-	const XMMATRIX GetScaleMatrix()		  { return XMMatrixScaling(XYZ(_scale)); }
+	const XMMATRIX GetTranslationMatrix() { return _position; }
+	const XMMATRIX GetRotationMatrix()	  { return XMMatrixRotationQuaternion(_rotation); }
+	const XMMATRIX GetScaleMatrix()		  { return _scale; }
 
 	const int GetKey(const int& keyCode);
 	const int GetKeyDown(const int& keyCode);
@@ -73,9 +74,9 @@ protected:
 	XMFLOAT4X4			_combinedWorldTransformation;
 	wstring				_name;
 
-	Vector3				_position{ 0, 0, 0 };
-	Vector3				_rotation{ 0, 0, 0 };
-	Vector3				_scale{ 1, 1, 1 };
+	XMMATRIX			_position = XMMatrixIdentity();
+	XMVECTOR			_rotation = XMQuaternionIdentity();
+	XMMATRIX			_scale = XMMatrixIdentity();
 
 	BOOL				_mouseLocked{ false };
 	BOOL				_mouseVisible{ true };

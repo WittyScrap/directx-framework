@@ -80,11 +80,26 @@ const float Vector3::Dot(const Vector3& lhs, const Vector3& rhs)
 	return (lhs._x * rhs._x) + (lhs._y * rhs._y) + (lhs._z * rhs._z);
 }
 
+const float Vector3::Dot(const XMVECTOR& lhs, const XMVECTOR& rhs)
+{
+	XMFLOAT2 o;
+
+	XMVECTOR dot = XMVector3Dot(lhs, rhs);
+	XMStoreFloat2(&o, dot);
+
+	return o.x;
+}
+
 const Vector3 Vector3::Cross(const Vector3& lhs, const Vector3& rhs)
 {
 	return Vector3(lhs._y * rhs._z - lhs._z * rhs._y,
 		lhs._z * rhs._x - lhs._x * rhs._z,
 		lhs._x * rhs._y - lhs._y * rhs._x);
+}
+
+const XMVECTOR Vector3::Cross(const XMVECTOR& lhs, const XMVECTOR& rhs)
+{
+	return XMVector3Cross(lhs, rhs);
 }
 
 const Vector3 Vector3::operator+(const Vector3& rhs) const

@@ -2,6 +2,67 @@
 #include <WinUser.h>
 #include "DirectXFramework.h"
 
+void SceneNode::SetRotation(const Vector3& forward, const Vector3& up)
+{
+	XMVECTOR zeroPosition = XMVectorSet(0, 0, 0, 0);
+
+	XMVECTOR fwdDirection = XMVectorSet(XYZ(forward), 0);
+	XMVECTOR  upDirection = XMVectorSet(XYZ(up), 0);
+
+	XMMATRIX lookAtMatrix = XMMatrixLookToLH(zeroPosition, fwdDirection, upDirection);
+	XMVECTOR quaternion = XMQuaternionRotationMatrix(lookAtMatrix);
+
+	_rotation = quaternion;
+}
+
+void SceneNode::RotateAround(const Vector3& axis, const float& angle)
+{
+	XMVECTOR axisVecSD = XMVectorSet(XYZ(axis), 0);
+	XMVECTOR transform = XMQuaternionRotationAxis(axisVecSD, angle * D2R);
+
+	_rotation = XMQuaternionMultiply(_rotation, transform);
+}
+
+const Vector3 SceneNode::GetForwardVector() const
+{
+	XMFLOAT4 qw;
+	XMStoreFloat4(&qw, _rotation);
+
+	XMVECTOR u = XMVectorSet(qw.x, qw.y, qw.z, 0);
+	XMVECTOR v = XMVectorSet(XYZ(Vector3::ForwardVector), 0);
+
+	FLOAT s = qw.w;
+
+	XMFLOAT3 out;
+
+	XMVECTOR fwd = 2.f * Vector3::Dot(u, v)		* u
+				 + (s * s - Vector3::Dot(u, v)) * v
+				 + 2.f * s * Vector3::Cross(u, v);
+
+	XMStoreFloat3(&out, fwd);
+	return Vector3(out.x, out.y, out.z);
+}
+
+const Vector3 SceneNode::GetUpVector() const
+{
+	XMFLOAT4 qw;
+	XMStoreFloat4(&qw, _rotation);
+
+	XMVECTOR u = XMVectorSet(qw.x, qw.y, qw.z, 0);
+	XMVECTOR v = XMVectorSet(XYZ(Vector3::UpVector), 0);
+
+	FLOAT s = qw.w;
+
+	XMFLOAT3 out;
+
+	XMVECTOR fwd = 2.f * Vector3::Dot(u, v)		* u
+				 + (s * s - Vector3::Dot(u, v)) * v
+				 + 2.f * s * Vector3::Cross(u, v);
+
+	XMStoreFloat3(&out, fwd);
+	return Vector3(out.x, out.y, out.z);
+}
+
 const int SceneNode::GetKey(const int& keyCode)
 {
 	return GetAsyncKeyState(keyCode) < 0;
@@ -37,7 +98,7 @@ void SceneNode::ResetMouse()
 		POINT mouseLocation;
 		RECT windowRect;
 
-		if (!GetCursorPos(&mouseLocation) || !GetWindowRect(FRAMEWORK->GetHWnd(), &windowRect))
+		if (!GetCursorPos(&mouseLocation) || !GetClientRect(FRAMEWORK->GetHWnd(), &windowRect))
 		{
 			SetMouseVisible(true);
 			_mouseLocked = false;

@@ -82,9 +82,7 @@ bool RobotNode::Initialise()
 void RobotNode::Update(FXMMATRIX& m)
 {
 	// Rotate around!
-	Vector3 rotation = GetRotation();
-	rotation += Vector3::UpVector * RotationSpeed;
-	SetRotation(rotation);
+	RotateAround(Vector3::UpVector, RotationSpeed);
 
 	SceneGraph::Update(m);
 }

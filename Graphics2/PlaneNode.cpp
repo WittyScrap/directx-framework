@@ -14,7 +14,7 @@ bool PlaneNode::Initialise()
 	Add(_planeController);
 	_planeController->Add(plane);
 
-	plane->SetRotation({ 90.f, 0, 180.f });
+	plane->SetRotation(Vector3{ 90.f, 0, 180.f });
 	plane->SetPosition({ 0.f, -5.f, 0.f });
 
 	return SceneGraph::Initialise();
@@ -22,7 +22,7 @@ bool PlaneNode::Initialise()
 
 void PlaneNode::Update(FXMMATRIX& m)
 {
-	Vector3 yawController(GetRotation());
+	/*Vector3 yawController(GetRotation());
 	Vector3 rollController(_planeController->GetRotation());
 
 	float rightInput = (float)GetKey('A');
@@ -58,7 +58,7 @@ void PlaneNode::Update(FXMMATRIX& m)
 	forward *= MovementSpeed;
 	location += forward;
 
-	SetPosition(location);
+	SetPosition(location);*/
 
 	SceneGraph::Update(m);
 }

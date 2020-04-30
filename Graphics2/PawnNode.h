@@ -33,25 +33,14 @@ inline bool PawnNode::Initialise()
 void PawnNode::Update(FXMMATRIX& m)
 {
     Vector3 location = GetPosition();
-    Vector3 rotation = GetRotation();
 
-    float pitch = rotation.GetX();
-    float yaw = rotation.GetY();
-    float roll = rotation.GetZ();
+    RotateAround(Vector3::RightVector,      GetMouseVertical() * _rotationSpeed);
+    RotateAround(Vector3::UpVector,         GetMouseHorizontal() * _rotationSpeed);
+    RotateAround(Vector3::ForwardVector,    static_cast<float>(GetKey('E') - GetKey('Q'))* _rotationSpeed);
 
-    pitch += GetMouseVertical() * _rotationSpeed;
-    yaw += GetMouseHorizontal() * _rotationSpeed;
-    roll += static_cast<float>(GetKey('E') - GetKey('Q')) * _rotationSpeed;
-
-    rotation.SetX(pitch);
-    rotation.SetY(yaw);
-    rotation.SetZ(roll);
-
-    SetRotation(rotation);
-
-    location += GetForwardVector() * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S'));
-    location += GetRightVector() * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A'));
-    location += GetUpVector() * _movementSpeed * static_cast<float>(GetKey('R') - GetKey('F'));
+    location += GetForwardVector()  * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S'));
+    location += GetRightVector()    * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A'));
+    location += GetUpVector()       * _movementSpeed * static_cast<float>(GetKey('R') - GetKey('F'));
 
     SetPosition(location);
 

@@ -162,6 +162,11 @@ const shared_ptr<Material>& Mesh::GetReferenceMaterial() const
 	return _referencedMaterial;
 }
 
+void Mesh::RecalculateNormals()
+{
+	// TODO: Implement this.
+}
+
 ComPtr<ID3D11Device> Mesh::GetDevice()
 {
 	return DirectXFramework::GetDXFramework()->GetDevice();

@@ -1,5 +1,5 @@
 #pragma once
-#include "FastNoise.h"
+#include "SimplexNoise.h"
 #include "MeshNode.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -29,10 +29,10 @@ enum class TerrainMode
 class PlanetNode : public MeshNode
 {
 public:
-                                    PlanetNode() : MeshNode(L"Terrain")                { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
-                                    PlanetNode(wstring name) : MeshNode(name)          { _noise.SetNoiseType(FastNoise::NoiseType::Perlin); }
+                                    PlanetNode() : MeshNode(L"Terrain")                { }
+                                    PlanetNode(wstring name) : MeshNode(name)          { }
 
-    virtual                        ~PlanetNode()                                       {}
+    virtual                        ~PlanetNode()                                       { }
 
     virtual  bool                   Initialise() override;
 
@@ -51,8 +51,7 @@ public:
      inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
      inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
 
-     inline  void                   SetNoise(FastNoise&& noise)                     { _noise = noise; }
-     inline  void                   SetNoise(const FastNoise& noise)                { _noise = noise; }
+     inline  void                   SetNoise(SimplexNoise& noise)                   { _noise = noise; }
      inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
 
      inline  FLOAT                  GetSeaLevel() const                             { return _seaLevel; }
@@ -75,7 +74,7 @@ protected:
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
 private:
-    FastNoise                       _noise;
+    SimplexNoise                    _noise;
 
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };

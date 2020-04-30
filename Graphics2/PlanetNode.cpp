@@ -22,6 +22,7 @@ bool PlanetNode::Generate()
 	GenerateFace(terrainData.get(), Vector3::LeftVector,		Vector3::ForwardVector);	// Left
 
 	terrainData->SetMode(_draw);
+	terrainData->RecalculateNormals();
 	terrainData->Apply();
 
 	SetMesh(terrainData);
@@ -84,8 +85,13 @@ void PlanetNode::GenerateFace(Mesh* const target, Vector3 normal, Vector3 right)
 
 	for (size_t i = 0; i < generatedVertices.size(); ++i)
 	{
+		const Vector3& vertex = generatedVertices[i];
+
+		// Generate noise value set
+		float noiseValue = _noise.noise(vertex.X * _noiseScale, vertex.Y * _noiseScale, vertex.Z * _noiseScale);
+
 		generatedVertices[i].Normalize();
-		generatedVertices[i] *= _radius;
+		generatedVertices[i] *= _radius + (noiseValue * _peakHeight);
 
 		// Save onto actual mesh
 		target->AddVertex(Vertex{

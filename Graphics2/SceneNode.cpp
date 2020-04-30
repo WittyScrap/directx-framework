@@ -67,4 +67,9 @@ void SceneNode::ResetMouse()
 			return;
 		}
 	}
+	else
+	{
+		_mouseHorizontalAxis = 0;
+		_mouseVerticalAxis = 0;
+	}
 }

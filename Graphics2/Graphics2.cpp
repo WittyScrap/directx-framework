@@ -23,15 +23,8 @@ void Graphics2::CreateSceneGraph()
 	planet->SetDrawMode(MeshMode::TriangleList);
 	planet->SetMode(TerrainMode::Procedural);
 
-	FastNoise terrainNoise;
-
-	terrainNoise.SetNoiseType(FastNoise::PerlinFractal);
-	terrainNoise.SetFractalGain((FN_DECIMAL)0.45);
-	terrainNoise.SetFractalOctaves(10);
-
-	planet->SetNoise(terrainNoise);
-	planet->SetNoiseScale(0.25f);
-	planet->SetPeakHeight(300.f);
+	planet->SetNoiseScale(2.f);
+	planet->SetPeakHeight(1.f);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMain();

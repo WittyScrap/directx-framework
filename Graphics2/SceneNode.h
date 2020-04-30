@@ -47,9 +47,9 @@ public:
 
 #define TRANSFORM _combinedWorldTransformation
 
-	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, -TRANSFORM._23, TRANSFORM._33).Normalized(); }
-	const Vector3 GetUpVector()				const { return Vector3(-TRANSFORM._12, -TRANSFORM._22, TRANSFORM._32).Normalized(); }
-	const Vector3 GetRightVector()			const { return Vector3::Cross(GetForwardVector(), GetUpVector()); }
+	const Vector3 GetForwardVector()		const { return Vector3(-TRANSFORM._13, -TRANSFORM._23,  TRANSFORM._33).Normalized(); }
+	const Vector3 GetUpVector()				const { return Vector3( TRANSFORM._12,  TRANSFORM._22, -TRANSFORM._32).Normalized(); }
+	const Vector3 GetRightVector()			const { return Vector3::Cross(GetUpVector(), GetForwardVector()); }
 
 #undef TRANSFORM
 
@@ -64,6 +64,7 @@ public:
 	const float GetMouseVertical();
 
 	void SetMouseLocked(const BOOL& value)		{ _mouseLocked = value; }
+	void SetMouseVisible(const BOOL& value)		{ if (value != _mouseVisible) { ShowCursor(value); _mouseVisible = value; } }
 
 private:
 	void ResetMouse();
@@ -77,6 +78,8 @@ protected:
 	Vector3				_scale{ 1, 1, 1 };
 
 	BOOL				_mouseLocked{ false };
+	BOOL				_mouseVisible{ true };
+
 	FLOAT				_mouseHorizontalAxis{ 0 };
 	FLOAT				_mouseVerticalAxis{ 0 };
 

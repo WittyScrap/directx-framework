@@ -29,6 +29,7 @@ void SceneNode::ResetMouse()
 	{
 		if (GetKey(VK_ESCAPE))
 		{
+			SetMouseVisible(true);
 			_mouseLocked = false;
 			return;
 		}
@@ -38,6 +39,7 @@ void SceneNode::ResetMouse()
 
 		if (!GetCursorPos(&mouseLocation) || !GetWindowRect(FRAMEWORK->GetHWnd(), &windowRect))
 		{
+			SetMouseVisible(true);
 			_mouseLocked = false;
 			return;
 		}
@@ -63,6 +65,7 @@ void SceneNode::ResetMouse()
 
 		if (!SetCursorPos((windowRect.right + windowRect.left) / 2, (windowRect.top + windowRect.bottom) / 2))
 		{
+			SetMouseVisible(true);
 			_mouseLocked = false;
 			return;
 		}

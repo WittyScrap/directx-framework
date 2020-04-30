@@ -25,6 +25,7 @@ private:
 inline bool PawnNode::Initialise()
 {
     SetMouseLocked(true);
+    SetMouseVisible(false);
 
     return CameraNode::Initialise();
 }
@@ -34,22 +35,31 @@ void PawnNode::Update(FXMMATRIX& m)
     Vector3 location = GetPosition();
     Vector3 rotation = GetRotation();
 
+    float pitch = rotation.GetX();
     float yaw = rotation.GetY();
+    float roll = rotation.GetZ();
+
+    pitch += GetMouseVertical() * _rotationSpeed;
     yaw += GetMouseHorizontal() * _rotationSpeed;
+    roll += static_cast<float>(GetKey('E') - GetKey('Q')) * _rotationSpeed;
+
+    rotation.SetX(pitch);
     rotation.SetY(yaw);
+    rotation.SetZ(roll);
 
     SetRotation(rotation);
 
     location += GetForwardVector() * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S'));
     location += GetRightVector() * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A'));
-    location += GetUpVector() * _movementSpeed * static_cast<float>(GetKey('E') - GetKey('Q'));
+    location += GetUpVector() * _movementSpeed * static_cast<float>(GetKey('R') - GetKey('F'));
 
     SetPosition(location);
 
     CameraNode::Update(m);
 
-    if (!_mouseLocked && GetKeyDown(VK_RETURN))
+    if (!_mouseLocked && GetKeyDown(VK_LBUTTON))
     {
         SetMouseLocked(true);
+        SetMouseVisible(false);
     }
 }

@@ -43,6 +43,7 @@ public:
 
 	virtual void SetRotation(const XMVECTOR& quat)	  { _rotation = quat; }
 	virtual void SetRotation(const XMMATRIX& rot)	  { _rotation = XMQuaternionRotationMatrix(rot); }
+
 	virtual void SetRotation(const Vector3& forward, const Vector3& up);
 	virtual void RotateAround(const Vector3& axis, const float& angle);
 
@@ -54,9 +55,9 @@ public:
 	const Vector3 GetUpVector() const;
 	const Vector3 GetRightVector()			const { return Vector3::Cross(GetUpVector(), GetForwardVector()); }
 
-	const XMMATRIX GetTranslationMatrix() { return _position; }
-	const XMMATRIX GetRotationMatrix()	  { return XMMatrixRotationQuaternion(_rotation); }
-	const XMMATRIX GetScaleMatrix()		  { return _scale; }
+	const XMMATRIX GetTranslationMatrix() const { return _position; }
+	const XMMATRIX GetRotationMatrix() const	{ return XMMatrixRotationQuaternion(_rotation); }
+	const XMMATRIX GetScaleMatrix() const		{ return _scale; }
 
 	const int GetKey(const int& keyCode);
 	const int GetKeyDown(const int& keyCode);

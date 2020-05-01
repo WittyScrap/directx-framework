@@ -34,9 +34,9 @@ void PawnNode::Update(FXMMATRIX& m)
 {
     Vector3 location = GetPosition();
 
-    RotateAround(Vector3::RightVector,      GetMouseVertical() * _rotationSpeed);
-    RotateAround(Vector3::UpVector,         GetMouseHorizontal() * _rotationSpeed);
-    RotateAround(Vector3::ForwardVector,    static_cast<float>(GetKey('E') - GetKey('Q'))* _rotationSpeed);
+    RotateAround(GetForwardVector(),    static_cast<float>(GetKey('E') - GetKey('Q'))* _rotationSpeed);
+    RotateAround(GetUpVector(),         GetMouseHorizontal() * _rotationSpeed);
+    RotateAround(GetRightVector(),      GetMouseVertical() * _rotationSpeed);
 
     location += GetForwardVector()  * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S'));
     location += GetRightVector()    * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A'));

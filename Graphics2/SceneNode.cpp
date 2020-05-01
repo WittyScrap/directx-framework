@@ -25,41 +25,23 @@ void SceneNode::RotateAround(const Vector3& axis, const float& angle)
 
 const Vector3 SceneNode::GetForwardVector() const
 {
-	XMFLOAT4 qw;
-	XMStoreFloat4(&qw, _rotation);
-
-	XMVECTOR u = XMVectorSet(qw.x, qw.y, qw.z, 0);
 	XMVECTOR v = XMVectorSet(XYZ(Vector3::ForwardVector), 0);
-
-	FLOAT s = qw.w;
-
 	XMFLOAT3 out;
 
-	XMVECTOR fwd = 2.f * Vector3::Dot(u, v)		* u
-				 + (s * s - Vector3::Dot(u, v)) * v
-				 + 2.f * s * Vector3::Cross(u, v);
+	XMVECTOR o = XMVector3TransformNormal(v, GetRotationMatrix());
 
-	XMStoreFloat3(&out, fwd);
+	XMStoreFloat3(&out, o);
 	return Vector3(out.x, out.y, out.z);
 }
 
 const Vector3 SceneNode::GetUpVector() const
 {
-	XMFLOAT4 qw;
-	XMStoreFloat4(&qw, _rotation);
-
-	XMVECTOR u = XMVectorSet(qw.x, qw.y, qw.z, 0);
 	XMVECTOR v = XMVectorSet(XYZ(Vector3::UpVector), 0);
-
-	FLOAT s = qw.w;
-
 	XMFLOAT3 out;
 
-	XMVECTOR fwd = 2.f * Vector3::Dot(u, v)		* u
-				 + (s * s - Vector3::Dot(u, v)) * v
-				 + 2.f * s * Vector3::Cross(u, v);
+	XMVECTOR o = XMVector3TransformNormal(v, GetRotationMatrix());
 
-	XMStoreFloat3(&out, fwd);
+	XMStoreFloat3(&out, o);
 	return Vector3(out.x, out.y, out.z);
 }
 

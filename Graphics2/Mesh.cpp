@@ -179,9 +179,9 @@ void Mesh::RecalculateNormals()
 
 	for (int i0 = 0, i1 = 1, i2 = 2; i2 < _indices.size(); i0 += 3, i1 += 3, i2 += 3)
 	{
-		if (_indices[i0] > _vertices.size() ||
-			_indices[i1] > _vertices.size() ||
-			_indices[i2] > _vertices.size())
+		if (_indices[i0] >= _vertices.size() ||
+			_indices[i1] >= _vertices.size() ||
+			_indices[i2] >= _vertices.size())
 		{
 			MessageBoxEx(0, L"Invalid Mesh Data: A mesh index has exceeded the boundaries of the vertex array.", L"Invalid Mesh", MB_OK, 0);
 			exit(~0);

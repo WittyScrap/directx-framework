@@ -12,14 +12,8 @@ bool PlanetNode::Generate()
 {
 	shared_ptr<Mesh> terrainData = make_shared<Mesh>();
 
-	// Generate 6 faces
-
-	GenerateFace(terrainData.get(), Vector3::UpVector,			Vector3::RightVector);		// Up
-	GenerateFace(terrainData.get(), Vector3::ForwardVector,		Vector3::RightVector);		// Forward
-	GenerateFace(terrainData.get(), Vector3::DownVector,		Vector3::RightVector);		// Down
-	GenerateFace(terrainData.get(), Vector3::BackwardVector,	Vector3::RightVector);		// Back
-	GenerateFace(terrainData.get(), Vector3::RightVector,		Vector3::BackwardVector);	// Right
-	GenerateFace(terrainData.get(), Vector3::LeftVector,		Vector3::ForwardVector);	// Left
+	GenerateVertices(terrainData.get());
+	GenerateIndices(terrainData.get());
 
 	terrainData->SetMode(_draw);
 	terrainData->RecalculateNormals();
@@ -30,81 +24,200 @@ bool PlanetNode::Generate()
 	return true;
 }
 
-void PlanetNode::GenerateFace(Mesh* const target, Vector3 normal, Vector3 right) const
+void PlanetNode::GenerateVertices(Mesh* target)
 {
-	/* Phase 1: Generate subdivided cube face mesh */
+	const int cornerVertices = 8;
+	const int edgeVertices = (_resolution * 3 - 3) * 4;
+	const int faceVertices = (
+		(_resolution - 1) * (_resolution - 1) +
+		(_resolution - 1) * (_resolution - 1) +
+		(_resolution - 1) * (_resolution - 1)) * 2;
 
-	const Vector3&& forward = Vector3::Cross(right, normal);
-	const UINT&& startIndex = (UINT)target->GetVertices().size();
+	vector<Vector3> vertices((size_t)cornerVertices + (size_t)edgeVertices + (size_t)faceVertices);
 
-	vector<Vector3> generatedVertices;
-	vector<UINT>	generatedIndices;
+	size_t v = 0;
 
-	for (UINT it_y = 0; it_y < _resolution; it_y++)
+	for (int y = 0; y <= (int)_resolution; ++y)
 	{
-		for (UINT it_x = 0; it_x < _resolution; it_x++)
+		for (int x = 0; x <= (int)_resolution; ++x)
 		{
-			FLOAT x = GetNormalizedValue(it_x, _resolution);
-			FLOAT y = GetNormalizedValue(it_y, _resolution);
+			vertices[v++] = Vector3((float)x, 0, 0);
+		}
 
-			generatedVertices.push_back(right * x + normal + forward * y);
+		for (int z = 1; z <= (int)_resolution; ++z)
+		{
+			vertices[v++] = Vector3((float)_resolution, 0, (float)z);
+		}
+
+		for (int x = (int)_resolution - 1; x >= 0; --x)
+		{
+			vertices[v++] = Vector3((float)x, 0, (float)_resolution);
+		}
+
+		for (int z = (int)_resolution - 1; z > 0; --z)
+		{
+			vertices[v++] = Vector3(0, 0, (float)z);
 		}
 	}
 
-	// Generate indices
-
-	for (size_t it = 0; it < generatedVertices.size() - _resolution; ++it) // Remove the last row
+	for (int z = 1; z < (int)_resolution; ++z)
 	{
-		const size_t it_x = it % _resolution;
-		const size_t it_y = it / _resolution;
-
-		const size_t lt_x = it_x + 1;
-		const size_t bt_y = it_y + 1;
-
-		if (lt_x < _resolution)
+		for (int x = 1; x < (int)_resolution; ++x)
 		{
-			const size_t it_left = lt_x + _resolution * it_y;		// Index for vertex to the LEFT of this one
-			const size_t it_bottomLeft = lt_x + _resolution * bt_y; // Index for vertex to the BOTTOM-LEFT of this one
-			const size_t it_bottom = it_x + _resolution * bt_y;		// Index for vertex to the BOTTOM of this one
-
-			/* First triangle */
-
-			generatedIndices.push_back((UINT)it_bottomLeft);
-			generatedIndices.push_back((UINT)it_left);
-			generatedIndices.push_back((UINT)it);
-
-			/* Second triangle */
-
-			generatedIndices.push_back((UINT)it);
-			generatedIndices.push_back((UINT)it_bottom);
-			generatedIndices.push_back((UINT)it_bottomLeft);
+			vertices[v++] = Vector3((float)x, (float)_resolution, (float)z);
 		}
 	}
 
-	/* Phase 2: Inflate vertices to create planetoid shape */
-
-	for (size_t i = 0; i < generatedVertices.size(); ++i)
+	for (int z = 1; z < (int)_resolution; ++z)
 	{
-		const Vector3& vertex = generatedVertices[i];
+		for (int x = 1; x < (int)_resolution; ++x)
+		{
+			vertices[v++] = Vector3((float)x, 0, (float)z);
+		}
+	}
 
-		// Generate noise value set
-		float noiseValue = _noise.noise(vertex.X * _noiseScale, vertex.Y * _noiseScale, vertex.Z * _noiseScale);
-
-		generatedVertices[i].Normalize();
-		generatedVertices[i] *= _radius + (noiseValue * _peakHeight);
-
-		// Save onto actual mesh
+	MakeSphere(vertices);
+	
+	for (size_t i = 0; i < vertices.size(); ++i)
+	{
 		target->AddVertex(Vertex{
-			generatedVertices[i].ToDX3(),
-			generatedVertices[i].Normalized().ToDX3(),
+			vertices[i].ToDX3(),
+			{ 0, 1, 0 },
 			{ 0, 0 }
 		});
 	}
+}
 
-	for (size_t i = 0; i < generatedIndices.size(); ++i)
+void PlanetNode::GenerateIndices(Mesh* target)
+{
+	int quads = ((_resolution * _resolution) * 3) * 2;
+
+	vector<int> indices((size_t)quads * 6);
+
+	int ring = _resolution * 4;
+	int t = 0, v = 0;
+
+	for (int y = 0; y < (int)_resolution; ++y, ++v)
 	{
-		target->AddIndex(generatedIndices[i] + startIndex);
+		for (int q = 0; q < ring - 1; q++, v++)
+		{
+			t = CreateQuad(indices, t, v, v + 1, v + ring, v + ring + 1);
+		}
+
+		t = CreateQuad(indices, t, v, v - ring + 1, v + ring, v + 1);
 	}
+
+	t = GenerateTopFace(indices, t, ring);
+	t = GenerateBottomFace(indices, t, ring);
+
+	for (size_t i = 0; i < indices.size(); ++i)
+	{
+		target->AddIndex(indices[i]);
+	}
+}
+
+int PlanetNode::GenerateTopFace(vector<int>& indices, int t, int ring)
+{
+	int v = ring * _resolution;
+
+	for (int x = 0; x < (int)_resolution - 1; ++x, ++v)
+	{
+		t = CreateQuad(indices, t, v, v + 1, v + ring - 1, v + ring);
+	}
+
+	t = CreateQuad(indices, t, v, v + 1, v + ring - 1, v + 2);
+
+	int vMin = ring * (_resolution + 1) - 1;
+	int vMid = vMin + 1;
+	int vMax = v + 2;
+
+	for (int z = 1; z < (int)_resolution - 1; ++z, --vMin, ++vMid, ++vMax)
+	{
+		t = CreateQuad(indices, t, vMin, vMid, vMin - 1, vMid + _resolution - 1);
+
+		for (int x = 1; x < (int)_resolution - 1; ++x, ++vMid)
+		{
+			t = CreateQuad(indices, t, vMid, vMid + 1, vMid + _resolution - 1, vMid + _resolution);
+		}
+
+		t = CreateQuad(indices, t, vMid, vMax, vMid + _resolution - 1, vMax + 1);
+	}
+
+	int vTop = vMin - 2;
+	t = CreateQuad(indices, t, vMin, vMid, vTop + 1, vTop);
+
+	for (int x = 1; x < (int)_resolution - 1; ++x, --vTop, ++vMid)
+	{
+		t = CreateQuad(indices, t, vMid, vMid + 1, vTop, vTop - 1);
+	}
+
+	t = CreateQuad(indices, t, vMid, vTop - 2, vTop, vTop - 1);
+
+	return t;
+}
+
+int PlanetNode::GenerateBottomFace(vector<int>& indices, int t, int ring)
+{
+	int v = 1;
+
+	int vMid = (int)(indices.size() - (size_t)(_resolution - 1) * (size_t)(_resolution - 1));
+
+	t = CreateQuad(indices, t, ring - 1, vMid, 0, 1);
+
+	for (int x = 0; x < (int)_resolution - 1; ++x, ++v, vMid)
+	{
+		t = CreateQuad(indices, t, vMid, vMid + 1, v, v + 1);
+	}
+
+	t = CreateQuad(indices, t, vMid, v + 2, v, v + 1);
+
+	int vMin = ring - 2;
+	vMid -= _resolution - 2;
+	int vMax = v + 2;
+
+	for (int z = 1; z < (int)_resolution - 1; ++z, --vMin, ++vMid, ++vMax)
+	{
+		t = CreateQuad(indices, t, vMin, vMid + _resolution - 1, vMin + 1, vMid);
+
+		for (int x = 1; x < (int)_resolution - 1; ++x, ++vMid)
+		{
+			t = CreateQuad(indices, t, vMid + _resolution - 1, vMid + _resolution, vMid, vMid + 1);
+		}
+
+		t = CreateQuad(indices, t, vMid + _resolution - 1, vMax + 1, vMid, vMax);
+	}
+
+	int vTop = vMin - 1;
+
+	t = CreateQuad(indices, t, vTop + 1, vTop, vTop + 2, vMid);
+
+	for (int x = 1; x < (int)_resolution - 1; ++x, --vTop, ++vMid)
+	{
+		t = CreateQuad(indices, t, vTop, vTop - 1, vMid, vMid + 1);
+	}
+
+	t = CreateQuad(indices, t, vTop, vTop - 1, vMid, vTop - 2);
+
+	return t;
+}
+
+void PlanetNode::MakeSphere(vector<Vector3>& vertices)
+{
+	for (size_t i = 0; i < vertices.size(); ++i)
+	{
+		vertices[i].Normalize();
+		vertices[i] *= _radius;
+	}
+}
+
+int PlanetNode::CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11)
+{
+	indices[i] = v00;
+	indices[(size_t)i + 1] = indices[(size_t)i + 4] = v01;
+	indices[(size_t)i + 2] = indices[(size_t)i + 3] = v10;
+	indices[(size_t)i + 5] = v11;
+
+	return i + 6;
 }
 
 constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& range) const

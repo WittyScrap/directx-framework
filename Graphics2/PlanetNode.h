@@ -69,7 +69,16 @@ public:
 
 protected:
              FLOAT                  GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const;
-             void                   GenerateFace(Mesh* const target, Vector3 normal, Vector3 right) const;
+
+             void                   GenerateVertices(Mesh* target);
+             void                   GenerateIndices(Mesh* target);
+
+             int                    GenerateTopFace(vector<int>& indices, int t, int ring);
+             int                    GenerateBottomFace(vector<int>& indices, int t, int ring);
+
+             void                   MakeSphere(vector<Vector3>& vertices);
+
+     static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
 
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
@@ -83,7 +92,7 @@ private:
 
     FLOAT                           _constantValue{ 0 };
     FLOAT                           _peakHeight{ 256 };
-    UINT                            _resolution{ 512 };
+    UINT                            _resolution{ 2 };
 
     FLOAT                           _noiseOffsetX{ 0 };
     FLOAT                           _noiseOffsetY{ 0 };

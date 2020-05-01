@@ -16,6 +16,8 @@ public:
     /* Constructors */
     Vector3();
     Vector3(const Vector3& copy);
+    Vector3(const XMVECTOR& copy);
+    Vector3(const XMFLOAT3& copy);
     Vector3(const float& x, const float& y, const float& z);
 
     virtual ~Vector3();
@@ -59,6 +61,9 @@ public:
     const Vector3& operator-=(const float& rhs);
     const Vector3& operator*=(const float& rhs);
     const Vector3& operator/=(const float& rhs);
+
+    operator XMFLOAT3() { return XMFLOAT3(_x, _y, _z); }
+    operator XMVECTOR() { return XMVectorSet(_x, _y, _z, 0); }
 
     XMFLOAT4 ToDX() const;
     XMFLOAT3 ToDX3() const;

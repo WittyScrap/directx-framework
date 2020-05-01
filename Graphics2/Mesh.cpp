@@ -1,6 +1,12 @@
 #include "Mesh.h"
 #include "Shader.h"
 
+struct NormalCalculator
+{
+	Vector3 normal;
+	int contributions;
+};
+
 void Mesh::AddVertex(Vertex v)
 {
 	_vertices.push_back(v);
@@ -164,7 +170,58 @@ const shared_ptr<Material>& Mesh::GetReferenceMaterial() const
 
 void Mesh::RecalculateNormals()
 {
-	// TODO: Implement this.
+	vector<NormalCalculator> normals;
+
+	for (size_t i = 0; i < _vertices.size(); ++i)
+	{
+		normals.push_back({ {}, 0 });
+	}
+
+	for (int i0 = 0, i1 = 1, i2 = 2; i2 < _indices.size(); i0 += 3, i1 += 3, i2 += 3)
+	{
+		if (_indices[i0] > _vertices.size() ||
+			_indices[i1] > _vertices.size() ||
+			_indices[i2] > _vertices.size())
+		{
+			MessageBoxEx(0, L"Invalid Mesh Data: A mesh index has exceeded the boundaries of the vertex array.", L"Invalid Mesh", MB_OK, 0);
+			exit(~0);
+		}
+
+		Vertex& a = _vertices[_indices[i0]];
+		Vertex& b = _vertices[_indices[i1]];
+		Vertex& c = _vertices[_indices[i2]];
+
+		Vector3 aTob(Vector3(b.Position) - a.Position);
+		Vector3 aToc(Vector3(c.Position) - a.Position);
+
+		aTob.Normalize();
+		aToc.Normalize();
+
+		Vector3 normal = Vector3::Cross(aTob, aToc).Normalized();
+
+		NormalCalculator& n0 = normals[_indices[i0]];
+		NormalCalculator& n1 = normals[_indices[i1]];
+		NormalCalculator& n2 = normals[_indices[i2]];
+
+		n0.normal += normal;
+		n0.contributions++;
+
+		n1.normal += normal;
+		n1.contributions++;
+
+		n2.normal += normal;
+		n2.contributions++;
+	}
+
+	for (size_t i = 0; i < normals.size(); ++i)
+	{
+		normals[i].normal /= static_cast<float>(normals[i].contributions);
+	}
+
+	for (size_t i = 0; i < _vertices.size(); ++i)
+	{
+		_vertices[i].Normal = normals[i].normal.ToDX3();
+	}
 }
 
 ComPtr<ID3D11Device> Mesh::GetDevice()

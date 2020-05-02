@@ -21,6 +21,7 @@ public:
 
     virtual bool                                Initialise()                                                                override { return true; }
     virtual void                                Update(FXMMATRIX& currentWorldTransformation)                               override;
+    virtual void                                OnPreRender()                                                               {}
     virtual void                                Render()                                                                    override;
     virtual void                                Shutdown()                                                                  override;
 

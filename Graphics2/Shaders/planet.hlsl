@@ -71,7 +71,7 @@ float4 PS(VertexOut input) : SV_Target
 	float4 color = saturate((ambientLight + diffuse/* + specular*/) * Texture.Sample(ss, input.TexCoord));
 	color.a = saturate(opacity);
 
-	return color;
+	return color * planetRadius;
 }
 
 

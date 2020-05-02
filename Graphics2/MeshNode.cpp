@@ -17,6 +17,8 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
+    OnPreRender();
+
     InternalRender(_mesh, _material);
 
     for (size_t it = 0; it < _mesh->GetSubmeshCount(); ++it)

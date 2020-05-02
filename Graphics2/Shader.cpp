@@ -45,7 +45,6 @@ void Shader::Compile()
 	else
 	{
 		BuildVertexLayout();
-		BuildConstantBuffer();
 	}
 
 	b_isCompiled = true;
@@ -72,11 +71,6 @@ ComPtr <ID3D11PixelShader> Shader::GetFragmentShader() const
 ComPtr <ID3D11InputLayout> Shader::GetInputLayout() const
 {
 	return _layout;
-}
-
-ComPtr<ID3D11Buffer> Shader::GetConstantBuffer() const
-{
-	return _constantBuffer;
 }
 
 const Shader& Shader::operator=(const Shader& rhs)
@@ -168,15 +162,4 @@ void Shader::BuildVertexLayout()
 	};
 
 	ThrowIfFailed(device->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), _vertBytes->GetBufferPointer(), _vertBytes->GetBufferSize(), _layout.GetAddressOf()));
-}
-
-void Shader::BuildConstantBuffer()
-{
-	D3D11_BUFFER_DESC bufferDesc;
-	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(ConstantBuffer);
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-	ThrowIfFailed(DirectXFramework::GetDXFramework()->GetDevice()->CreateBuffer(&bufferDesc, NULL, _constantBuffer.GetAddressOf()));
 }

@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="AmbientLight.h" />
     <ClInclude Include="CameraNode.h" />
+    <ClInclude Include="ConstantBufferObject.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CubeNode.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -219,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\config.h.in" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

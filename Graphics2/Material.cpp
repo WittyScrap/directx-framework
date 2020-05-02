@@ -1,6 +1,9 @@
 #include "Material.h"
 #include "WICTextureLoader.h"
 #include "DirectXFramework.h"
+#include "DirectionalLight.h"
+#include "AmbientLight.h"
+#include "CameraNode.h"
 
 Material* Material::_activeMaterial{ nullptr };
 
@@ -69,15 +72,34 @@ bool Material::Activate()
 	return true;
 }
 
-void Material::Update(ConstantBuffer* cbuf)
+void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 {
 	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
-	// Update the constant buffer 
-	deviceContext->VSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
-	deviceContext->PSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+	// Get lights
+	shared_ptr<DirectionalLight> directional = FRAMEWORK->GetLight<DirectionalLight>();
+	shared_ptr<AmbientLight> ambient = FRAMEWORK->GetLight<AmbientLight>();
 
-	deviceContext->UpdateSubresource(_shader->GetConstantBuffer().Get(), 0, 0, cbuf, 0, 0);
+	// Camera information
+	DirectXFramework* framework = DirectXFramework::GetDXFramework();
+	const CameraNode* mainCamera = CameraNode::GetMain();
+
+	ConstantBuffer* baseData = GetConstantBuffer()->GetDataPointer();
+
+	baseData->CompleteTransformation	= meshData.completeTransformation;
+	baseData->WorldTransformation		= meshData.worldTransformation;
+	baseData->CameraPosition			= mainCamera->GetPosition().ToDX();
+	baseData->LightVector				= XMVector4Normalize(directional->GetDirection());
+	baseData->LightColor				= directional->GetColor();
+	baseData->AmbientColor				= ambient->GetColor();
+	baseData->DiffuseCoefficient		= GetAlbedo();
+	baseData->SpecularCoefficient		= GetSpecularColor();
+	baseData->Shininess					= GetShininess();
+
+	// Update the constant buffer 
+	deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
+	deviceContext->PSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+	deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer().Get(), 0, 0, baseData, 0, 0);
 
 	// Set the texture to be used by the pixel shader
 	for (const auto& texture : _textures)
@@ -94,4 +116,15 @@ shared_ptr<Texture>& Material::GetTexture(const int& id)
 	}
 
 	return _textures[id];
+}
+
+shared_ptr<CBO>& Material::GetConstantBuffer()
+{
+	if (_constantBuffer == nullptr)
+	{
+		_constantBuffer = make_shared<CBO>();
+		_constantBuffer->CreateBufferData<ConstantBuffer>();
+	}
+
+	return _constantBuffer;
 }

@@ -14,27 +14,6 @@ struct Vertex
 };
 
 /**
- * Simple structure to hold constant buffer
- * data to be transported to the shader program.
- *
- */
-
-struct ConstantBuffer
-{
-    XMMATRIX    CompleteTransformation;
-    XMMATRIX	WorldTransformation;
-    XMFLOAT4	CameraPosition;
-    XMVECTOR    LightVector;
-    XMFLOAT4    LightColor;
-    XMFLOAT4    AmbientColor;
-    XMFLOAT4    DiffuseCoefficient;
-    XMFLOAT4	SpecularCoefficient;
-    float		Shininess;
-    float		Opacity;
-    float       Padding[2];
-};
-
-/**
  * Represents a shader object that can hold a shader's
  * source code, compile it, and apply it to a material
  * for rendering.
@@ -59,7 +38,6 @@ public:
     ComPtr<ID3D11VertexShader> GetVertexShader() const;
     ComPtr<ID3D11PixelShader>  GetFragmentShader() const;
     ComPtr<ID3D11InputLayout>  GetInputLayout() const;
-    ComPtr<ID3D11Buffer>       GetConstantBuffer() const;
 
     const Shader& operator=(const Shader& rhs);
     static shared_ptr<Shader> Load(const wstring& file);
@@ -69,7 +47,6 @@ protected:
     bool CompileFragment(DWORD flags);
 
     void BuildVertexLayout();
-    void BuildConstantBuffer();
 
 private:
     bool b_isCompiled;
@@ -81,5 +58,4 @@ private:
 	ComPtr<ID3D11VertexShader>          _vert;
 	ComPtr<ID3D11PixelShader>           _frag;
 	ComPtr<ID3D11InputLayout>           _layout;
-	ComPtr<ID3D11Buffer>                _constantBuffer;
 };

@@ -1,7 +1,16 @@
 #pragma once
 #include "Shader.h"
 #include "Texture.h"
+#include "ConstantBufferObject.h"
 #include <map>
+
+#define IDLIST(t) map<int, t>
+
+struct MeshObjectData
+{
+    XMMATRIX completeTransformation;
+    XMMATRIX worldTransformation;
+};
 
 /**
  * The Material class will hold and manage a reference to a Shader,
@@ -27,10 +36,12 @@ public:
 
 
             bool                            Activate();
-            void                            Update(ConstantBuffer* cbuf);
+            void                            UpdateConstantBuffers(const MeshObjectData& cbuf);
 
             void                            SetTexture(const int& id, const shared_ptr<Texture>& textureName);
             shared_ptr<Texture>&            GetTexture(const int& id);
+
+            shared_ptr<CBO>&                GetConstantBuffer();
 
             void                            SetAlbedo(const XMFLOAT4& albedo)           { _albedo = albedo; }
             const XMFLOAT4&                 GetAlbedo() const                           { return _albedo;}
@@ -51,7 +62,8 @@ private:
     wstring                             _name{ L"Material" };
 	shared_ptr<Shader>                  _shader = nullptr;
 
-	map<int, shared_ptr<Texture>>       _textures;
+	IDLIST(shared_ptr<Texture>)         _textures;
+    shared_ptr<CBO>                     _constantBuffer;
 
     XMFLOAT4                            _albedo;
     XMFLOAT4                            _specular;
@@ -61,3 +73,4 @@ private:
     static Material*                    _activeMaterial;
 };
 
+#undef IDLIST

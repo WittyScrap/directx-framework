@@ -114,6 +114,9 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBufferObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -189,5 +192,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\config.h.in" />
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

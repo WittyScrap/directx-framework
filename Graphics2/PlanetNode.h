@@ -51,6 +51,7 @@ public:
      inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
      inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
 
+     inline  void                   SetNoiseOctaves(const size_t& value)            { _octaves = value; }
      inline  void                   SetNoise(SimplexNoise& noise)                   { _noise = noise; }
      inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
 
@@ -99,6 +100,7 @@ private:
     FLOAT                           _noiseOffsetZ{ 0 };
 
     FLOAT                           _noiseScale{ 1 };
+    SIZE_T                          _octaves{ 1 };
     FLOAT                           _seaLevel{ 0 };
 };
 

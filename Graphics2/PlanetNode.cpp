@@ -192,7 +192,7 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices)
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
 		vertices[i].Normalize();
-		vertices[i] *= _radius;
+		vertices[i] *= _radius + (GetNoiseValue(XYZ(vertices[i])));
 	}
 }
 
@@ -223,7 +223,10 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 
 FLOAT PlanetNode::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
 {
-	return _constantValue;
+	return _noise.fractal(_octaves,
+						  x * _noiseScale + _noiseOffsetX,
+						  y * _noiseScale + _noiseOffsetY,
+						  z * _noiseScale + _noiseOffsetY) * _peakHeight;
 }
 
 #undef gridSize

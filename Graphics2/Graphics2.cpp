@@ -23,8 +23,9 @@ void Graphics2::CreateSceneGraph()
 	planet->SetDrawMode(MeshMode::TriangleList);
 	planet->SetMode(TerrainMode::Procedural);
 
-	planet->SetNoiseScale(2.f);
-	planet->SetPeakHeight(1.f);
+	planet->SetNoiseOctaves(16);
+	planet->SetNoiseScale(.75f);
+	planet->SetPeakHeight(5.f);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMain();

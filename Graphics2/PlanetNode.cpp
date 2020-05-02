@@ -32,8 +32,8 @@ bool PlanetNode::Generate()
 	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
 
 	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
-	planetBuffer->PlanetRadius = 0;
-	planetBuffer->PlanetPeaks = _radius + _peakHeight;
+	planetBuffer->PlanetRadius = _radius;
+	planetBuffer->PlanetPeaks = _peakHeight;
 
 	SetMaterial(terrainMaterial);
 

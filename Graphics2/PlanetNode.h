@@ -92,7 +92,7 @@ private:
     FLOAT                           _radius{ 250 };
 
     FLOAT                           _constantValue{ 0 };
-    FLOAT                           _peakHeight{ 256 };
+    FLOAT                           _peakHeight{ 5.f };
     UINT                            _resolution{ 128 };
 
     FLOAT                           _noiseOffsetX{ 0 };

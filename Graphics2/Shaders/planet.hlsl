@@ -32,8 +32,9 @@ struct VertexIn
 struct VertexOut
 {
 	float4 Position  : SV_POSITION;
-	float4 PositionWS: TEXCOORD1;
-	float4 NormalWS : TEXCOORD2;
+	float4 PositionLS: TEXCOORD1;
+	float4 PositionWS: TEXCOORD2;
+	float4 NormalWS : TEXCOORD3;
 	float2 TexCoord	 : TEXCOORD;
 };
 
@@ -42,6 +43,7 @@ VertexOut VS(VertexIn vin)
 	VertexOut vout;
 	
 	vout.Position = mul(completeTransform, float4(vin.Position, 1.0f));
+	vout.PositionLS = float4(vin.Position, 1);
 	vout.PositionWS = mul(worldTransform, float4(vin.Position, 1.0f));
 	vout.NormalWS = float4(mul((float3x3)worldTransform, vin.Normal), 1.0f);
 	vout.TexCoord = vin.TexCoord;
@@ -71,7 +73,11 @@ float4 PS(VertexOut input) : SV_Target
 	float4 color = saturate((ambientLight + diffuse/* + specular*/) * Texture.Sample(ss, input.TexCoord));
 	color.a = saturate(opacity);
 
-	return color * planetRadius;
+	float len = length(input.PositionLS);
+	len -= planetRadius;
+	len /= planetPeaks;
+
+	return color * (1 - len);
 }
 
 

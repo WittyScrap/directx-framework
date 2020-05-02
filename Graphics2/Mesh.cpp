@@ -1,6 +1,12 @@
 #include "Mesh.h"
 #include "Shader.h"
 
+struct NormalCalculator
+{
+	Vector3 normal;
+	int contributions;
+};
+
 void Mesh::AddVertex(Vertex v)
 {
 	_vertices.push_back(v);
@@ -160,6 +166,80 @@ void Mesh::SetReferenceMaterial(const shared_ptr<Material>& material)
 const shared_ptr<Material>& Mesh::GetReferenceMaterial() const
 {
 	return _referencedMaterial;
+}
+
+void Mesh::RecalculateNormals()
+{
+	vector<NormalCalculator> normals;
+
+	for (size_t i = 0; i < _vertices.size(); ++i)
+	{
+		normals.push_back({ {}, 0 });
+	}
+
+	for (int i0 = 0, i1 = 1, i2 = 2; i2 < _indices.size(); i0 += 3, i1 += 3, i2 += 3)
+	{
+		int index0 = _indices[i0];
+		int index1 = _indices[i1];
+		int index2 = _indices[i2];
+
+		if (index0 >= _vertices.size() ||
+			index1 >= _vertices.size() ||
+			index2 >= _vertices.size())
+		{
+			int o = MessageBoxEx(0, L"Invalid Mesh Data: A mesh index has exceeded the boundaries of the vertex array.\n\nAbort: Close this application.\nRetry: Debug this application.\nIgnore: Continue without generating normals.", L"Invalid Mesh", MB_ABORTRETRYIGNORE | MB_ICONERROR, 0);
+			
+			switch (o)
+			{
+			case IDABORT:
+				exit(~0);
+				break;
+
+			case IDIGNORE:
+				return;
+
+			case IDRETRY:
+			default:
+				throw std::out_of_range("A mesh index has exceeded the boundaries of the vertex array.");
+				break;
+			}
+		}
+
+		Vertex& a = _vertices[index0];
+		Vertex& b = _vertices[index1];
+		Vertex& c = _vertices[index2];
+
+		Vector3 aTob(Vector3(b.Position) - a.Position);
+		Vector3 aToc(Vector3(c.Position) - a.Position);
+
+		aTob.Normalize();
+		aToc.Normalize();
+
+		Vector3 normal = Vector3::Cross(aTob, aToc).Normalized();
+
+		NormalCalculator& n0 = normals[index0];
+		NormalCalculator& n1 = normals[index1];
+		NormalCalculator& n2 = normals[index2];
+
+		n0.normal += normal;
+		n0.contributions++;
+
+		n1.normal += normal;
+		n1.contributions++;
+
+		n2.normal += normal;
+		n2.contributions++;
+	}
+
+	for (size_t i = 0; i < normals.size(); ++i)
+	{
+		normals[i].normal /= static_cast<float>(normals[i].contributions);
+	}
+
+	for (size_t i = 0; i < _vertices.size(); ++i)
+	{
+		_vertices[i].Normal = normals[i].normal.ToDX3();
+	}
 }
 
 ComPtr<ID3D11Device> Mesh::GetDevice()

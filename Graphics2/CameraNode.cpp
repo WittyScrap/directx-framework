@@ -27,12 +27,16 @@ void CameraNode::Update(FXMMATRIX& m)
 		XMLoadFloat4(&up)
 	);*/
 
-	XMStoreFloat4x4(&_viewTransformation, transform);
+	// XMStoreFloat4x4(&_viewTransformation, transform);
 }
 
 XMMATRIX CameraNode::GetViewTransformation() const
 {
-	return XMLoadFloat4x4(&_viewTransformation);
+	return XMMatrixLookToLH(
+		XMVectorSet(XYZ(GetPosition()), 0),
+		XMVectorSet(XYZ(GetForwardVector()), 0),
+		XMVectorSet(XYZ(GetUpVector()), 0)
+	);
 }
 
 XMMATRIX CameraNode::GetProjectionTransformation() const

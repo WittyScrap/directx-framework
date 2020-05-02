@@ -43,5 +43,5 @@ inline shared_ptr<TNode> SceneGraph::Create(wstring name)
 template<typename TNode>
 inline shared_ptr<TNode> SceneGraph::Create()
 {
-	return Create<TNode>(L"Scene Node");
+	return make_shared<TNode>();
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCore.h"
 
+
 // Shorthand
 #define X		GetX()
 #define Y		GetY()
@@ -15,6 +16,8 @@ public:
     /* Constructors */
     Vector3();
     Vector3(const Vector3& copy);
+    Vector3(const XMVECTOR& copy);
+    Vector3(const XMFLOAT3& copy);
     Vector3(const float& x, const float& y, const float& z);
 
     virtual ~Vector3();
@@ -34,7 +37,10 @@ public:
     const Vector3 Normalized() const;
 
     static const float Dot(const Vector3& lhs, const Vector3& rhs);
+    static const float Dot(const XMVECTOR& lhs, const XMVECTOR& rhs);
+
     static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
+    static const XMVECTOR Cross(const XMVECTOR& lhs, const XMVECTOR& rhs);
 
     const Vector3 operator+(const Vector3& rhs) const;
     const Vector3 operator-(const Vector3& rhs) const;
@@ -55,6 +61,9 @@ public:
     const Vector3& operator-=(const float& rhs);
     const Vector3& operator*=(const float& rhs);
     const Vector3& operator/=(const float& rhs);
+
+    operator XMFLOAT3() { return XMFLOAT3(_x, _y, _z); }
+    operator XMVECTOR() { return XMVectorSet(_x, _y, _z, 0); }
 
     XMFLOAT4 ToDX() const;
     XMFLOAT3 ToDX3() const;

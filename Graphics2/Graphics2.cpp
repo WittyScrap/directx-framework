@@ -3,8 +3,9 @@
 #include "PlaneNode.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
-#include "TerrainNode.h"
+#include "PlanetNode.h"
 #include "CameraNode.h"
+#include "PawnNode.h"
 
 Graphics2 app;
 
@@ -16,18 +17,21 @@ void Graphics2::CreateSceneGraph()
 	directionalLight->SetDirection({ -1, 1, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
-	shared_ptr<TerrainNode> terrain = SceneGraph::Create<TerrainNode>(L"Terrain");
-	shared_ptr<CameraNode> mainCam = SceneGraph::Create<CameraNode>(L"Main Camera");
+	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
+	shared_ptr<PawnNode> mainPawn = SceneGraph::Create<PawnNode>();
 
-	terrain->SetDrawMode(MeshMode::TriangleList);
-	terrain->LoadHeightMap(L"Example_HeightMap.raw");
-	terrain->SetMode(TerrainMode::TextureSample);
+	planet->SetDrawMode(MeshMode::TriangleList);
+	planet->SetMode(TerrainMode::Procedural);
 
-	mainCam->SetPosition({ 0, 256, 0 });
-	mainCam->SetMain();
+	planet->SetNoiseOctaves(16);
+	planet->SetNoiseScale(.75f);
+	planet->SetPeakHeight(10.f);
 
-	SCENE->Add(terrain);
-	SCENE->Add(mainCam);
+	mainPawn->SetPosition({ 0, 128, -1024 });
+	mainPawn->SetMain();
+
+	SCENE->Add(planet);
+	SCENE->Add(mainPawn);
 }
 
 void Graphics2::UpdateSceneGraph()

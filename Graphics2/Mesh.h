@@ -63,6 +63,8 @@ public:
 	inline  void								SetMode(const MeshMode& mode)												{ _mode = mode; }
 	inline  const MeshMode&						GetMode() const																{ return _mode; }
 
+			void								RecalculateNormals();
+
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();

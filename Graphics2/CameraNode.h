@@ -39,7 +39,7 @@ private:
 
     static CameraNode*                  _mainCamera;
 
-    FLOAT                               _fieldOfView{ 90.f };
+    FLOAT                               _fieldOfView{ 60.f };
 
     FLOAT                               _nearClipPlane{ .3f };
     FLOAT                               _farClipPlane{ 10000.f };

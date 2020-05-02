@@ -165,7 +165,6 @@
     <ClInclude Include="CubeNode.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="DirectXCore.h" />
-    <ClInclude Include="FastNoise.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="Graphics2.h" />
@@ -174,6 +173,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshNode.h" />
+    <ClInclude Include="PawnNode.h" />
     <ClInclude Include="PlaneNode.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -181,8 +181,10 @@
     <ClInclude Include="SceneGraph.h" />
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SimplexNoise.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TerrainNode.h" />
+    <ClInclude Include="PlanetNode.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="WICTextureLoader.h" />
   </ItemGroup>
@@ -196,7 +198,6 @@
   <ItemGroup>
     <ClCompile Include="CameraNode.cpp" />
     <ClCompile Include="CubeNode.cpp" />
-    <ClCompile Include="FastNoise.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Graphics2.cpp" />
@@ -209,7 +210,9 @@
     <ClCompile Include="SceneGraph.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="TerrainNode.cpp" />
+    <ClCompile Include="PlanetNode.cpp" />
+    <ClCompile Include="SimplexNoise.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
   </ItemGroup>

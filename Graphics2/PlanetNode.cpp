@@ -16,9 +16,14 @@ bool PlanetNode::Initialise()
 bool PlanetNode::Generate()
 {
 	shared_ptr<Mesh> terrainData = make_shared<Mesh>();
+	shared_ptr<Material> terrainMaterial = make_shared<Material>();
 
 	GenerateVertices(terrainData.get());
 	GenerateIndices(terrainData.get(), terrainData->GetVertices().size());
+
+	terrainMaterial->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
+	terrainMaterial->SetTexture(0, RESOURCES->GetDefaultTexture());
+	SetMaterial(terrainMaterial);
 
 	terrainData->SetMode(_draw);
 	terrainData->RecalculateNormals();

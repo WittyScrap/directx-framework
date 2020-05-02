@@ -37,11 +37,11 @@ bool RobotNode::Initialise()
 	Add(headRoot);
 
 	// Construct all shared resources...
-	shared_ptr<Shader>		shader = make_shared<Shader>(L"shader.hlsl"); shader->CompileOnce();
+	shared_ptr<Shader>		shader = RESOURCES->GetDefaultShader();
 	shared_ptr<Mesh>		cubeBox = make_shared<Mesh>(CubeNode::GetVertices(), CubeNode::GetIndices());
-	shared_ptr<Material>	bricks = make_shared<Material>(shader); bricks->SetTexture(L"Bricks.png");
-	shared_ptr<Material>	concrete = make_shared<Material>(shader); concrete->SetTexture(L"Concrete.png");
-	shared_ptr<Material>	wood = make_shared<Material>(shader); wood->SetTexture(L"Wood.png");
+	shared_ptr<Material>	bricks = make_shared<Material>(shader); bricks->SetTexture(0, make_shared<Texture>(L"Bricks.png"));
+	shared_ptr<Material>	concrete = make_shared<Material>(shader); concrete->SetTexture(0, make_shared<Texture>(L"Concrete.png"));
+	shared_ptr<Material>	wood = make_shared<Material>(shader); wood->SetTexture(0, make_shared<Texture>(L"Wood.png"));
 
 	cubeBox->Apply();
 

@@ -32,10 +32,14 @@ void CameraNode::Update(FXMMATRIX& m)
 
 XMMATRIX CameraNode::GetViewTransformation() const
 {
+	const auto& position = GetPosition();
+	const auto& forward = GetForwardVector();
+	const auto& up = GetUpVector();
+
 	return XMMatrixLookToLH(
-		XMVectorSet(XYZ(GetPosition()), 0),
-		XMVectorSet(XYZ(GetForwardVector()), 0),
-		XMVectorSet(XYZ(GetUpVector()), 0)
+		XMVectorSet(XYZ(position), 0),
+		XMVectorSet(XYZ(forward), 0),
+		XMVectorSet(XYZ(up), 0)
 	);
 }
 

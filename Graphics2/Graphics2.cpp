@@ -25,7 +25,7 @@ void Graphics2::CreateSceneGraph()
 
 	planet->SetNoiseOctaves(16);
 	planet->SetNoiseScale(.75f);
-	planet->SetPeakHeight(5.f);
+	planet->SetPeakHeight(10.f);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMain();

@@ -46,7 +46,7 @@ void PawnNode::Update(FXMMATRIX& m)
 
     CameraNode::Update(m);
 
-    if (!_mouseLocked && GetKeyDown(VK_LBUTTON))
+    if (!_mouseLocked && GetKeyDown(VK_LBUTTON) && GetForegroundWindow() == FRAMEWORK->GetHWnd())
     {
         SetMouseLocked(true);
         SetMouseVisible(false);

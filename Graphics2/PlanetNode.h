@@ -71,10 +71,10 @@ protected:
              FLOAT                  GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const;
 
              void                   GenerateVertices(Mesh* target);
-             void                   GenerateIndices(Mesh* target);
+             void                   GenerateIndices(Mesh* target, size_t verticesLength);
 
              int                    GenerateTopFace(vector<int>& indices, int t, int ring);
-             int                    GenerateBottomFace(vector<int>& indices, int t, int ring);
+             int                    GenerateBottomFace(vector<int>& indices, int t, int ring, size_t verticesLength);
 
              void                   MakeSphere(vector<Vector3>& vertices);
 
@@ -88,11 +88,11 @@ private:
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
 
-    FLOAT                           _radius{ 50 };
+    FLOAT                           _radius{ 250 };
 
     FLOAT                           _constantValue{ 0 };
     FLOAT                           _peakHeight{ 256 };
-    UINT                            _resolution{ 2 };
+    UINT                            _resolution{ 128 };
 
     FLOAT                           _noiseOffsetX{ 0 };
     FLOAT                           _noiseOffsetY{ 0 };

@@ -179,17 +179,35 @@ void Mesh::RecalculateNormals()
 
 	for (int i0 = 0, i1 = 1, i2 = 2; i2 < _indices.size(); i0 += 3, i1 += 3, i2 += 3)
 	{
-		if (_indices[i0] >= _vertices.size() ||
-			_indices[i1] >= _vertices.size() ||
-			_indices[i2] >= _vertices.size())
+		int index0 = _indices[i0];
+		int index1 = _indices[i1];
+		int index2 = _indices[i2];
+
+		if (index0 >= _vertices.size() ||
+			index1 >= _vertices.size() ||
+			index2 >= _vertices.size())
 		{
-			MessageBoxEx(0, L"Invalid Mesh Data: A mesh index has exceeded the boundaries of the vertex array.", L"Invalid Mesh", MB_OK, 0);
-			exit(~0);
+			int o = MessageBoxEx(0, L"Invalid Mesh Data: A mesh index has exceeded the boundaries of the vertex array.\n\nAbort: Close this application.\nRetry: Debug this application.\nIgnore: Continue without generating normals.", L"Invalid Mesh", MB_ABORTRETRYIGNORE | MB_ICONERROR, 0);
+			
+			switch (o)
+			{
+			case IDABORT:
+				exit(~0);
+				break;
+
+			case IDIGNORE:
+				return;
+
+			case IDRETRY:
+			default:
+				throw std::out_of_range("A mesh index has exceeded the boundaries of the vertex array.");
+				break;
+			}
 		}
 
-		Vertex& a = _vertices[_indices[i0]];
-		Vertex& b = _vertices[_indices[i1]];
-		Vertex& c = _vertices[_indices[i2]];
+		Vertex& a = _vertices[index0];
+		Vertex& b = _vertices[index1];
+		Vertex& c = _vertices[index2];
 
 		Vector3 aTob(Vector3(b.Position) - a.Position);
 		Vector3 aToc(Vector3(c.Position) - a.Position);
@@ -199,9 +217,9 @@ void Mesh::RecalculateNormals()
 
 		Vector3 normal = Vector3::Cross(aTob, aToc).Normalized();
 
-		NormalCalculator& n0 = normals[_indices[i0]];
-		NormalCalculator& n1 = normals[_indices[i1]];
-		NormalCalculator& n2 = normals[_indices[i2]];
+		NormalCalculator& n0 = normals[index0];
+		NormalCalculator& n1 = normals[index1];
+		NormalCalculator& n2 = normals[index2];
 
 		n0.normal += normal;
 		n0.contributions++;

@@ -32,11 +32,13 @@ public:
     inline  ComPtr<ID3D11Buffer>        GetConstantBuffer() const           { return _constantBuffer; }
     
     template<typename TBufferType>
-    inline  shared_ptr<TBufferType>     GetBufferData() const               { return dynamic_pointer_cast<TBufferType>(_bufferData); }
-    inline  ConstantBuffer*             GetDataPointer() const              { return _bufferData.get(); }
+    inline  TBufferType*                GetLayoutPointer()                  { return (TBufferType*)(_bufferData.get()); }
+    inline  ConstantBuffer*             GetLayoutPointer()                  { return (ConstantBuffer*)(_bufferData.get()); }
 
     template<typename TBufferType>
-    inline  void                        CreateBufferData()                  { _bufferData = dynamic_pointer_cast<ConstantBuffer>(make_shared<TBufferType>()); _bufferSize = sizeof(TBufferType); ApplyBufferData(); }
+    inline  void                        CreateBufferData()                  { _bufferData = (shared_ptr<ConstantBuffer>)(make_shared<TBufferType>()); _bufferSize = sizeof(TBufferType); ApplyBufferData(); }
+    
+protected:
     inline  void                        ApplyBufferData();
 
 private:

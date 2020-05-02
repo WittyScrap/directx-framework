@@ -1,6 +1,7 @@
 
 cbuffer ConstantBuffer 
 {
+	// General (base) data
 	matrix completeTransform;	// The complete transformation
 	matrix worldTransform;		// The world transformation matrix
 	float4 cameraPosition;		// The world position of the camera
@@ -12,6 +13,10 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+
+	// Planet-specific data
+	float  planetRadius;
+	float  planetPeaks;
 };
 
 Texture2D Texture;

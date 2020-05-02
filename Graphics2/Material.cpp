@@ -84,7 +84,7 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 	DirectXFramework* framework = DirectXFramework::GetDXFramework();
 	const CameraNode* mainCamera = CameraNode::GetMain();
 
-	ConstantBuffer* baseData = GetConstantBuffer()->GetDataPointer();
+	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer();
 
 	baseData->CompleteTransformation	= meshData.completeTransformation;
 	baseData->WorldTransformation		= meshData.worldTransformation;

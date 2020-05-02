@@ -8,6 +8,12 @@
 
 #define F(x) CAST(float, x)
 
+struct PlanetConstantBuffer : public ConstantBuffer
+{
+	float  PlanetRadius;
+	float  PlanetPeaks;
+};
+
 bool PlanetNode::Initialise()
 {
 	return Generate();
@@ -23,6 +29,12 @@ bool PlanetNode::Generate()
 
 	terrainMaterial->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
 	terrainMaterial->SetTexture(0, RESOURCES->GetDefaultTexture());
+	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
+
+	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
+	planetBuffer->PlanetRadius = _radius;
+	planetBuffer->PlanetPeaks = _radius + _peakHeight;
+
 	SetMaterial(terrainMaterial);
 
 	terrainData->SetMode(_draw);

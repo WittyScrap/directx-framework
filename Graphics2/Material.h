@@ -27,7 +27,7 @@ public:
 
 
             bool                            Activate();
-            void                            Update(CBUFFER* cbuf);
+            void                            Update(ConstantBuffer* cbuf);
 
             void                            SetTexture(const int& id, const shared_ptr<Texture>& textureName);
             shared_ptr<Texture>&            GetTexture(const int& id);

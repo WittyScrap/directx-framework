@@ -69,7 +69,7 @@ bool Material::Activate()
 	return true;
 }
 
-void Material::Update(CBUFFER* cbuf)
+void Material::Update(ConstantBuffer* cbuf)
 {
 	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 

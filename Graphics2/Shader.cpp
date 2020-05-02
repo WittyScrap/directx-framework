@@ -175,7 +175,7 @@ void Shader::BuildConstantBuffer()
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(CBUFFER);
+	bufferDesc.ByteWidth = sizeof(ConstantBuffer);
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	ThrowIfFailed(DirectXFramework::GetDXFramework()->GetDevice()->CreateBuffer(&bufferDesc, NULL, _constantBuffer.GetAddressOf()));

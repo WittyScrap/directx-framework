@@ -143,7 +143,7 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         shared_ptr<AmbientLight> ambient = FRAMEWORK->GetLight<AmbientLight>();
 
         // Generate constant buffer for handing data to GPU
-        CBUFFER cBuffer;
+        ConstantBuffer cBuffer;
         cBuffer.CompleteTransformation = completeTransformation;
         cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
         cBuffer.CameraPosition = mainCamera->GetPosition().ToDX();
@@ -154,7 +154,7 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         cBuffer.SpecularCoefficient = material->GetSpecularColor();
         cBuffer.Shininess = material->GetShininess();
 
-        material->Update(&cBuffer);
+        material->UpdateConstantBuffers(&cBuffer);
         mesh->Render();
     }
 }

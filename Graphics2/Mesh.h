@@ -4,7 +4,7 @@
 #include "Material.h"
 
 struct Vertex;
-struct CBUFFER;
+struct ConstantBuffer;
 
 /**
  * Defines in which way a mesh should be rendered.

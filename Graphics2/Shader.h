@@ -19,7 +19,7 @@ struct Vertex
  *
  */
 
-struct CBUFFER
+struct ConstantBuffer
 {
     XMMATRIX    CompleteTransformation;
     XMMATRIX	WorldTransformation;

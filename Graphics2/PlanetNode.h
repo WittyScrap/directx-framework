@@ -45,6 +45,9 @@ public:
      inline  FLOAT                  GetPeakHeight() const                           { return _peakHeight; }
      inline  void                   SetPeakHeight(FLOAT value)                      { _peakHeight = value; }
 
+     inline  FLOAT                  GetMaximumHeight() const                        { return _maxHeight; }
+     inline  void                   SetMaximumHeight(FLOAT value)                   { _maxHeight = value; }
+
      inline  FLOAT                  GetPerlinStartX() const                         { return _noiseOffsetX; }
      inline  FLOAT                  GetPerlinStartY() const                         { return _noiseOffsetY; }
 
@@ -93,7 +96,8 @@ private:
 
     FLOAT                           _constantValue{ 0 };
     FLOAT                           _peakHeight{ 5.f };
-    UINT                            _resolution{ 128 };
+    FLOAT                           _maxHeight{ 5.f };
+    UINT                            _resolution{ 512 };
 
     FLOAT                           _noiseOffsetX{ 0 };
     FLOAT                           _noiseOffsetY{ 0 };

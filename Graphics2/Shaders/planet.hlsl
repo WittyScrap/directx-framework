@@ -32,9 +32,10 @@ struct VertexIn
 struct VertexOut
 {
 	float4 Position  : SV_POSITION;
-	float4 PositionLS: TEXCOORD1;
+	float3 PositionLS: TEXCOORD1;
 	float4 PositionWS: TEXCOORD2;
-	float4 NormalWS : TEXCOORD3;
+	float3 NormalLS : TEXCOORD3;
+	float4 NormalWS : TEXCOORD4;
 	float2 TexCoord	 : TEXCOORD;
 };
 
@@ -43,8 +44,9 @@ VertexOut VS(VertexIn vin)
 	VertexOut vout;
 	
 	vout.Position = mul(completeTransform, float4(vin.Position, 1.0f));
-	vout.PositionLS = float4(vin.Position, 1);
+	vout.PositionLS = vin.Position;
 	vout.PositionWS = mul(worldTransform, float4(vin.Position, 1.0f));
+	vout.NormalLS = vin.Normal;
 	vout.NormalWS = float4(mul((float3x3)worldTransform, vin.Normal), 1.0f);
 	vout.TexCoord = vin.TexCoord;
     
@@ -67,17 +69,27 @@ float4 PS(VertexOut input) : SV_Target
 	float4 specular = saturate(lightColor * pow(RdotV, shininess) * specCoefficient);
 
 	// Calculate ambient lighting
-	float4 ambientLight = ambientColor * diffCoefficient;
+	float4 ambientLight = ambientColor * diffCoefficient * .25f;
 
 	// Combine all components
-	float4 color = saturate((ambientLight + diffuse/* + specular*/) * Texture.Sample(ss, input.TexCoord));
-	color.a = saturate(opacity);
+	float4 light = saturate(ambientLight + diffuse/* + specular*/);
 
 	float len = length(input.PositionLS);
 	len -= planetRadius;
 	len /= planetPeaks;
 
-	return color * (1 - len);
+	float slope = dot(normalize(input.PositionLS), input.NormalLS) * .65f;
+	float desert = saturate(-log10(abs(dot(normalize(input.PositionLS), float3(0, 1, 0))))) * .5f;
+	float ice = saturate(-log10(1 - abs(dot(normalize(input.PositionLS), float3(0, 1, 0)))));
+
+	float4 color = lerp(.25f * light, light * float4(.75f, 1.f, .65f, 1.f), slope);
+		   color = lerp(color, light, len);
+		   color = lerp(color, light * float4(1.f, .75f, .1f, 1.f), desert);
+		   color = lerp(color, light, ice);
+
+	color.a = saturate(opacity);
+
+	return color * Texture.Sample(ss, input.TexCoord);
 }
 
 

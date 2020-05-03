@@ -14,7 +14,7 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<AmbientLight> ambientLight = AddLight<AmbientLight>();
 	shared_ptr<DirectionalLight> directionalLight = AddLight<DirectionalLight>();
 
-	directionalLight->SetDirection({ -1, 1, 0 });
+	directionalLight->SetDirection({ -1, 0, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
 	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
@@ -24,8 +24,11 @@ void Graphics2::CreateSceneGraph()
 	planet->SetMode(TerrainMode::Procedural);
 
 	planet->SetNoiseOctaves(16);
-	planet->SetNoiseScale(.75f);
-	planet->SetPeakHeight(10.f);
+	planet->SetNoiseScale(.25f);
+	planet->SetPeakHeight(50.f);
+	planet->SetMaximumHeight(25.f);
+	planet->SetRadius(256.f);
+	planet->SetResolution(128);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMain();

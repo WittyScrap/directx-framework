@@ -32,8 +32,8 @@ bool PlanetNode::Generate()
 	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
 
 	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
-	planetBuffer->PlanetRadius = _radius;
-	planetBuffer->PlanetPeaks = _peakHeight;
+	planetBuffer->PlanetRadius = max(_radius, _seaLevel);
+	planetBuffer->PlanetPeaks = min(_peakHeight, _maxHeight);
 
 	SetMaterial(terrainMaterial);
 
@@ -209,7 +209,7 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices)
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
 		vertices[i].Normalize();
-		vertices[i] *= _radius + (GetNoiseValue(XYZ(vertices[i])));
+		vertices[i] *= min(_radius + (GetNoiseValue(XYZ(vertices[i]))), _radius + _maxHeight);
 	}
 }
 

@@ -11,6 +11,7 @@ struct PlanetConstantBuffer : public ConstantBuffer
 {
 	float  PlanetRadius;
 	float  PlanetPeaks;
+	float  PlanetResolution;
 };
 
 bool PlanetNode::Initialise()
@@ -33,6 +34,7 @@ bool PlanetNode::Generate()
 	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
 	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
+	planetBuffer->PlanetResolution = (FLOAT)_resolution / 2.f;
 
 	SetMaterial(terrainMaterial);
 
@@ -55,25 +57,30 @@ void PlanetNode::GenerateVertices(Mesh* target)
 		(gridSize - 1) * (gridSize - 1)) * 2;
 
 	vector<Vector3> vertices(CAST(size_t, cornerVertices) + CAST(size_t, edgeVertices) + CAST(size_t, faceVertices));
+	vector<XMFLOAT2> uv(vertices.size());
 
 	int v = 0;
 	for (int y = 0; y <= gridSize; y++)
 	{
 		for (int x = 0; x <= gridSize; x++)
 		{
-			SetVertex(vertices, v++, F(x) - offset, F(y) - offset, -offset);
+			SetVertex(vertices, v, F(x) - offset, F(y) - offset, -offset);
+			uv[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int z = 1; z <= gridSize; z++)
 		{
-			SetVertex(vertices, v++, F(gridSize) - offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v, F(gridSize) - offset, F(y) - offset, F(z) - offset);
+			uv[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int x = gridSize - 1; x >= 0; x--)
 		{
-			SetVertex(vertices, v++, F(x) - offset, F(y) - offset, F(gridSize) - offset);
+			SetVertex(vertices, v, F(x) - offset, F(y) - offset, F(gridSize) - offset);
+			uv[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int z = gridSize - 1; z > 0; z--)
 		{
-			SetVertex(vertices, v++, -offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v, -offset, F(y) - offset, F(z) - offset);
+			uv[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 	}
 
@@ -81,14 +88,16 @@ void PlanetNode::GenerateVertices(Mesh* target)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			SetVertex(vertices, v++, F(x) - offset, F(gridSize) - offset, F(z) - offset);
+			SetVertex(vertices, v, F(x) - offset, F(gridSize) - offset, F(z) - offset);
+			uv[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
 		}
 	}
 	for (int z = 1; z < gridSize; z++)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			SetVertex(vertices, v++, F(x) - offset, -offset, F(z) - offset);
+			SetVertex(vertices, v, F(x) - offset, -offset, F(z) - offset);
+			uv[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
 		}
 	}
 
@@ -99,7 +108,7 @@ void PlanetNode::GenerateVertices(Mesh* target)
 		target->AddVertex(Vertex{
 			vertices[i].ToDX3(),
 			{ 0, 1, 0 },
-			{ 0, 0 }
+			uv[i]
 		});
 	}
 }

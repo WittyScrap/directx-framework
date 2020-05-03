@@ -17,6 +17,7 @@ cbuffer ConstantBuffer
 	// Planet-specific data
 	float  planetRadius;
 	float  planetPeaks;
+	float  planetResolution;
 };
 
 Texture2D Texture;
@@ -89,7 +90,7 @@ float4 PS(VertexOut input) : SV_Target
 
 	color.a = saturate(opacity);
 
-	return color * Texture.Sample(ss, input.TexCoord) * float4(1, 1, 1, .25f);
+	return color * Texture.Sample(ss, input.TexCoord);
 }
 
 

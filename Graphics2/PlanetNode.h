@@ -1,5 +1,6 @@
 #pragma once
-#include "SimplexNoise.h"
+#include "NoiseManager.h"
+#include "BasicNoise.h"
 #include "MeshNode.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -42,26 +43,6 @@ public:
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
-     inline  FLOAT                  GetPeakHeight() const                           { return _peakHeight; }
-     inline  void                   SetPeakHeight(FLOAT value)                      { _peakHeight = value; }
-
-     inline  FLOAT                  GetMaximumHeight() const                        { return _maxHeight; }
-     inline  void                   SetMaximumHeight(FLOAT value)                   { _maxHeight = value; }
-
-     inline  FLOAT                  GetPerlinStartX() const                         { return _noiseOffsetX; }
-     inline  FLOAT                  GetPerlinStartY() const                         { return _noiseOffsetY; }
-
-     inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
-     inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
-
-     inline  void                   SetNoiseOctaves(const size_t& value)            { _octaves = value; }
-     inline  void                   SetNoise(SimplexNoise& noise)                   { _noise = noise; }
-     inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
-
-     inline  FLOAT                  GetSeaLevel() const                             { return _seaLevel; }
-     inline  void                   SetSeaLevel(const FLOAT& seaLevel)              { _seaLevel = seaLevel; }
-     inline  void                   SetSeaLevel(const FLOAT&& seaLevel)             { _seaLevel = seaLevel; }
-
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
      inline  void                   SetResolution(const UINT& value)                { _resolution = value; }
      inline  void                   SetResolution(const UINT&& value)               { _resolution = value; }
@@ -69,11 +50,11 @@ public:
      inline  TerrainMode            GetMode()                                       { return _mode; }
      inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
 
+     inline  NoiseManager&          GetNoiseManager()                               { return _noises; }
+
              bool                   Generate();
 
 protected:
-             FLOAT                  GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const;
-
              void                   GenerateVertices(Mesh* target);
              void                   GenerateIndices(Mesh* target, size_t verticesLength);
 
@@ -83,11 +64,10 @@ protected:
              void                   MakeSphere(vector<Vector3>& vertices);
 
      static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
-
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
 private:
-    SimplexNoise                    _noise;
+    NoiseManager                    _noises;
 
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
@@ -95,16 +75,6 @@ private:
     FLOAT                           _radius{ 250 };
 
     FLOAT                           _constantValue{ 0 };
-    FLOAT                           _peakHeight{ 5.f };
-    FLOAT                           _maxHeight{ 5.f };
     UINT                            _resolution{ 512 };
-
-    FLOAT                           _noiseOffsetX{ 0 };
-    FLOAT                           _noiseOffsetY{ 0 };
-    FLOAT                           _noiseOffsetZ{ 0 };
-
-    FLOAT                           _noiseScale{ 1 };
-    SIZE_T                          _octaves{ 1 };
-    FLOAT                           _seaLevel{ 0 };
 };
 

@@ -89,7 +89,7 @@ float4 PS(VertexOut input) : SV_Target
 
 	color.a = saturate(opacity);
 
-	return color * Texture.Sample(ss, input.TexCoord);
+	return color * Texture.Sample(ss, input.TexCoord) * float4(1, 1, 1, .25f);
 }
 
 

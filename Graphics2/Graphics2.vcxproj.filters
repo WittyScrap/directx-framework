@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Utilities">
       <UniqueIdentifier>{9ec531ba-94d4-4b3e-9495-bf54faca56bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Noise Functions">
+      <UniqueIdentifier>{aa23dc6a-3d77-48c9-8e6e-2e3f738afc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Noise Functions">
+      <UniqueIdentifier>{5ad907de-1f31-43cf-b2ab-ffc8f2677196}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -117,6 +123,12 @@
     <ClInclude Include="ConstantBufferObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NoiseManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicNoise.h">
+      <Filter>Header Files\Noise Functions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -187,6 +199,12 @@
       <Filter>Source Files\Scene Nodes</Filter>
     </ClCompile>
     <ClCompile Include="SimplexNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicNoise.cpp">
+      <Filter>Source Files\Noise Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="NoiseManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

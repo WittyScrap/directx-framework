@@ -23,10 +23,27 @@ void Graphics2::CreateSceneGraph()
 	planet->SetDrawMode(MeshMode::TriangleList);
 	planet->SetMode(TerrainMode::Procedural);
 
-	planet->SetNoiseOctaves(16);
-	planet->SetNoiseScale(.25f);
-	planet->SetPeakHeight(50.f);
-	planet->SetMaximumHeight(25.f);
+	auto& noiseManager = planet->GetNoiseManager();
+
+	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
+	planetNoise->SetNoiseOctaves(1);
+	planetNoise->SetNoiseScale(40.f);
+	planetNoise->SetPeakHeight(25.f);
+
+	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
+	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
+	planetDetail->SetNoiseOctaves(8);
+	planetDetail->SetNoiseScale(5.f);
+	planetDetail->SetPeakHeight(1.f);
+
+	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
+	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
+	planetContinents->SetNoiseOctaves(4);
+	planetContinents->SetNoiseScale(80.f);
+	planetContinents->SetPeakHeight(1.f);
+
+	noiseManager.SetMaximumHeight(10.f);
+
 	planet->SetRadius(256.f);
 	planet->SetResolution(128);
 

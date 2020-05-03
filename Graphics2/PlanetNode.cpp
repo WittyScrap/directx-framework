@@ -1,7 +1,6 @@
 #include "PlanetNode.h"
 #include <fstream>
 
-#define clamp(a, x, y) { a = ((a) > (x) ? ((a) < (y) ? (a) : (y)) : (x)); }
 #define CAST(t, x) static_cast<t>(x)
 #define gridSize CAST(long long, _resolution)
 #define offset (F(_resolution) / 2.f)
@@ -32,8 +31,8 @@ bool PlanetNode::Generate()
 	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
 
 	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
-	planetBuffer->PlanetRadius = max(_radius, _seaLevel);
-	planetBuffer->PlanetPeaks = min(_peakHeight, _maxHeight);
+	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
+	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
 
 	SetMaterial(terrainMaterial);
 
@@ -208,8 +207,10 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices)
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
+		const float height = _noises.GetNoiseValue(_radius, XYZ(vertices[i]));
+
 		vertices[i].Normalize();
-		vertices[i] *= min(_radius + (GetNoiseValue(XYZ(vertices[i]))), _radius + _maxHeight);
+		vertices[i] *= height;
 	}
 }
 
@@ -236,14 +237,6 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 	}
 
 	return static_cast<float>(value) / static_cast<float>(range) * 2 - 1;
-}
-
-FLOAT PlanetNode::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
-{
-	return _noise.fractal(_octaves,
-						  x * _noiseScale + _noiseOffsetX,
-						  y * _noiseScale + _noiseOffsetY,
-						  z * _noiseScale + _noiseOffsetY) * _peakHeight;
 }
 
 #undef gridSize

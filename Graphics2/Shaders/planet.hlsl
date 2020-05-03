@@ -20,7 +20,11 @@ cbuffer ConstantBuffer
 	float  planetResolution;
 };
 
-Texture2D Texture;
+Texture2D ground;
+Texture2D cliff;
+Texture2D sand;
+Texture2D snow;
+
 SamplerState ss;
 
 struct VertexIn
@@ -80,17 +84,19 @@ float4 PS(VertexOut input) : SV_Target
 	len /= planetPeaks;
 
 	float slope = dot(normalize(input.PositionLS), input.NormalLS) * .65f;
-	float desert = saturate(-log10(abs(dot(normalize(input.PositionLS), float3(0, 1, 0))))) * .5f;
+	float desert = saturate(-log10(abs(dot(normalize(input.PositionLS), float3(0, 1, 0)))) * .5f) * .75f;
 	float ice = saturate(-log10(1 - abs(dot(normalize(input.PositionLS), float3(0, 1, 0)))));
 
-	float4 color = lerp(.25f * light, light * float4(.75f, 1.f, .65f, 1.f), slope);
-		   color = lerp(color, light, len);
-		   color = lerp(color, light * float4(1.f, .75f, .1f, 1.f), desert);
-		   color = lerp(color, light, ice);
+	float2 uv = (input.TexCoord * planetResolution) % 1.f;
+
+	float4 color = lerp(light * cliff.Sample(ss, uv), light * ground.Sample(ss, uv), slope);
+		   color = lerp(color,						  light * snow.Sample(ss, uv), len);
+		   color = lerp(color,						  light * sand.Sample(ss, uv), desert);
+		   color = lerp(color,						  light * snow.Sample(ss, uv), ice);
 
 	color.a = saturate(opacity);
 
-	return color * Texture.Sample(ss, input.TexCoord);
+	return color;
 }
 
 

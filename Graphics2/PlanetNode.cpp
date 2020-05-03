@@ -28,13 +28,18 @@ bool PlanetNode::Generate()
 	GenerateIndices(terrainData.get(), terrainData->GetVertices().size());
 
 	terrainMaterial->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
-	terrainMaterial->SetTexture(0, RESOURCES->GetDefaultTexture());
+
+	terrainMaterial->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/ground.png"));
+	terrainMaterial->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
+	terrainMaterial->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
+	terrainMaterial->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+
 	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
 
 	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
 	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
-	planetBuffer->PlanetResolution = (FLOAT)_resolution / 2.f;
+	planetBuffer->PlanetResolution = (FLOAT)_resolution / 4.f;
 
 	SetMaterial(terrainMaterial);
 

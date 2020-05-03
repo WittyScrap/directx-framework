@@ -122,6 +122,29 @@ shared_ptr<Material> ResourceManager::GetMaterial(wstring materialName)
 	}
 }
 
+shared_ptr<Texture> ResourceManager::GetTexture(wstring textureName)
+{
+	TextureResourceMap::iterator it = _textureResources.find(textureName);
+
+	if (it != _textureResources.end())
+	{
+		it->second.ReferenceCount++;
+		return it->second.TexturePointer;
+	}
+	else
+	{
+		shared_ptr<Texture> texture = make_shared<Texture>(textureName);
+
+		TextureResourceStruct resourceStruct;
+		resourceStruct.ReferenceCount = 1;
+		resourceStruct.TexturePointer = texture;
+
+		_textureResources[textureName] = resourceStruct;
+
+		return texture;
+	}
+}
+
 shared_ptr<Material> ResourceManager::GetDefaultMaterial()
 {
 	if (!_defaultMaterial)

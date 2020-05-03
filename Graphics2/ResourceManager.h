@@ -41,6 +41,16 @@ struct ShaderResourceStruct
 	shared_ptr<Shader>		ShaderPointer;
 };
 
+/**
+ * Texture resource tracker structure.
+ *
+ */
+struct TextureResourceStruct
+{
+	unsigned int			ReferenceCount;
+	shared_ptr<Texture>		TexturePointer;
+};
+
 /** Mesh resource mapper */
 typedef map<wstring, MeshResourceStruct>		MeshResourceMap;
 
@@ -49,6 +59,9 @@ typedef map<wstring, MaterialResourceStruct>	MaterialResourceMap;
 
 /** Shader resource mapper */
 typedef map<wstring, ShaderResourceStruct>		ShaderResourceMap;
+
+/** Texture resource mapper */
+typedef map<wstring, TextureResourceStruct>		TextureResourceMap;
 
 /**
  * Manages system resources for meshes, materials, and shaders.
@@ -63,6 +76,7 @@ public:
 			shared_ptr<Shader>							GetShader(wstring shaderName);
 			shared_ptr<Mesh>							GetMesh(wstring modelName);
 			shared_ptr<Material>						GetMaterial(wstring materialName);
+			shared_ptr<Texture>							GetTexture(wstring textureName);
 
 			void										ReleaseMesh(wstring modelName);
 			void										ReleaseMaterial(wstring materialName);
@@ -78,6 +92,7 @@ private:
 	MeshResourceMap										_meshResources;
 	MaterialResourceMap									_materialResources;
 	ShaderResourceMap									_shaderResources;
+	TextureResourceMap									_textureResources;
 
 	ComPtr<ID3D11Device>								_device;
 	ComPtr<ID3D11DeviceContext>							_deviceContext;

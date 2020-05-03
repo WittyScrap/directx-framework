@@ -1,4 +1,6 @@
 #include "BasicNoise.h"
+#include <stdlib.h>
+#include <ctime>
 
 FLOAT BasicNoise::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
 {
@@ -8,4 +10,13 @@ FLOAT BasicNoise::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
 		z / _noiseScale + _noiseOffsetY) * _peakHeight * static_cast<int>(_direction);
 
 	return value;
+}
+
+void BasicNoise::RandomizeOffsets()
+{ 
+	srand((unsigned int)time(0));
+	
+	_noiseOffsetX = (float)rand();
+	_noiseOffsetY = (float)rand(); 
+	_noiseOffsetZ = (float)rand();
 }

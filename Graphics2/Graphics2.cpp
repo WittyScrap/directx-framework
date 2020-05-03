@@ -29,18 +29,21 @@ void Graphics2::CreateSceneGraph()
 	planetNoise->SetNoiseOctaves(1);
 	planetNoise->SetNoiseScale(40.f);
 	planetNoise->SetPeakHeight(25.f);
+	planetNoise->RandomizeOffsets();
 
 	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
 	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
 	planetDetail->SetNoiseOctaves(8);
 	planetDetail->SetNoiseScale(5.f);
 	planetDetail->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
 
 	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
 	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
 	planetContinents->SetNoiseOctaves(4);
 	planetContinents->SetNoiseScale(80.f);
 	planetContinents->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
 
 	noiseManager.SetMaximumHeight(10.f);
 

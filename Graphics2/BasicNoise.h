@@ -47,6 +47,8 @@ public:
     inline  NoiseBlendMode          GetNoiseBlendMode() const                       { return _blendMode; }
     inline  void                    SetNoiseBlendMode(const NoiseBlendMode mode)    { _blendMode = mode; }
 
+            void                    RandomizeOffsets();
+
 private:
     SimplexNoise                    _noise;
 

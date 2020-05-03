@@ -66,6 +66,8 @@ protected:
      static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
+             void                   SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z);
+
 private:
     NoiseManager                    _noises;
 

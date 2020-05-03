@@ -61,19 +61,19 @@ void PlanetNode::GenerateVertices(Mesh* target)
 	{
 		for (int x = 0; x <= gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(y) - offset, -offset);
+			SetVertex(vertices, v++, F(x) - offset, F(y) - offset, -offset);
 		}
 		for (int z = 1; z <= gridSize; z++)
 		{
-			vertices[v++] = Vector3(F(gridSize) - offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v++, F(gridSize) - offset, F(y) - offset, F(z) - offset);
 		}
 		for (int x = gridSize - 1; x >= 0; x--)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(y) - offset, F(gridSize) - offset);
+			SetVertex(vertices, v++, F(x) - offset, F(y) - offset, F(gridSize) - offset);
 		}
 		for (int z = gridSize - 1; z > 0; z--)
 		{
-			vertices[v++] = Vector3(-offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v++, -offset, F(y) - offset, F(z) - offset);
 		}
 	}
 
@@ -81,14 +81,14 @@ void PlanetNode::GenerateVertices(Mesh* target)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(gridSize) - offset, F(z) - offset);
+			SetVertex(vertices, v++, F(x) - offset, F(gridSize) - offset, F(z) - offset);
 		}
 	}
 	for (int z = 1; z < gridSize; z++)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, -offset, F(z) - offset);
+			SetVertex(vertices, v++, F(x) - offset, -offset, F(z) - offset);
 		}
 	}
 
@@ -237,6 +237,11 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 	}
 
 	return static_cast<float>(value) / static_cast<float>(range) * 2 - 1;
+}
+
+void PlanetNode::SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z)
+{
+	vertices[i] = Vector3(x, y, z);
 }
 
 #undef gridSize

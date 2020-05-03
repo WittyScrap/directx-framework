@@ -255,7 +255,20 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 
 void PlanetNode::SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z)
 {
-	vertices[i] = Vector3(x, y, z);
+	Vector3 v = Vector3(x, y, z) / F(gridSize);
+
+	float x2 = v.X * v.X;
+	float y2 = v.Y * v.Y;
+	float z2 = v.Z * v.Z;
+
+	Vector3 s;
+	s.SetX(v.X * sqrt(1.f - y2 / 2.f - z2 / 2.f + y2 * z2 / 3.f));
+	s.SetY(v.Y * sqrt(1.f - x2 / 2.f - z2 / 2.f + x2 * z2 / 3.f));
+	s.SetZ(v.Z * sqrt(1.f - x2 / 2.f - y2 / 2.f + x2 * y2 / 3.f));
+
+	s *= F(gridSize);
+
+	vertices[i] = s;
 }
 
 #undef gridSize

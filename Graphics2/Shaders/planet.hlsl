@@ -82,19 +82,25 @@ float4 PS(VertexOut input) : SV_Target
 	float len = length(input.PositionLS);
 	len -= planetRadius;
 	len /= planetPeaks;
+	len = saturate((len - .5) * 2.f);
 
-	float slope = dot(normalize(input.PositionLS), input.NormalLS) * .65f;
-	float desert = saturate(-log10(abs(dot(normalize(input.PositionLS), float3(0, 1, 0)))) * .5f) * .75f;
-	float ice = saturate(-log10(1 - abs(dot(normalize(input.PositionLS), float3(0, 1, 0)))));
+	float slope = (1 - dot(normalize(input.PositionLS), input.NormalLS)) * 6.f;
+	float desert = 1 - saturate((abs(dot(normalize(input.PositionLS), float3(0, 1, 0))) - .05f) * 4.f);
+	float ice = saturate((abs(dot(normalize(input.PositionLS), float3(0, 1, 0))) - .5f) * 4.f);
 
 	float2 uv = (input.TexCoord * planetResolution) % 1.f;
 
-	float4 color = lerp(light * cliff.Sample(ss, uv), light * ground.Sample(ss, uv), slope);
-		   color = lerp(color,						  light * snow.Sample(ss, uv), len);
-		   color = lerp(color,						  light * sand.Sample(ss, uv), desert);
-		   color = lerp(color,						  light * snow.Sample(ss, uv), ice);
+	float4 flatGround = ground.Sample(ss, uv);
+	float4 cliffRocks = cliff.Sample(ss, uv);
+	float4 desertSand = sand.Sample(ss, uv);
+	float4 HiPeakSnow = snow.Sample(ss, uv);
 
-	color.a = saturate(opacity);
+	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len);
+	float4 desertDetection = lerp(mountainDetection, desertSand, desert * .5f);
+	float4 polesDetection = lerp(desertDetection, HiPeakSnow, ice);
+	float4 cliffDetection = lerp(polesDetection, cliffRocks, slope);
+
+	float4 color = light * cliffDetection;
 
 	return color;
 }

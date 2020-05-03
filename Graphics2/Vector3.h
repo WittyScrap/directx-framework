@@ -74,6 +74,8 @@ public:
     static const Vector3 RightVector;
     static const Vector3 ForwardVector;
     static const Vector3 BackwardVector;
+    static const Vector3 ZeroVector;
+    static const Vector3 OneVector;
 
 private:
     float _x;

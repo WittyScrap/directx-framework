@@ -227,6 +227,16 @@ void Mesh::RecalculateNormals()
 	}
 }
 
+void Mesh::Invert()
+{
+	for (size_t it0 = 0, it1 = 2; it1 < _indices.size(); it0 = it1 + 1, it1 = it0 + 2)
+	{
+		UINT i0 = _indices[it0];
+		_indices[it0] = _indices[it1];
+		_indices[it1] = i0;
+	}
+}
+
 ComPtr<ID3D11Device> Mesh::GetDevice()
 {
 	return DirectXFramework::GetDXFramework()->GetDevice();

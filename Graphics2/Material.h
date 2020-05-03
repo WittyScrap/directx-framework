@@ -36,6 +36,8 @@ public:
 
 
             bool                            Activate();
+            void                            Reset();
+
             void                            UpdateConstantBuffers(const MeshObjectData& cbuf);
 
             void                            SetTexture(const int& id, const shared_ptr<Texture>& textureName);

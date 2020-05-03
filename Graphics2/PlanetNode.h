@@ -40,6 +40,9 @@ public:
      inline  FLOAT                  GetRadius() const                               { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                   { _radius = value; }
 
+     inline  FLOAT                  GetAtmosphereThickness() const                  { return _atmosphereThickness; }
+     inline  void                   SetAtmosphereThickness(const FLOAT& value)      { _atmosphereThickness = value; }
+
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
@@ -55,18 +58,23 @@ public:
              bool                   Generate();
 
 protected:
-             void                   GenerateVertices(Mesh* target);
+             bool                   InternalGenerateSpheroid(Mesh* target, float radius, bool deform);
+
+             void                   GenerateVertices(Mesh* target, float radius, bool deform);
              void                   GenerateIndices(Mesh* target, size_t verticesLength);
 
              int                    GenerateTopFace(vector<int>& indices, int t, int ring);
              int                    GenerateBottomFace(vector<int>& indices, int t, int ring, size_t verticesLength);
 
-             void                   MakeSphere(vector<Vector3>& vertices);
+             void                   MakeSphere(vector<Vector3>& vertices, float radius, bool deform);
 
      static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
              void                   SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z);
+
+             void                   PopulateGroundMaterial(shared_ptr<Material>& mat);
+             void                   PopulateAtmosphereMaterial(shared_ptr<Material>& mat);
 
 private:
     NoiseManager                    _noises;
@@ -75,6 +83,7 @@ private:
     MeshMode                        _draw{ MeshMode::TriangleList };
 
     FLOAT                           _radius{ 250 };
+    FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
     UINT                            _resolution{ 512 };

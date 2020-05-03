@@ -24,35 +24,39 @@ bool PlanetNode::Generate()
 	shared_ptr<Mesh> terrainData = make_shared<Mesh>();
 	shared_ptr<Material> terrainMaterial = make_shared<Material>();
 
-	GenerateVertices(terrainData.get());
-	GenerateIndices(terrainData.get(), terrainData->GetVertices().size());
+	shared_ptr<Mesh> atmosphereData = terrainData->AddSubmesh();
+	shared_ptr<Material> atmosphereMaterial = make_shared<Material>();
 
-	terrainMaterial->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
+	InternalGenerateSpheroid(terrainData.get(), _radius, true);
+	InternalGenerateSpheroid(atmosphereData.get(), _radius + _atmosphereThickness, false);
 
-	terrainMaterial->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/ground.png"));
-	terrainMaterial->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
-	terrainMaterial->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
-	terrainMaterial->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+	atmosphereData->Invert();
+	atmosphereData->Apply();
 
-	terrainMaterial->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
-
-	PlanetConstantBuffer* planetBuffer = terrainMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
-	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
-	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
-	planetBuffer->PlanetResolution = (FLOAT)_resolution / 4.f;
+	PopulateGroundMaterial(terrainMaterial);
+	PopulateAtmosphereMaterial(atmosphereMaterial);
 
 	SetMaterial(terrainMaterial);
-
-	terrainData->SetMode(_draw);
-	terrainData->RecalculateNormals();
-	terrainData->Apply();
+	SetMaterial(0, atmosphereMaterial);
 
 	SetMesh(terrainData);
 
 	return true;
 }
 
-void PlanetNode::GenerateVertices(Mesh* target)
+bool PlanetNode::InternalGenerateSpheroid(Mesh* target, float radius, bool deform)
+{
+	GenerateVertices(target, radius, deform);
+	GenerateIndices(target, target->GetVertices().size());
+
+	target->SetMode(_draw);
+	target->RecalculateNormals();
+	target->Apply();
+
+	return true;
+}
+
+void PlanetNode::GenerateVertices(Mesh* target, float radius, bool deform)
 {
 	const int cornerVertices = 8;
 	const int edgeVertices = (gridSize + gridSize + gridSize - 3) * 4;
@@ -106,7 +110,7 @@ void PlanetNode::GenerateVertices(Mesh* target)
 		}
 	}
 
-	MakeSphere(vertices);
+	MakeSphere(vertices, radius, deform);
 	
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
@@ -217,11 +221,11 @@ int PlanetNode::GenerateBottomFace(vector<int>& triangles, int t, int ring, size
 	return t;
 }
 
-void PlanetNode::MakeSphere(vector<Vector3>& vertices)
+void PlanetNode::MakeSphere(vector<Vector3>& vertices, float radius, bool deform)
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		const float height = _noises.GetNoiseValue(_radius, XYZ(vertices[i]));
+		const float height = deform ? _noises.GetNoiseValue(radius, XYZ(vertices[i])) : radius;
 
 		vertices[i].Normalize();
 		vertices[i] *= height;
@@ -269,6 +273,28 @@ void PlanetNode::SetVertex(vector<Vector3>& vertices, int i, const float& x, con
 	s *= F(gridSize);
 
 	vertices[i] = s;
+}
+
+void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
+{
+	mat->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
+
+	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/ground.png"));
+	mat->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
+	mat->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
+	mat->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+
+	mat->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
+
+	PlanetConstantBuffer* planetBuffer = mat->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
+	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
+	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
+	planetBuffer->PlanetResolution = (FLOAT)_resolution / 4.f;
+}
+
+void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
+{
+	mat->SetShader(RESOURCES->GetShader(L"Shaders/atmosphere.hlsl"));
 }
 
 #undef gridSize

@@ -53,6 +53,11 @@ bool Material::Activate()
 {
 	if (_activeMaterial != this)
 	{
+		if (_activeMaterial != nullptr)
+		{
+			_activeMaterial->Reset();
+		}
+
 		if (!_shader)
 		{
 			return false;
@@ -70,6 +75,18 @@ bool Material::Activate()
 	}
 
 	return true;
+}
+
+void Material::Reset()
+{
+	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
+	const auto& defaultTexture = RESOURCES->GetDefaultTexture();
+
+	// Clear any assigned texture in shared resources by replacing it with default texture
+	for (const auto& texture : _textures)
+	{
+		deviceContext->PSSetShaderResources(texture.first, 1, defaultTexture->Get().GetAddressOf());
+	}
 }
 
 void Material::UpdateConstantBuffers(const MeshObjectData& meshData)

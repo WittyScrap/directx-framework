@@ -1,20 +1,20 @@
 #include "Material.h"
 #include "WICTextureLoader.h"
 #include "DirectXFramework.h"
+#include "DirectionalLight.h"
+#include "AmbientLight.h"
+#include "CameraNode.h"
 
 Material* Material::_activeMaterial{ nullptr };
 
-void Material::SetShader(Shader& source)
+void Material::SetShader(shared_ptr<Shader> source)
 {
-	if (!_shader)
+	if (_shader.get() == source.get())
 	{
-		_shader = make_shared<Shader>();
-	}
-	else
-	{
-		_shader.reset<Shader>(&source);
+		return;
 	}
 
+	_shader = source;
 	_shader->CompileOnce();
 }
 
@@ -32,33 +32,15 @@ void Material::SetShader(const wstring& source)
 	_shader->CompileOnce();
 }
 
-void Material::SetTexture(const wstring& textureName)
+void Material::SetTexture(const int& id, const shared_ptr<Texture>& texture)
 {
-	if (textureName != _textureName)
+	if (_textures.find(id) != _textures.end())
 	{
-		if (FAILED(CreateWICTextureFromFile(
-				DirectXFramework::GetDXFramework()->GetDevice().Get(),
-				DirectXFramework::GetDXFramework()->GetDeviceContext().Get(),
-				textureName.c_str(),
-				nullptr,
-				_texture.GetAddressOf()
-			)))
-		{
-			wstring err = L"Unable to load texture: \"" + textureName + L"\"";
-			MessageBoxA(0, ws2s(err).c_str(), "Texture loading error", MB_OK);
-		}
-		else
-		{
-			_textureName = textureName;
-		}
+		_textures[id] = texture;
 	}
-}
-
-void Material::SetTextureFromSource(const Texture& textureObj)
-{
-	if (textureObj)
+	else
 	{
-		_texture = textureObj;
+		_textures.emplace(id, texture);
 	}
 }
 
@@ -71,6 +53,11 @@ bool Material::Activate()
 {
 	if (_activeMaterial != this)
 	{
+		if (_activeMaterial != nullptr)
+		{
+			_activeMaterial->Reset();
+		}
+
 		if (!_shader)
 		{
 			return false;
@@ -90,31 +77,71 @@ bool Material::Activate()
 	return true;
 }
 
-void Material::Update(CBUFFER* cbuf)
+void Material::Reset()
+{
+	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
+	const auto& defaultTexture = RESOURCES->GetDefaultTexture();
+
+	// Clear any assigned texture in shared resources by replacing it with default texture
+	for (const auto& texture : _textures)
+	{
+		deviceContext->PSSetShaderResources(texture.first, 1, defaultTexture->Get().GetAddressOf());
+	}
+}
+
+void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 {
 	ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
-	// Update the constant buffer 
-	deviceContext->VSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
-	deviceContext->PSSetConstantBuffers(0, 1, _shader->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+	// Get lights
+	shared_ptr<DirectionalLight> directional = FRAMEWORK->GetLight<DirectionalLight>();
+	shared_ptr<AmbientLight> ambient = FRAMEWORK->GetLight<AmbientLight>();
 
-	deviceContext->UpdateSubresource(_shader->GetConstantBuffer().Get(), 0, 0, cbuf, 0, 0);
+	// Camera information
+	DirectXFramework* framework = DirectXFramework::GetDXFramework();
+	const CameraNode* mainCamera = CameraNode::GetMain();
+
+	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer();
+
+	baseData->CompleteTransformation	= meshData.completeTransformation;
+	baseData->WorldTransformation		= meshData.worldTransformation;
+	baseData->CameraPosition			= mainCamera->GetPosition().ToDX();
+	baseData->LightVector				= XMVector4Normalize(directional->GetDirection());
+	baseData->LightColor				= directional->GetColor();
+	baseData->AmbientColor				= ambient->GetColor();
+	baseData->DiffuseCoefficient		= GetAlbedo();
+	baseData->SpecularCoefficient		= GetSpecularColor();
+	baseData->Shininess					= GetShininess();
+
+	// Update the constant buffer 
+	deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
+	deviceContext->PSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+	deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer().Get(), 0, 0, baseData, 0, 0);
 
 	// Set the texture to be used by the pixel shader
-	deviceContext->PSSetShaderResources(0, 1, GetTexture().GetAddressOf());
-}
-
-ComPtr<ID3D11ShaderResourceView> Material::GetTexture() const
-{
-	return _texture;
-}
-
-Texture Material::GetTexture()
-{
-	if (!_texture)
+	for (const auto& texture : _textures)
 	{
-		_texture = RESOURCES->GetDefaultTexture();
+		deviceContext->PSSetShaderResources(texture.first, 1, texture.second->Get().GetAddressOf());
+	}
+}
+
+shared_ptr<Texture>& Material::GetTexture(const int& id)
+{
+	if (!_textures[id] || !_textures[id]->IsLoaded())
+	{
+		_textures[id] = RESOURCES->GetDefaultTexture();
 	}
 
-	return _texture;
+	return _textures[id];
+}
+
+shared_ptr<CBO>& Material::GetConstantBuffer()
+{
+	if (_constantBuffer == nullptr)
+	{
+		_constantBuffer = make_shared<CBO>();
+		_constantBuffer->CreateBufferData<ConstantBuffer>();
+	}
+
+	return _constantBuffer;
 }

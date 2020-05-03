@@ -8,6 +8,8 @@ const Vector3 Vector3::LeftVector		(-1, 0, 0);
 const Vector3 Vector3::RightVector		(1, 0, 0);
 const Vector3 Vector3::ForwardVector	(0, 0, 1);
 const Vector3 Vector3::BackwardVector	(0, 0, -1);
+const Vector3 Vector3::ZeroVector		(0, 0, 0);
+const Vector3 Vector3::OneVector		(1, 1, 1);
 
 Vector3::Vector3() : _x{ 0 }, _y{ 0 }, _z{ 0 }
 { }

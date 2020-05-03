@@ -23,16 +23,7 @@ ResourceManager::ResourceManager()
     // the default texture will be null, i.e. black.  This causes problems for materials that do not
 	// provide a texture, unless we provide a totally different shader just for those cases.  That
 	// might be more efficient, but is a lot of work at this stage for little gain.
-	if (FAILED(CreateWICTextureFromFile(_device.Get(),
-				  					    _deviceContext.Get(),
-										L"white.png",
-										nullptr,
-										_defaultTexture.GetAddressOf()
-										)))
-	{
-		_defaultTexture = nullptr;
-	}
-
+	_defaultTexture = SceneGraph::Create<Texture>(L"white.png");
 }
 
 ResourceManager::~ResourceManager(void)
@@ -131,20 +122,54 @@ shared_ptr<Material> ResourceManager::GetMaterial(wstring materialName)
 	}
 }
 
+shared_ptr<Texture> ResourceManager::GetTexture(wstring textureName)
+{
+	TextureResourceMap::iterator it = _textureResources.find(textureName);
+
+	if (it != _textureResources.end())
+	{
+		it->second.ReferenceCount++;
+		return it->second.TexturePointer;
+	}
+	else
+	{
+		shared_ptr<Texture> texture = make_shared<Texture>(textureName);
+
+		TextureResourceStruct resourceStruct;
+		resourceStruct.ReferenceCount = 1;
+		resourceStruct.TexturePointer = texture;
+
+		_textureResources[textureName] = resourceStruct;
+
+		return texture;
+	}
+}
+
 shared_ptr<Material> ResourceManager::GetDefaultMaterial()
 {
 	if (!_defaultMaterial)
 	{
-		_defaultMaterial = make_shared<Material>(Shader::Load(L"shader.hlsl"));
-		_defaultMaterial->SetTextureFromSource(GetDefaultTexture());
+		_defaultMaterial = make_shared<Material>(GetDefaultShader());
+		_defaultMaterial->SetTexture(0, GetDefaultTexture());
 	}
 
-	if (!_defaultMaterial->GetTexture())
+	if (!_defaultMaterial->GetTexture(0))
 	{
-		_defaultMaterial->SetTextureFromSource(GetDefaultTexture());
+		_defaultMaterial->SetTexture(0, GetDefaultTexture());
 	}
 
 	return _defaultMaterial;
+}
+
+shared_ptr<Shader> ResourceManager::GetDefaultShader()
+{
+	if (!_defaultShader)
+	{
+		_defaultShader = make_shared<Shader>(L"Shaders/lambert.hlsl");
+		_defaultShader->CompileOnce();
+	}
+
+	return _defaultShader;
 }
 
 void ResourceManager::ReleaseMaterial(wstring materialName)
@@ -281,12 +306,16 @@ shared_ptr<Mesh> ResourceManager::LoadModelFromFile(wstring modelName)
 			string materialName = materialNameStream.str();
 			wstring materialNameWS = s2ws(materialName);
 
-			shared_ptr<Material> materialObject = make_shared<Material>(materialNameWS, GetShader(L"shader.hlsl"));
-			materialObject->SetTexture(s2ws(fullTextureNamePath));
+			shared_ptr<Material> materialObject = make_shared<Material>(materialNameWS, GetDefaultShader());
 			materialObject->SetAlbedo({ diffuseColour.r, diffuseColour.g, diffuseColour.b, 1.0f });
 			materialObject->SetSpecularColor({ specularColour.r, specularColour.g, specularColour.b, 1.0f });
 			materialObject->SetShininess(shininess);
 			materialObject->SetOpacity(opacity);
+
+			if (!fullTextureNamePath.empty())
+			{
+				materialObject->SetTexture(0, make_shared<Texture>(s2ws(fullTextureNamePath)));
+			}
 
 			// Save new material
 			_materialResources[materialNameWS] = { 1, materialObject };

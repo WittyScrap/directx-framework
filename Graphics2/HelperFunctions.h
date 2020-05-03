@@ -44,3 +44,25 @@ inline string ws2s(const std::wstring& wstr)
 
 	return converterX.to_bytes(wstr);
 }
+
+inline void ErrorDialog(const wstring& title, const wstring& content, const std::exception& exception)
+{
+	int o = MessageBoxEx(
+		0, (content + L"\n\nAbort: Close this application.\nRetry: Debug this application.\nIgnore: Continue without generating normals.").c_str(),
+		title.c_str(), MB_ABORTRETRYIGNORE | MB_ICONERROR, 0
+	);
+
+	switch (o)
+	{
+	case IDABORT:
+		exit(~0);
+		break;
+
+	case IDRETRY:
+		throw exception;
+		break;
+
+	case IDIGNORE: default:
+		break;
+	}
+}

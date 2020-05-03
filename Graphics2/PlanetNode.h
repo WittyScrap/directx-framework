@@ -1,5 +1,6 @@
 #pragma once
-#include "SimplexNoise.h"
+#include "NoiseManager.h"
+#include "BasicNoise.h"
 #include "MeshNode.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -39,25 +40,11 @@ public:
      inline  FLOAT                  GetRadius() const                               { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                   { _radius = value; }
 
+     inline  FLOAT                  GetAtmosphereThickness() const                  { return _atmosphereThickness; }
+     inline  void                   SetAtmosphereThickness(const FLOAT& value)      { _atmosphereThickness = value; }
+
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
-
-     inline  FLOAT                  GetPeakHeight() const                           { return _peakHeight; }
-     inline  void                   SetPeakHeight(FLOAT value)                      { _peakHeight = value; }
-
-     inline  FLOAT                  GetPerlinStartX() const                         { return _noiseOffsetX; }
-     inline  FLOAT                  GetPerlinStartY() const                         { return _noiseOffsetY; }
-
-     inline  void                   SetNoiseOffsetX(const FLOAT& value)             { _noiseOffsetX = value; }
-     inline  void                   SetNoiseOffsetY(const FLOAT& value)             { _noiseOffsetY = value; }
-
-     inline  void                   SetNoiseOctaves(const size_t& value)            { _octaves = value; }
-     inline  void                   SetNoise(SimplexNoise& noise)                   { _noise = noise; }
-     inline  void                   SetNoiseScale(const FLOAT& scale)               { _noiseScale = scale; }
-
-     inline  FLOAT                  GetSeaLevel() const                             { return _seaLevel; }
-     inline  void                   SetSeaLevel(const FLOAT& seaLevel)              { _seaLevel = seaLevel; }
-     inline  void                   SetSeaLevel(const FLOAT&& seaLevel)             { _seaLevel = seaLevel; }
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
      inline  void                   SetResolution(const UINT& value)                { _resolution = value; }
@@ -66,41 +53,39 @@ public:
      inline  TerrainMode            GetMode()                                       { return _mode; }
      inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
 
+     inline  NoiseManager&          GetNoiseManager()                               { return _noises; }
+
              bool                   Generate();
 
 protected:
-             FLOAT                  GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const;
+             bool                   InternalGenerateSpheroid(Mesh* target, float radius, bool deform);
 
-             void                   GenerateVertices(Mesh* target);
+             void                   GenerateVertices(Mesh* target, float radius, bool deform);
              void                   GenerateIndices(Mesh* target, size_t verticesLength);
 
              int                    GenerateTopFace(vector<int>& indices, int t, int ring);
              int                    GenerateBottomFace(vector<int>& indices, int t, int ring, size_t verticesLength);
 
-             void                   MakeSphere(vector<Vector3>& vertices);
+             void                   MakeSphere(vector<Vector3>& vertices, float radius, bool deform);
 
      static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
-
    constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
 
+             void                   SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z);
+
+             void                   PopulateGroundMaterial(shared_ptr<Material>& mat);
+             void                   PopulateAtmosphereMaterial(shared_ptr<Material>& mat);
+
 private:
-    SimplexNoise                    _noise;
+    NoiseManager                    _noises;
 
     TerrainMode                     _mode{ TerrainMode::Flat };
     MeshMode                        _draw{ MeshMode::TriangleList };
 
     FLOAT                           _radius{ 250 };
+    FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
-    FLOAT                           _peakHeight{ 256 };
-    UINT                            _resolution{ 128 };
-
-    FLOAT                           _noiseOffsetX{ 0 };
-    FLOAT                           _noiseOffsetY{ 0 };
-    FLOAT                           _noiseOffsetZ{ 0 };
-
-    FLOAT                           _noiseScale{ 1 };
-    SIZE_T                          _octaves{ 1 };
-    FLOAT                           _seaLevel{ 0 };
+    UINT                            _resolution{ 512 };
 };
 

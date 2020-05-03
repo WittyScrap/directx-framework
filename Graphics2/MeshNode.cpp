@@ -1,7 +1,5 @@
 #include "MeshNode.h"
 #include "DirectXFramework.h"
-#include "DirectionalLight.h"
-#include "AmbientLight.h"
 #include "CameraNode.h"
 
 /**
@@ -19,6 +17,8 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
+    OnPreRender();
+
     InternalRender(_mesh, _material);
 
     for (size_t it = 0; it < _mesh->GetSubmeshCount(); ++it)
@@ -132,29 +132,15 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
             material = RESOURCES->GetDefaultMaterial(); material->Activate();
         }
 
-        DirectXFramework* framework = DirectXFramework::GetDXFramework();
-        const CameraNode* mainCamera = CameraNode::GetMain();
-
         // Calculate the world x view x projection transformation
-        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * mainCamera->GetViewTransformation() * mainCamera->GetProjectionTransformation();
+        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
+        
+        // Create mesh data object and populate with mesh object specific data
+        MeshObjectData data;
+        data.completeTransformation = completeTransformation;
+        data.worldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
 
-        // Get lights
-        shared_ptr<DirectionalLight> directional = FRAMEWORK->GetLight<DirectionalLight>();
-        shared_ptr<AmbientLight> ambient = FRAMEWORK->GetLight<AmbientLight>();
-
-        // Generate constant buffer for handing data to GPU
-        CBUFFER cBuffer;
-        cBuffer.CompleteTransformation = completeTransformation;
-        cBuffer.WorldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
-        cBuffer.CameraPosition = mainCamera->GetPosition().ToDX();
-        cBuffer.LightVector = XMVector4Normalize(directional->GetDirection());
-        cBuffer.LightColor = directional->GetColor();
-        cBuffer.AmbientColor = ambient->GetColor();
-        cBuffer.DiffuseCoefficient = material->GetAlbedo();
-        cBuffer.SpecularCoefficient = material->GetSpecularColor();
-        cBuffer.Shininess = material->GetShininess();
-
-        material->Update(&cBuffer);
+        material->UpdateConstantBuffers(data);
         mesh->Render();
     }
 }

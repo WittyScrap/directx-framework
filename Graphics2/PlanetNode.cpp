@@ -1,12 +1,18 @@
 #include "PlanetNode.h"
 #include <fstream>
 
-#define clamp(a, x, y) { a = ((a) > (x) ? ((a) < (y) ? (a) : (y)) : (x)); }
 #define CAST(t, x) static_cast<t>(x)
 #define gridSize CAST(long long, _resolution)
 #define offset (F(_resolution) / 2.f)
 
 #define F(x) CAST(float, x)
+
+struct PlanetConstantBuffer : public ConstantBuffer
+{
+	float  PlanetRadius;
+	float  PlanetPeaks;
+	float  PlanetResolution;
+};
 
 bool PlanetNode::Initialise()
 {
@@ -16,20 +22,41 @@ bool PlanetNode::Initialise()
 bool PlanetNode::Generate()
 {
 	shared_ptr<Mesh> terrainData = make_shared<Mesh>();
+	shared_ptr<Material> terrainMaterial = make_shared<Material>();
 
-	GenerateVertices(terrainData.get());
-	GenerateIndices(terrainData.get(), terrainData->GetVertices().size());
+	shared_ptr<Mesh> atmosphereData = terrainData->AddSubmesh();
+	shared_ptr<Material> atmosphereMaterial = make_shared<Material>();
 
-	terrainData->SetMode(_draw);
-	terrainData->RecalculateNormals();
-	terrainData->Apply();
+	InternalGenerateSpheroid(terrainData.get(), _radius, true);
+	InternalGenerateSpheroid(atmosphereData.get(), _radius + _atmosphereThickness, false);
+
+	atmosphereData->Invert();
+	atmosphereData->Apply();
+
+	PopulateGroundMaterial(terrainMaterial);
+	PopulateAtmosphereMaterial(atmosphereMaterial);
+
+	SetMaterial(terrainMaterial);
+	SetMaterial(0, atmosphereMaterial);
 
 	SetMesh(terrainData);
 
 	return true;
 }
 
-void PlanetNode::GenerateVertices(Mesh* target)
+bool PlanetNode::InternalGenerateSpheroid(Mesh* target, float radius, bool deform)
+{
+	GenerateVertices(target, radius, deform);
+	GenerateIndices(target, target->GetVertices().size());
+
+	target->SetMode(_draw);
+	target->RecalculateNormals();
+	target->Apply();
+
+	return true;
+}
+
+void PlanetNode::GenerateVertices(Mesh* target, float radius, bool deform)
 {
 	const int cornerVertices = 8;
 	const int edgeVertices = (gridSize + gridSize + gridSize - 3) * 4;
@@ -39,25 +66,30 @@ void PlanetNode::GenerateVertices(Mesh* target)
 		(gridSize - 1) * (gridSize - 1)) * 2;
 
 	vector<Vector3> vertices(CAST(size_t, cornerVertices) + CAST(size_t, edgeVertices) + CAST(size_t, faceVertices));
+	vector<XMFLOAT2> uv(vertices.size());
 
 	int v = 0;
 	for (int y = 0; y <= gridSize; y++)
 	{
 		for (int x = 0; x <= gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(y) - offset, -offset);
+			SetVertex(vertices, v, F(x) - offset, F(y) - offset, -offset);
+			uv[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int z = 1; z <= gridSize; z++)
 		{
-			vertices[v++] = Vector3(F(gridSize) - offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v, F(gridSize) - offset, F(y) - offset, F(z) - offset);
+			uv[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int x = gridSize - 1; x >= 0; x--)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(y) - offset, F(gridSize) - offset);
+			SetVertex(vertices, v, F(x) - offset, F(y) - offset, F(gridSize) - offset);
+			uv[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 		for (int z = gridSize - 1; z > 0; z--)
 		{
-			vertices[v++] = Vector3(-offset, F(y) - offset, F(z) - offset);
+			SetVertex(vertices, v, -offset, F(y) - offset, F(z) - offset);
+			uv[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 	}
 
@@ -65,25 +97,27 @@ void PlanetNode::GenerateVertices(Mesh* target)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, F(gridSize) - offset, F(z) - offset);
+			SetVertex(vertices, v, F(x) - offset, F(gridSize) - offset, F(z) - offset);
+			uv[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
 		}
 	}
 	for (int z = 1; z < gridSize; z++)
 	{
 		for (int x = 1; x < gridSize; x++)
 		{
-			vertices[v++] = Vector3(F(x) - offset, -offset, F(z) - offset);
+			SetVertex(vertices, v, F(x) - offset, -offset, F(z) - offset);
+			uv[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
 		}
 	}
 
-	MakeSphere(vertices);
+	MakeSphere(vertices, radius, deform);
 	
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
 		target->AddVertex(Vertex{
 			vertices[i].ToDX3(),
 			{ 0, 1, 0 },
-			{ 0, 0 }
+			uv[i]
 		});
 	}
 }
@@ -187,12 +221,14 @@ int PlanetNode::GenerateBottomFace(vector<int>& triangles, int t, int ring, size
 	return t;
 }
 
-void PlanetNode::MakeSphere(vector<Vector3>& vertices)
+void PlanetNode::MakeSphere(vector<Vector3>& vertices, float radius, bool deform)
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
+		const float height = deform ? _noises.GetNoiseValue(radius, XYZ(vertices[i])) : radius;
+
 		vertices[i].Normalize();
-		vertices[i] *= _radius + (GetNoiseValue(XYZ(vertices[i])));
+		vertices[i] *= height;
 	}
 }
 
@@ -221,12 +257,44 @@ constexpr FLOAT PlanetNode::GetNormalizedValue(const UINT& value, const UINT& ra
 	return static_cast<float>(value) / static_cast<float>(range) * 2 - 1;
 }
 
-FLOAT PlanetNode::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
+void PlanetNode::SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z)
 {
-	return _noise.fractal(_octaves,
-						  x * _noiseScale + _noiseOffsetX,
-						  y * _noiseScale + _noiseOffsetY,
-						  z * _noiseScale + _noiseOffsetY) * _peakHeight;
+	Vector3 v = Vector3(x, y, z) / F(gridSize);
+
+	float x2 = v.X * v.X;
+	float y2 = v.Y * v.Y;
+	float z2 = v.Z * v.Z;
+
+	Vector3 s;
+	s.SetX(v.X * sqrt(1.f - y2 / 2.f - z2 / 2.f + y2 * z2 / 3.f));
+	s.SetY(v.Y * sqrt(1.f - x2 / 2.f - z2 / 2.f + x2 * z2 / 3.f));
+	s.SetZ(v.Z * sqrt(1.f - x2 / 2.f - y2 / 2.f + x2 * y2 / 3.f));
+
+	s *= F(gridSize);
+
+	vertices[i] = s;
+}
+
+void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
+{
+	mat->SetShader(RESOURCES->GetShader(L"Shaders/planet.hlsl"));
+
+	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/ground.png"));
+	mat->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
+	mat->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
+	mat->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+
+	mat->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
+
+	PlanetConstantBuffer* planetBuffer = mat->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
+	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
+	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
+	planetBuffer->PlanetResolution = (FLOAT)_resolution / 4.f;
+}
+
+void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
+{
+	mat->SetShader(RESOURCES->GetShader(L"Shaders/atmosphere.hlsl"));
 }
 
 #undef gridSize

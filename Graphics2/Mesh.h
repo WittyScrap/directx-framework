@@ -4,7 +4,7 @@
 #include "Material.h"
 
 struct Vertex;
-struct CBUFFER;
+struct ConstantBuffer;
 
 /**
  * Defines in which way a mesh should be rendered.
@@ -50,6 +50,7 @@ public:
 			void								Apply();
 			void								Render() const;
 
+			shared_ptr<Mesh>					AddSubmesh()																{ shared_ptr<Mesh> mesh = make_shared<Mesh>(); AddSubmesh(mesh); return mesh; }
 			void								AddSubmesh(shared_ptr<Mesh>& subMesh);
 			void								RemoveSubmesh(shared_ptr<Mesh>& subMesh);
 			void								RemoveSubmesh(const size_t& index);
@@ -64,6 +65,7 @@ public:
 	inline  const MeshMode&						GetMode() const																{ return _mode; }
 
 			void								RecalculateNormals();
+			void								Invert();
 
 protected:
 

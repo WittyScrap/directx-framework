@@ -14,7 +14,7 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<AmbientLight> ambientLight = AddLight<AmbientLight>();
 	shared_ptr<DirectionalLight> directionalLight = AddLight<DirectionalLight>();
 
-	directionalLight->SetDirection({ -1, 1, 0 });
+	directionalLight->SetDirection({ -1, 0, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
 	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
@@ -23,9 +23,32 @@ void Graphics2::CreateSceneGraph()
 	planet->SetDrawMode(MeshMode::TriangleList);
 	planet->SetMode(TerrainMode::Procedural);
 
-	planet->SetNoiseOctaves(16);
-	planet->SetNoiseScale(.75f);
-	planet->SetPeakHeight(10.f);
+	auto& noiseManager = planet->GetNoiseManager();
+
+	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
+	planetNoise->SetNoiseOctaves(1);
+	planetNoise->SetNoiseScale(40.f);
+	planetNoise->SetPeakHeight(25.f);
+	planetNoise->RandomizeOffsets();
+
+	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
+	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
+	planetDetail->SetNoiseOctaves(8);
+	planetDetail->SetNoiseScale(5.f);
+	planetDetail->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
+
+	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
+	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
+	planetContinents->SetNoiseOctaves(4);
+	planetContinents->SetNoiseScale(80.f);
+	planetContinents->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
+
+	noiseManager.SetMaximumHeight(10.f);
+
+	planet->SetRadius(256.f);
+	planet->SetResolution(128);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMain();

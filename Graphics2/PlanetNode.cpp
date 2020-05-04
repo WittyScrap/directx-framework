@@ -13,6 +13,7 @@ struct PlanetConstantBuffer : public ConstantBuffer
 	float  PlanetRadius;
 	float  PlanetPeaks;
 	float  PlanetResolution;
+	XMFLOAT3 PlanetPosition;
 };
 
 struct AtmosphereConstantBuffer : public ConstantBuffer
@@ -30,10 +31,10 @@ bool PlanetNode::Initialise()
 bool PlanetNode::Generate()
 {
 	shared_ptr<Mesh> terrainData = make_shared<Mesh>();
-	shared_ptr<Material> terrainMaterial = make_shared<Material>();
+	_planetMaterial = make_shared<Material>();
 
 	shared_ptr<Mesh> atmosphereData = terrainData->AddSubmesh();
-	_atmosphere = make_shared<Material>();
+	_atmosphereMaterial = make_shared<Material>();
 
 	InternalGenerateSpheroid(terrainData.get(), _radius, true);
 	InternalGenerateSpheroid(atmosphereData.get(), _radius + _atmosphereThickness, false);
@@ -41,11 +42,11 @@ bool PlanetNode::Generate()
 	atmosphereData->Invert();
 	atmosphereData->Apply();
 
-	PopulateGroundMaterial(terrainMaterial);
-	PopulateAtmosphereMaterial(_atmosphere);
+	PopulateGroundMaterial(_planetMaterial);
+	PopulateAtmosphereMaterial(_atmosphereMaterial);
 
-	SetMaterial(terrainMaterial);
-	SetMaterial(0, _atmosphere);
+	SetMaterial(_planetMaterial);
+	SetMaterial(0, _atmosphereMaterial);
 
 	SetMesh(terrainData);
 
@@ -57,10 +58,13 @@ void PlanetNode::OnPreRender()
 	const float innerRadius = _radius;
 	const float outerRadius = _radius + _atmosphereThickness;
 
-	AtmosphereConstantBuffer* atmoBuffer = _atmosphere->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>();
+	AtmosphereConstantBuffer* atmoBuffer = _atmosphereMaterial->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>();
 	atmoBuffer->v3PlanetPosition = GetPosition().ToDX3();
 	atmoBuffer->fOuterRadius = outerRadius;
 	atmoBuffer->fInnerRadius = innerRadius;
+
+	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
+	planetBuffer->PlanetPosition = GetPosition().ToDX3();
 }
 
 bool PlanetNode::InternalGenerateSpheroid(Mesh* target, float radius, bool deform)

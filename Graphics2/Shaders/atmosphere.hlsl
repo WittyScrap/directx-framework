@@ -44,6 +44,9 @@ VertexOut VS(VertexIn vin)
 	
 	vout.Position = mul(completeTransform, float4(vin.Position, 1.0f));
 
+	float innerRadius2 = fInnerRadius * fInnerRadius;
+	float outerRadius2 = fOuterRadius * fOuterRadius;
+
 	float3 cameraPos = cameraPosition.xyz - v3PlanetPosition;
 	float cameraHeight = length(cameraPos);
 	float cameraHeight2 = cameraHeight * cameraHeight;
@@ -56,18 +59,27 @@ VertexOut VS(VertexIn vin)
 	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz;
 	float3 farPointToPlanetCenter = normalize(v3PlanetPosition - atmosphereFarPoint);
 	float3 cameraAtmosphereRay = normalize(cameraPosition.xyz - atmosphereFarPoint);
-	float atmosphereFallof = dot(cameraAtmosphereRay, farPointToPlanetCenter);
 
 	float B = 2.0 * dot(cameraPos, ray);
 	float C = cameraHeight2 - (fOuterRadius * fOuterRadius);
 	float det = max(0.0, B * B - 4.0 * C);
 	float near = 0.5 * (-B - sqrt(det));
 
-	float3 atmosphereNear = cameraPos + ray * near;
+	float atmosphereVertexHeight = length(atmosphereFarPoint - v3PlanetPosition);
+	float atmosphereThickness = fOuterRadius - fInnerRadius;
+	float cameraInsetAmount = saturate(cameraHeight - atmosphereVertexHeight);
+	float cameraAtmosphereGradient = saturate((cameraHeight - fInnerRadius) / atmosphereThickness);
+	float maximumTravelDistanceGround = sqrt(outerRadius2 - innerRadius2);
+	float maximumTravelDistanceSpace = maximumTravelDistanceGround * 2;
+	float lightTravelDistance = (length(cameraPosition.xyz - atmosphereFarPoint) - max(near, 0)) / lerp(maximumTravelDistanceGround, maximumTravelDistanceSpace, cameraAtmosphereGradient);
+
+	float atmosphereFallof = lightTravelDistance;
+
+	float3 atmosphereNear = cameraPos + ray * near * cameraInsetAmount;
 	float3 atmosphereNormal = normalize(atmosphereNear - v3PlanetPosition);
 
 	float rayAngle = dot(ray, -lightVector.xyz);
-	float lightAngle = saturate((dot(atmosphereNormal, -lightVector.xyz) + .5f) * 2);
+	float lightAngle = saturate((dot(atmosphereNormal, -lightVector.xyz) + .25f) * 2);
 
 	vout.TexCoord = float2(lightAngle, atmosphereFallof);
 

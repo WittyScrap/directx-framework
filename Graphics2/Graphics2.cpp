@@ -51,6 +51,7 @@ void Graphics2::CreateSceneGraph()
 	planet->SetResolution(128);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
+	mainPawn->SetMovementSpeed(1.f);
 	mainPawn->SetMain();
 
 	SCENE->Add(planet);

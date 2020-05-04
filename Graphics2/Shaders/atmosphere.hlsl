@@ -1,6 +1,4 @@
-//
-// Shader source: GPU Gems (NVIDIA)
-//
+#define PI		3.14159265359f
 
 cbuffer ConstantBuffer 
 {
@@ -22,7 +20,7 @@ cbuffer ConstantBuffer
 	float  fInnerRadius;		// The inner (planetary) radius
 };
 
-Texture2D atmoLUT;
+Texture2D atmoLUT : register(t0);
 SamplerState samplerState;
 
 struct VertexIn

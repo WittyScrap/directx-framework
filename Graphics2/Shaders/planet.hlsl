@@ -21,10 +21,11 @@ cbuffer ConstantBuffer
 	float3 planetPosition;
 };
 
-Texture2D ground;
-Texture2D cliff;
-Texture2D sand;
-Texture2D snow;
+Texture2D ground : register(t0);
+Texture2D cliff : register(t1);
+Texture2D sand : register(t2);
+Texture2D snow : register(t3);
+Texture2D atmo : register(t4);
 
 SamplerState ss;
 
@@ -43,7 +44,8 @@ struct VertexOut
 	float4 PositionWS	: TEXCOORD2;
 	float3 NormalLS		: TEXCOORD3;
 	float4 NormalWS		: TEXCOORD4;
-	float  Fog			: TEXCOORD5;
+	float3 NormalSphere : TEXCOORD5;
+	float  Fog			: TEXCOORD6;
 };
 
 VertexOut VS(VertexIn vin)
@@ -55,6 +57,7 @@ VertexOut VS(VertexIn vin)
 	vout.PositionWS = mul(worldTransform, float4(vin.Position, 1.0f));
 	vout.NormalLS = vin.Normal;
 	vout.NormalWS = float4(mul((float3x3)worldTransform, vin.Normal), 1.0f);
+	vout.NormalSphere = normalize(vout.PositionWS.xyz - planetPosition);
 	vout.TexCoord = vin.TexCoord;
 
 	float3 worldPos = vout.PositionWS.xyz;
@@ -109,8 +112,9 @@ float4 PS(VertexOut input) : SV_Target
 	float4 cliffDetection = lerp(polesDetection, cliffRocks, slope);
 
 	float4 color = light * cliffDetection;
+	float sphereLightFactor = saturate(dot(input.NormalSphere, -lightVector.xyz) + .15f);
 
-	float4 foggyColor = lerp(color, 1, .75f);
+	float4 foggyColor = lerp(color, atmo.Sample(ss, float2(sphereLightFactor, 1.f)), .75f);
 	color = lerp(color, foggyColor, input.Fog);
 
 	return color;

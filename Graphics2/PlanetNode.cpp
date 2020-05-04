@@ -306,6 +306,7 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	mat->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
 	mat->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
 	mat->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+	mat->SetTexture(4, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
 
 	mat->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
 

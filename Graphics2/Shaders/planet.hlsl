@@ -18,6 +18,7 @@ cbuffer ConstantBuffer
 	float  planetRadius;
 	float  planetPeaks;
 	float  planetResolution;
+	float3 planetPosition;
 };
 
 Texture2D ground;
@@ -36,12 +37,13 @@ struct VertexIn
 
 struct VertexOut
 {
-	float4 Position  : SV_POSITION;
-	float3 PositionLS: TEXCOORD1;
-	float4 PositionWS: TEXCOORD2;
-	float3 NormalLS : TEXCOORD3;
-	float4 NormalWS : TEXCOORD4;
-	float2 TexCoord	 : TEXCOORD;
+	float4 Position		: SV_POSITION;
+	float2 TexCoord		: TEXCOORD;
+	float3 PositionLS	: TEXCOORD1;
+	float4 PositionWS	: TEXCOORD2;
+	float3 NormalLS		: TEXCOORD3;
+	float4 NormalWS		: TEXCOORD4;
+	float  Fog			: TEXCOORD5;
 };
 
 VertexOut VS(VertexIn vin)
@@ -54,6 +56,12 @@ VertexOut VS(VertexIn vin)
 	vout.NormalLS = vin.Normal;
 	vout.NormalWS = float4(mul((float3x3)worldTransform, vin.Normal), 1.0f);
 	vout.TexCoord = vin.TexCoord;
+
+	float3 worldPos = vout.PositionWS.xyz;
+	float3 sphereNormal = normalize(worldPos - planetPosition);
+	float3 eye = normalize(worldPos - cameraPosition.xyz);
+
+	vout.Fog = (1 - dot(-sphereNormal, eye)) * dot(sphereNormal, -lightVector.xyz);
     
     return vout;
 }
@@ -101,6 +109,9 @@ float4 PS(VertexOut input) : SV_Target
 	float4 cliffDetection = lerp(polesDetection, cliffRocks, slope);
 
 	float4 color = light * cliffDetection;
+
+	float4 foggyColor = lerp(color, 1, .75f);
+	color = lerp(color, foggyColor, input.Fog);
 
 	return color;
 }

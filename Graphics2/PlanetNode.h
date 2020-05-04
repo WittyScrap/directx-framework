@@ -90,6 +90,7 @@ private:
     FLOAT                           _constantValue{ 0 };
     UINT                            _resolution{ 512 };
 
-    shared_ptr<Material>            _atmosphere;
+    shared_ptr<Material>            _atmosphereMaterial;
+    shared_ptr<Material>            _planetMaterial;
 };
 

@@ -1,4 +1,5 @@
 #include "PlanetNode.h"
+#include "CameraNode.h"
 #include <fstream>
 
 #define CAST(t, x) static_cast<t>(x)
@@ -14,6 +15,13 @@ struct PlanetConstantBuffer : public ConstantBuffer
 	float  PlanetResolution;
 };
 
+struct AtmosphereConstantBuffer : public ConstantBuffer
+{
+	XMFLOAT3 v3PlanetPosition;	// The position of the planet in world space
+	float  fOuterRadius;		// The outer (atmosphere) radius
+	float  fInnerRadius;		// The inner (planetary) radius
+};
+
 bool PlanetNode::Initialise()
 {
 	return Generate();
@@ -25,7 +33,7 @@ bool PlanetNode::Generate()
 	shared_ptr<Material> terrainMaterial = make_shared<Material>();
 
 	shared_ptr<Mesh> atmosphereData = terrainData->AddSubmesh();
-	shared_ptr<Material> atmosphereMaterial = make_shared<Material>();
+	_atmosphere = make_shared<Material>();
 
 	InternalGenerateSpheroid(terrainData.get(), _radius, true);
 	InternalGenerateSpheroid(atmosphereData.get(), _radius + _atmosphereThickness, false);
@@ -34,14 +42,25 @@ bool PlanetNode::Generate()
 	atmosphereData->Apply();
 
 	PopulateGroundMaterial(terrainMaterial);
-	PopulateAtmosphereMaterial(atmosphereMaterial);
+	PopulateAtmosphereMaterial(_atmosphere);
 
 	SetMaterial(terrainMaterial);
-	SetMaterial(0, atmosphereMaterial);
+	SetMaterial(0, _atmosphere);
 
 	SetMesh(terrainData);
 
 	return true;
+}
+
+void PlanetNode::OnPreRender()
+{
+	const float innerRadius = _radius;
+	const float outerRadius = _radius + _atmosphereThickness;
+
+	AtmosphereConstantBuffer* atmoBuffer = _atmosphere->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>();
+	atmoBuffer->v3PlanetPosition = GetPosition().ToDX3();
+	atmoBuffer->fOuterRadius = outerRadius;
+	atmoBuffer->fInnerRadius = innerRadius;
 }
 
 bool PlanetNode::InternalGenerateSpheroid(Mesh* target, float radius, bool deform)
@@ -295,6 +314,9 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 {
 	mat->SetShader(RESOURCES->GetShader(L"Shaders/atmosphere.hlsl"));
+	mat->GetConstantBuffer()->CreateBufferData<AtmosphereConstantBuffer>();
+
+	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
 }
 
 #undef gridSize

@@ -39,7 +39,7 @@ void Shader::Compile()
 
 	if (!CompileVertex(shaderCompileFlags) || !CompileFragment(shaderCompileFlags))
 	{
-		MessageBoxA(0, "Could not compile source shader, refer to log for details.", "Shader error", 0);
+		ErrorDialog(L"Shader error", L"Could not compile source shader, refer to log for details.", std::exception());
 		return;
 	}
 	else
@@ -109,7 +109,7 @@ bool Shader::CompileVertex(DWORD flags)
 	if (m.Get() != nullptr)
 	{
 		// If there were any compilation messages, display them
-		MessageBoxA(0, (char*)m->GetBufferPointer(), 0, 0);
+		ErrorDialog(L"Vertex Shader Compilation", s2ws((char*)m->GetBufferPointer()), std::exception());
 	}
 
 	// Even if there are no compiler messages, check to make sure there were no other errors.
@@ -139,7 +139,7 @@ bool Shader::CompileFragment(DWORD flags)
 	if (m.Get() != nullptr)
 	{
 		// If there were any compilation messages, display them
-		MessageBoxA(0, (char*)m->GetBufferPointer(), 0, 0);
+		ErrorDialog(L"Pixel Shader Compilation", s2ws((char*)m->GetBufferPointer()), std::exception());
 	}
 
 	ThrowIfFailed(hr);

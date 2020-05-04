@@ -1,3 +1,6 @@
+//
+// Shader source: GPU Gems (NVIDIA)
+//
 
 cbuffer ConstantBuffer 
 {
@@ -12,10 +15,15 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+
+	// Atmosphere-specific data
+	float3 v3PlanetPosition;	// The position of the planet in world space
+	float  fOuterRadius;		// The outer (atmosphere) radius
+	float  fInnerRadius;		// The inner (planetary) radius
 };
 
-Texture2D Texture;
-SamplerState ss;
+Texture2D atmoLUT;
+SamplerState samplerState;
 
 struct VertexIn
 {
@@ -26,10 +34,8 @@ struct VertexIn
 
 struct VertexOut
 {
-	float4 Position  : SV_POSITION;
-	float4 PositionWS: TEXCOORD1;
-	float4 NormalWS : TEXCOORD2;
-	float2 TexCoord	 : TEXCOORD;
+	float4 Position		: SV_POSITION;
+	float2 TexCoord		: TEXCOORD;
 };
 
 VertexOut VS(VertexIn vin)
@@ -37,36 +43,38 @@ VertexOut VS(VertexIn vin)
 	VertexOut vout;
 	
 	vout.Position = mul(completeTransform, float4(vin.Position, 1.0f));
-	vout.PositionWS = mul(worldTransform, float4(vin.Position, 1.0f));
-	vout.NormalWS = float4(mul((float3x3)worldTransform, vin.Normal), 1.0f);
-	vout.TexCoord = vin.TexCoord;
-    
-    return vout;
+
+	float3 cameraPos = cameraPosition.xyz - v3PlanetPosition;
+	float cameraHeight = length(cameraPos);
+	float cameraHeight2 = cameraHeight * cameraHeight;
+
+	float3 atmosphereFar = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - v3PlanetPosition;
+	float3 ray = atmosphereFar - cameraPos;
+	float farDistance = length(ray);
+	ray /= farDistance;
+
+	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz;
+	float3 farPointToPlanetCenter = normalize(v3PlanetPosition - atmosphereFarPoint);
+	float3 cameraAtmosphereRay = normalize(cameraPosition.xyz - atmosphereFarPoint);
+	float atmosphereFallof = dot(cameraAtmosphereRay, farPointToPlanetCenter);
+
+	float B = 2.0 * dot(cameraPos, ray);
+	float C = cameraHeight2 - (fOuterRadius * fOuterRadius);
+	float det = max(0.0, B * B - 4.0 * C);
+	float near = 0.5 * (-B - sqrt(det));
+
+	float3 atmosphereNear = cameraPos + ray * near;
+	float3 atmosphereNormal = normalize(atmosphereNear - v3PlanetPosition);
+
+	float rayAngle = dot(ray, -lightVector.xyz);
+	float lightAngle = saturate((dot(atmosphereNormal, -lightVector.xyz) + .5f) * 2);
+
+	vout.TexCoord = float2(lightAngle, atmosphereFallof);
+
+	return vout;
 }
 
 float4 PS(VertexOut input) : SV_Target
 {
-	float4 viewDirection = normalize(cameraPosition - input.PositionWS);
-	float4 directionToLight = normalize(-lightVector);
-
-	// Calculate diffuse lighting
-	float4 adjustedNormal = normalize(input.NormalWS);
-	float NdotL = max(0, dot(adjustedNormal, directionToLight));
-	float4 diffuse = saturate(lightColor * NdotL * diffCoefficient);
-
-	// Calculate specular component
-	float4 R = 2 * NdotL * adjustedNormal - directionToLight;
-	float RdotV = max(0, dot(R, viewDirection));
-	float4 specular = saturate(lightColor * pow(RdotV, shininess) * specCoefficient);
-
-	// Calculate ambient lighting
-	float4 ambientLight = 0;
-
-	// Combine all components
-	float4 color = saturate((ambientLight + diffuse/* + specular*/) * Texture.Sample(ss, input.TexCoord));
-	color.a = color.r;
-
-	return color;
+	return atmoLUT.Sample(samplerState, input.TexCoord) * input.TexCoord.x * input.TexCoord.y;
 }
-
-

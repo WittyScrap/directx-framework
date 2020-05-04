@@ -57,6 +57,8 @@ public:
 
              bool                   Generate();
 
+    virtual  void                   OnPreRender() override;
+
 protected:
              bool                   InternalGenerateSpheroid(Mesh* target, float radius, bool deform);
 
@@ -87,5 +89,7 @@ private:
 
     FLOAT                           _constantValue{ 0 };
     UINT                            _resolution{ 512 };
+
+    shared_ptr<Material>            _atmosphere;
 };
 

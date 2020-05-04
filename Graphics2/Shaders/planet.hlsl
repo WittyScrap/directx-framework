@@ -114,7 +114,7 @@ float4 PS(VertexOut input) : SV_Target
 	float4 color = light * cliffDetection;
 	float sphereLightFactor = saturate(dot(input.NormalSphere, -lightVector.xyz) + .15f);
 
-	float4 foggyColor = lerp(color, atmo.Sample(ss, float2(sphereLightFactor, 1.f)), .75f);
+	float4 foggyColor = atmo.Sample(ss, float2(sphereLightFactor, 1.f));
 	color = lerp(color, foggyColor, input.Fog);
 
 	return color;

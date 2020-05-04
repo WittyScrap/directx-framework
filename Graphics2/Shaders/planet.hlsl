@@ -104,7 +104,7 @@ float4 PS(VertexOut input) : SV_Target
 	float4 flatGround = ground.Sample(ss, uv);
 	float4 cliffRocks = cliff.Sample(ss, uv);
 	float4 desertSand = sand.Sample(ss, uv);
-	float4 HiPeakSnow = snow.Sample(ss, uv);
+	float4 HiPeakSnow = snow.Sample(ss, uv) * 2;
 
 	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len);
 	float4 desertDetection = lerp(mountainDetection, desertSand, desert * .5f);

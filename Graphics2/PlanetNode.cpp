@@ -12,6 +12,7 @@ struct PlanetConstantBuffer : public ConstantBuffer
 {
 	float  PlanetRadius;
 	float  PlanetPeaks;
+	float  PlanetOuterRadius;
 	float  PlanetResolution;
 	XMFLOAT3 PlanetPosition;
 };
@@ -314,6 +315,7 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
 	planetBuffer->PlanetResolution = (FLOAT)_resolution / 4.f;
+	planetBuffer->PlanetOuterRadius = _radius + _atmosphereThickness;
 }
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)

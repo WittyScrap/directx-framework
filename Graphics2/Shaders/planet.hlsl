@@ -17,6 +17,7 @@ cbuffer ConstantBuffer
 	// Planet-specific data
 	float  planetRadius;
 	float  planetPeaks;
+	float  planetOuterRadius;
 	float  planetResolution;
 	float3 planetPosition;
 };
@@ -60,11 +61,27 @@ VertexOut VS(VertexIn vin)
 	vout.NormalSphere = normalize(vout.PositionWS.xyz - planetPosition);
 	vout.TexCoord = vin.TexCoord;
 
-	float3 worldPos = vout.PositionWS.xyz;
-	float3 sphereNormal = normalize(worldPos - planetPosition);
-	float3 eye = normalize(worldPos - cameraPosition.xyz);
+	float outerRadius2 = planetOuterRadius * planetOuterRadius;
+	float innerRadius2 = planetRadius * planetRadius;
 
-	vout.Fog = (1 - dot(-sphereNormal, eye)) * dot(sphereNormal, -lightVector.xyz) * .75f;
+	float3 cameraPos = cameraPosition.xyz - planetPosition;
+	float cameraHeight = length(cameraPos);
+	float cameraHeight2 = cameraHeight * cameraHeight;
+
+	float3 atmosphereFar = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - planetPosition;
+	float3 ray = atmosphereFar - cameraPos;
+	float farDistance = length(ray);
+	ray /= farDistance;
+
+	float B = 2.0 * dot(cameraPos, ray);
+	float C = cameraHeight2 - (planetOuterRadius * planetRadius);
+	float det = max(0.0, B * B - 4.0 * C);
+	float near = 0.5 * (-B - sqrt(det));
+
+	float lightRayTravelDistance = farDistance - near;
+	float maximumTravelDistance = sqrt(outerRadius2 - innerRadius2);
+
+	vout.Fog = (lightRayTravelDistance / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
     
     return vout;
 }

@@ -64,7 +64,7 @@ VertexOut VS(VertexIn vin)
 	float3 sphereNormal = normalize(worldPos - planetPosition);
 	float3 eye = normalize(worldPos - cameraPosition.xyz);
 
-	vout.Fog = (1 - dot(-sphereNormal, eye)) * dot(sphereNormal, -lightVector.xyz);
+	vout.Fog = (1 - dot(-sphereNormal, eye)) * dot(sphereNormal, -lightVector.xyz) * .75f;
     
     return vout;
 }

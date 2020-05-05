@@ -37,7 +37,10 @@ bool PlanetNode::Generate()
 	shared_ptr<Mesh> atmosphereData = terrainData->AddSubmesh();
 	_atmosphereMaterial = make_shared<Material>();
 
+	_resolution = _planetResolution;
 	InternalGenerateSpheroid(terrainData.get(), _radius, true);
+
+	_resolution = 32;
 	InternalGenerateSpheroid(atmosphereData.get(), _radius + _atmosphereThickness, false);
 
 	atmosphereData->Invert();
@@ -56,13 +59,8 @@ bool PlanetNode::Generate()
 
 void PlanetNode::OnPreRender()
 {
-	const float innerRadius = _radius;
-	const float outerRadius = _radius + _atmosphereThickness;
-
 	AtmosphereConstantBuffer* atmoBuffer = _atmosphereMaterial->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>();
 	atmoBuffer->v3PlanetPosition = GetPosition().ToDX3();
-	atmoBuffer->fOuterRadius = outerRadius;
-	atmoBuffer->fInnerRadius = innerRadius;
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
 	planetBuffer->PlanetPosition = GetPosition().ToDX3();
@@ -249,7 +247,10 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices, float radius, bool deform
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		const float height = deform ? _noises.GetNoiseValue(radius, XYZ(vertices[i])) : radius;
+		const float height = deform ? _noises.GetNoiseValue(radius, 
+											  (vertices[i].X / gridSize) * 128,
+											  (vertices[i].Y / gridSize) * 128,
+											  (vertices[i].Z / gridSize) * 128) : radius;
 
 		vertices[i].Normalize();
 		vertices[i] *= height;
@@ -307,6 +308,8 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	mat->SetTexture(1, RESOURCES->GetTexture(L"PlanetData/cliff.png"));
 	mat->SetTexture(2, RESOURCES->GetTexture(L"PlanetData/sand.png"));
 	mat->SetTexture(3, RESOURCES->GetTexture(L"PlanetData/snow.png"));
+
+	// Atmosphere atlas
 	mat->SetTexture(4, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
 
 	mat->GetConstantBuffer()->CreateBufferData<PlanetConstantBuffer>();
@@ -320,10 +323,16 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 {
+	const float innerRadius = _radius;
+	const float outerRadius = _radius + _atmosphereThickness;
+
 	mat->SetShader(RESOURCES->GetShader(L"Shaders/atmosphere.hlsl"));
+	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
 	mat->GetConstantBuffer()->CreateBufferData<AtmosphereConstantBuffer>();
 
-	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
+	AtmosphereConstantBuffer* atmoBuffer = mat->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>();
+	atmoBuffer->fOuterRadius = outerRadius;
+	atmoBuffer->fInnerRadius = innerRadius;
 }
 
 #undef gridSize

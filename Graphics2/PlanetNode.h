@@ -16,6 +16,8 @@ enum class TerrainMode
     Flat
 };
 
+#define MESH shared_ptr<Mesh>
+
 /**
  * Represents a graph for procedurally generated or
  * sampled terrain data.
@@ -47,8 +49,8 @@ public:
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
-     inline  void                   SetResolution(const UINT& value)                { _resolution = value; }
-     inline  void                   SetResolution(const UINT&& value)               { _resolution = value; }
+     inline  void                   SetResolution(const UINT& value)                { _planetResolution = value; }
+     inline  void                   SetResolution(const UINT&& value)               { _planetResolution = value; }
 
      inline  TerrainMode            GetMode()                                       { return _mode; }
      inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
@@ -88,7 +90,9 @@ private:
     FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
-    UINT                            _resolution{ 256 };
+    UINT                            _resolution{ 0 };
+
+    UINT                            _planetResolution{ 256 };
 
     shared_ptr<Material>            _atmosphereMaterial;
     shared_ptr<Material>            _planetMaterial;

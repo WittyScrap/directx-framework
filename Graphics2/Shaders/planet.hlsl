@@ -26,6 +26,7 @@ Texture2D ground : register(t0);
 Texture2D cliff : register(t1);
 Texture2D sand : register(t2);
 Texture2D snow : register(t3);
+
 Texture2D atmo : register(t4);
 
 SamplerState ss;

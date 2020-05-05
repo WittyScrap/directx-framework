@@ -116,12 +116,29 @@ float4 PS(VertexOut input) : SV_Target
 	float desert = 1 - saturate((abs(dot(normalize(input.PositionLS), float3(0, 1, 0))) - .05f) * 4.f);
 	float ice = saturate((abs(dot(normalize(input.PositionLS), float3(0, 1, 0))) - .5f) * 4.f);
 
-	float2 uv = (input.TexCoord * planetResolution) % 1.f;
+	float3 cameraPos = cameraPosition.xyz - planetPosition;
+	float cameraHeight = length(cameraPos);
+	cameraHeight -= planetRadius;
+	cameraHeight /= (planetOuterRadius - planetRadius);
+	cameraHeight = 1 - saturate(cameraHeight);
+
+	float2 uv = (input.TexCoord * 8) % 1.f;
+	float2 uvDetail = (input.TexCoord * 64) % 1.f;
 
 	float4 flatGround = ground.Sample(ss, uv);
 	float4 cliffRocks = cliff.Sample(ss, uv);
 	float4 desertSand = sand.Sample(ss, uv);
 	float4 HiPeakSnow = snow.Sample(ss, uv) * 2;
+
+	float4 flatDetail   = ground.Sample(ss, uvDetail);
+	float4 cliffDetail  = cliff.Sample(ss, uvDetail);
+	float4 desertDetail = sand.Sample(ss, uvDetail);
+	float4 snowDetail   = snow.Sample(ss, uvDetail) * 2;
+
+	flatGround = lerp(flatGround, flatDetail, cameraHeight);
+	cliffRocks = lerp(cliffRocks, cliffDetail, cameraHeight);
+	desertSand = lerp(desertSand, desertDetail, cameraHeight);
+	HiPeakSnow = lerp(HiPeakSnow, snowDetail, cameraHeight);
 
 	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len);
 	float4 desertDetection = lerp(mountainDetection, desertSand, desert * .5f);

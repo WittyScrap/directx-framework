@@ -182,6 +182,7 @@
     <ClInclude Include="BasicNoise.h" />
     <ClInclude Include="PawnNode.h" />
     <ClInclude Include="PlaneNode.h" />
+    <ClInclude Include="PlanetBuilder.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="RobotNode.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="BasicNoise.cpp" />
     <ClCompile Include="NoiseManager.cpp" />
     <ClCompile Include="PlaneNode.cpp" />
+    <ClCompile Include="PlanetBuilder.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="RobotNode.cpp" />
     <ClCompile Include="SceneGraph.cpp" />

@@ -67,6 +67,11 @@ public:
 			void								RecalculateNormals();
 			void								Invert();
 
+			void								ClearVertices()																{ _vertices.clear(); b_isApplied = false; }
+			void								ClearIndices()																{ _indices.clear(); b_isApplied = false; }
+			
+			void								Clear()																		{ ClearVertices(); ClearIndices(); }
+
 protected:
 
 	static  ComPtr<ID3D11Device>                GetDevice();

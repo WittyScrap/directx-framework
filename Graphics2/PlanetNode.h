@@ -18,6 +18,11 @@ enum class TerrainMode
 
 #define MESH shared_ptr<Mesh>
 
+struct LOD
+{
+    UINT planetLOD, atmosphereLOD;
+};
+
 /**
  * Represents a graph for procedurally generated or
  * sampled terrain data.
@@ -49,8 +54,7 @@ public:
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
-     inline  void                   SetResolution(const UINT& value)                { _planetResolution = value; }
-     inline  void                   SetResolution(const UINT&& value)               { _planetResolution = value; }
+             void                   CreateLOD(const UINT& resolution);
 
      inline  TerrainMode            GetMode()                                       { return _mode; }
      inline  void                   SetMode(TerrainMode value)                      { _mode = value; }
@@ -62,20 +66,8 @@ public:
     virtual  void                   OnPreRender() override;
 
 protected:
-             bool                   InternalGenerateSpheroid(Mesh* target, float radius, bool deform);
-
-             void                   GenerateVertices(Mesh* target, float radius, bool deform);
-             void                   GenerateIndices(Mesh* target, size_t verticesLength);
-
-             int                    GenerateTopFace(vector<int>& indices, int t, int ring);
-             int                    GenerateBottomFace(vector<int>& indices, int t, int ring, size_t verticesLength);
-
-             void                   MakeSphere(vector<Vector3>& vertices, float radius, bool deform);
-
-     static  int                    CreateQuad(vector<int>& indices, int i, int v00, int v10, int v01, int v11);
-   constexpr FLOAT                  GetNormalizedValue(const UINT& value, const UINT& range) const;
-
-             void                   SetVertex(vector<Vector3>& vertices, int i, const float& x, const float& y, const float& z);
+             MESH                   GenerateLOD(const LOD& resolution);
+             void                   MakeSphere(vector<Vector3>& vertices, const UINT& resolution, float radius, bool deform);
 
              void                   PopulateGroundMaterial(shared_ptr<Material>& mat);
              void                   PopulateAtmosphereMaterial(shared_ptr<Material>& mat);
@@ -90,11 +82,13 @@ private:
     FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
-    UINT                            _resolution{ 0 };
-
-    UINT                            _planetResolution{ 256 };
+    const UINT                      _atmosphereMaxResolution{ 32 };
 
     shared_ptr<Material>            _atmosphereMaterial;
     shared_ptr<Material>            _planetMaterial;
+
+    vector<MESH>                    _meshLODs;
+    vector<LOD>                     _requestedLODs;
 };
 
+#undef MESH

@@ -129,6 +129,9 @@
     <ClInclude Include="BasicNoise.h">
       <Filter>Header Files\Noise Functions</Filter>
     </ClInclude>
+    <ClInclude Include="PlanetBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -205,6 +208,9 @@
       <Filter>Source Files\Noise Functions</Filter>
     </ClCompile>
     <ClCompile Include="NoiseManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlanetBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

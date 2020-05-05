@@ -18,7 +18,6 @@ cbuffer ConstantBuffer
 	float  planetRadius;
 	float  planetPeaks;
 	float  planetOuterRadius;
-	float  planetResolution;
 	float3 planetPosition;
 };
 

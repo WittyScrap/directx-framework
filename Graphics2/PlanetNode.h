@@ -88,7 +88,7 @@ private:
     FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
-    UINT                            _resolution{ 512 };
+    UINT                            _resolution{ 256 };
 
     shared_ptr<Material>            _atmosphereMaterial;
     shared_ptr<Material>            _planetMaterial;

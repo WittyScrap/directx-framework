@@ -93,7 +93,7 @@ float4 PS(VertexOut input) : SV_Target
 
 	// Calculate diffuse lighting
 	float4 adjustedNormal = normalize(input.NormalWS);
-	float NdotL = max(0, dot(adjustedNormal, directionToLight));
+	float NdotL = saturate(dot(adjustedNormal, directionToLight));
 	float4 diffuse = saturate(lightColor * NdotL * diffCoefficient);
 
 	// Calculate specular component

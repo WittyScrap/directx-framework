@@ -53,6 +53,9 @@ public:
      inline  FLOAT                  GetConstantValue() const                        { return _constantValue; }
      inline  void                   SetConstantValue(const FLOAT& value)            { _constantValue = value; }
 
+     inline  void                   SetMinimumDistance(const FLOAT& value)          { _minimumDistance = value; }
+     inline  void                   SetMaximumDistance(const FLOAT& value)          { _maximumDistance = value; }
+
      inline  void                   SetDrawMode(const MeshMode& value)              { _draw = value; }
              void                   CreateLOD(const UINT& resolution);
 
@@ -62,7 +65,6 @@ public:
      inline  NoiseManager&          GetNoiseManager()                               { return _noises; }
 
              bool                   Generate();
-
     virtual  void                   OnPreRender() override;
 
 protected:
@@ -71,6 +73,9 @@ protected:
 
              void                   PopulateGroundMaterial(shared_ptr<Material>& mat);
              void                   PopulateAtmosphereMaterial(shared_ptr<Material>& mat);
+
+private:
+             void                   SetLOD(size_t lod);
 
 private:
     NoiseManager                    _noises;
@@ -89,6 +94,11 @@ private:
 
     vector<MESH>                    _meshLODs;
     vector<LOD>                     _requestedLODs;
+
+    FLOAT                           _minimumDistance{ 200.f };
+    FLOAT                           _maximumDistance{ 4000.f };
+
+    int                             _currentLOD{ -1 };
 };
 
 #undef MESH

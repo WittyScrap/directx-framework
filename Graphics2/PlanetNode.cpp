@@ -3,6 +3,7 @@
 #include "PlanetBuilder.h"
 #include <fstream>
 #include <sstream>
+#include <thread> // Oh no
 
 void Output(const char* szFormat, ...)
 {
@@ -51,13 +52,9 @@ bool PlanetNode::Generate()
 	SetMaterial(_planetMaterial);
 	SetMaterial(0, _atmosphereMaterial);
 
-	for (size_t lod = 0; lod < _requestedLODs.size(); ++lod)
-	{
-		_meshLODs.push_back(GenerateLOD(_requestedLODs[lod]));
-	}
-
-	// Set up lowest LOD
-	SetLOD(0);
+	// I am so going to regret this am I not
+	thread planetGenerationThread(&PlanetNode::GenerateAllLODs, this);
+	planetGenerationThread.detach();
 
 	return true;
 }
@@ -79,6 +76,14 @@ void PlanetNode::OnPreRender()
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>();
 	planetBuffer->PlanetPosition = GetPosition().ToDX3();
+}
+
+void PlanetNode::GenerateAllLODs()
+{
+	for (size_t lod = 0; lod < _requestedLODs.size(); ++lod)
+	{
+		_meshLODs.push_back(GenerateLOD(_requestedLODs[lod]));
+	}
 }
 
 shared_ptr<Mesh> PlanetNode::GenerateLOD(const LOD& resolution)

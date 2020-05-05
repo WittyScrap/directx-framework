@@ -50,9 +50,10 @@ void Graphics2::CreateSceneGraph()
 	planet->SetRadius(256.f);
 
 	// Define LOD resolutions...
-	planet->CreateLOD(8);
-	planet->CreateLOD(32);
-	planet->CreateLOD(128);
+	planet->CreateLOD(4);
+	planet->CreateLOD(16);
+	planet->CreateLOD(64);
+	planet->CreateLOD(256);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
 	mainPawn->SetMovementSpeed(2.f);

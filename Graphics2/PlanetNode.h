@@ -68,6 +68,8 @@ public:
     virtual  void                   OnPreRender() override;
 
 protected:
+             void                   GenerateAllLODs();
+
              MESH                   GenerateLOD(const LOD& resolution);
              void                   MakeSphere(vector<Vector3>& vertices, const UINT& resolution, float radius, bool deform);
 

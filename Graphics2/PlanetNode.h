@@ -5,6 +5,8 @@
 #include "Material.h"
 #include "Mesh.h"
 
+#include <thread> // Oh no
+
 /**
  * Toggles between in which way the terrain should be sampled.
  *
@@ -37,10 +39,10 @@ struct LOD
 class PlanetNode : public MeshNode
 {
 public:
-                                    PlanetNode() : MeshNode(L"Terrain")                { }
-                                    PlanetNode(wstring name) : MeshNode(name)          { }
+                                    PlanetNode() : MeshNode(L"Terrain")             { }
+                                    PlanetNode(wstring name) : MeshNode(name)       { }
 
-    virtual                        ~PlanetNode()                                       { }
+    virtual                        ~PlanetNode()                                    { b_abortBuild = true; _planetBuildingThread.join(); }
 
     virtual  bool                   Initialise() override;
 
@@ -105,6 +107,9 @@ private:
 
     int                             _currentLOD{ -1 };
     bool                            b_hasAtmosphere{ true };
+
+    thread                          _planetBuildingThread;
+    bool                            b_abortBuild{ false };
 };
 
 #undef MESH

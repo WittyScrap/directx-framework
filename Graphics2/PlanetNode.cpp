@@ -3,7 +3,6 @@
 #include "PlanetBuilder.h"
 #include <fstream>
 #include <sstream>
-#include <thread> // Oh no
 
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
@@ -46,8 +45,7 @@ bool PlanetNode::Generate()
 	SetMaterial(0, _atmosphereMaterial);
 
 	// I am so going to regret this am I not
-	thread planetGenerationThread(&PlanetNode::GenerateAllLODs, this);
-	planetGenerationThread.detach(); // We detach the thread here since we do not want to block this function
+	_planetBuildingThread = thread(&PlanetNode::GenerateAllLODs, this);
 
 	return true;
 }
@@ -76,7 +74,7 @@ void PlanetNode::OnPreRender()
 
 void PlanetNode::GenerateAllLODs()
 {
-	for (size_t lod = 0; lod < _requestedLODs.size(); ++lod)
+	for (size_t lod = 0; lod < _requestedLODs.size() && !b_abortBuild; ++lod)
 	{
 		_meshLODs.push_back(GenerateLOD(_requestedLODs[lod]));
 	}

@@ -83,7 +83,7 @@ VertexOut VS(VertexIn vin)
 	float lightRayTravelDistance = farDistance - near;
 	float maximumTravelDistance = sqrt(outerRadius2 - innerRadius2);
 
-	vout.Fog = ((lightRayTravelDistance) / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
+	vout.Fog = ((lightRayTravelDistance * planetHasAtmosphere) / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
     
     return vout;
 }

@@ -225,6 +225,8 @@ void Mesh::RecalculateNormals()
 	{
 		_vertices[i].Normal = normals[i].normal.ToDX3();
 	}
+
+	b_isApplied = false;
 }
 
 void Mesh::Invert()
@@ -235,6 +237,8 @@ void Mesh::Invert()
 		_indices[it0] = _indices[it1];
 		_indices[it1] = i0;
 	}
+	
+	b_isApplied = false;
 }
 
 ComPtr<ID3D11Device> Mesh::GetDevice()

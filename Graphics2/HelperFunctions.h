@@ -66,3 +66,14 @@ inline void ErrorDialog(const wstring& title, const wstring& content, const std:
 		break;
 	}
 }
+
+inline void Output(const char* szFormat, ...)
+{
+	char szBuff[1024];
+	va_list arg;
+	va_start(arg, szFormat);
+	_vsnprintf_s(szBuff, sizeof(szBuff), szFormat, arg);
+	va_end(arg);
+
+	OutputDebugString(s2ws(szBuff).c_str());
+}

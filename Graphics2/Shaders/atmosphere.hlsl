@@ -1,6 +1,4 @@
-//
-// Shader source: GPU Gems (NVIDIA)
-//
+#define PI		3.14159265359f
 
 cbuffer ConstantBuffer 
 {
@@ -22,7 +20,7 @@ cbuffer ConstantBuffer
 	float  fInnerRadius;		// The inner (planetary) radius
 };
 
-Texture2D atmoLUT;
+Texture2D atmoLUT : register(t0);
 SamplerState samplerState;
 
 struct VertexIn
@@ -44,44 +42,60 @@ VertexOut VS(VertexIn vin)
 	
 	vout.Position = mul(completeTransform, float4(vin.Position, 1.0f));
 
+	// Store away squared values for easier access
 	float innerRadius2 = fInnerRadius * fInnerRadius;
 	float outerRadius2 = fOuterRadius * fOuterRadius;
 
+	// Determine camera location in local space to extract its height from the top of the atmosphere
 	float3 cameraPos = cameraPosition.xyz - v3PlanetPosition;
 	float cameraHeight = length(cameraPos);
 	float cameraHeight2 = cameraHeight * cameraHeight;
 
-	float3 atmosphereFar = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - v3PlanetPosition;
-	float3 ray = atmosphereFar - cameraPos;
+	// Calculate a ray from the camera's location to the "far point", AKA the vertex that is currently being rendered.
+	// Because the atmosphere's sphere is inverted, only the "far" points will be rendered at any given point in time.
+	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz;
+	float3 relativeFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - v3PlanetPosition;
+	float3 ray = relativeFarPoint - cameraPos;
 	float farDistance = length(ray);
 	ray /= farDistance;
 
-	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz;
 	float3 farPointToPlanetCenter = normalize(v3PlanetPosition - atmosphereFarPoint);
 	float3 cameraAtmosphereRay = normalize(cameraPosition.xyz - atmosphereFarPoint);
 
+	// Determine near point
 	float B = 2.0 * dot(cameraPos, ray);
 	float C = cameraHeight2 - (fOuterRadius * fOuterRadius);
 	float det = max(0.0, B * B - 4.0 * C);
 	float near = 0.5 * (-B - sqrt(det));
 
+	// Calculate a gradient to determine the amount by which the camera has entered
+	// the atmosphere.
 	float atmosphereVertexHeight = length(atmosphereFarPoint - v3PlanetPosition);
 	float atmosphereThickness = fOuterRadius - fInnerRadius;
 	float cameraInsetAmount = saturate(cameraHeight - atmosphereVertexHeight);
 	float cameraAtmosphereGradient = saturate((cameraHeight - fInnerRadius) / atmosphereThickness);
+
+	// Calculate the maximum distance that a light ray could travel across the atmosphere when
+	// in space and when on the surface of the planet.
 	float maximumTravelDistanceGround = sqrt(outerRadius2 - innerRadius2);
 	float maximumTravelDistanceSpace = maximumTravelDistanceGround * 2;
-	float lightTravelDistance = (length(cameraPosition.xyz - atmosphereFarPoint) - max(near, 0)) / lerp(maximumTravelDistanceGround, maximumTravelDistanceSpace, cameraAtmosphereGradient);
+	float currentMaximumDistance = lerp(maximumTravelDistanceGround, maximumTravelDistanceSpace, cameraAtmosphereGradient); // The current maximum distance depends on how close to the ground the camera is.
 
-	float atmosphereFallof = lightTravelDistance;
+	// Calculate the total distance the light ray had to travel to get to the camera.
+	float lightTravelDistance = length(cameraPosition.xyz - atmosphereFarPoint) - max(near, 0);
+	float atmosphereFalloff = lightTravelDistance / currentMaximumDistance; // The falloff gradient
 
+	// Determine the normal of the "near" point in the atmosphere to calculate light value
 	float3 atmosphereNear = cameraPos + ray * near * cameraInsetAmount;
 	float3 atmosphereNormal = normalize(atmosphereNear - v3PlanetPosition);
 
-	float rayAngle = dot(ray, -lightVector.xyz);
+	// Finally, calculate the light amount using the previously determined normal.
+	// Add a bias of 0.25 because atmosphere scattering would allow light to illuminate parts of the
+	// atmosphere slightly beyond the sphere's diameter.
 	float lightAngle = saturate((dot(atmosphereNormal, -lightVector.xyz) + .25f) * 2);
 
-	vout.TexCoord = float2(lightAngle, atmosphereFallof);
+	// Create LUT map coordinates
+	vout.TexCoord = float2(lightAngle, atmosphereFalloff);
 
 	return vout;
 }

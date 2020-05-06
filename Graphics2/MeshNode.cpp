@@ -19,14 +19,17 @@ void MeshNode::Render()
 {
     OnPreRender();
 
-    InternalRender(_mesh, _material);
-
-    for (size_t it = 0; it < _mesh->GetSubmeshCount(); ++it)
+    if (_mesh)
     {
-        shared_ptr<Mesh> mesh = _mesh->GetSubmesh(it);
-        shared_ptr<Material> mat = it >= _materials.size() ? nullptr : _materials[it];
+        InternalRender(_mesh, _material);
 
-        InternalRender(mesh, mat);
+        for (size_t it = 0; it < _mesh->GetSubmeshCount(); ++it)
+        {
+            shared_ptr<Mesh> mesh = _mesh->GetSubmesh(it);
+            shared_ptr<Material> mat = it >= _materials.size() ? nullptr : _materials[it];
+
+            InternalRender(mesh, mat);
+        }
     }
 }
 

@@ -48,9 +48,15 @@ void Graphics2::CreateSceneGraph()
 	noiseManager.SetMaximumHeight(10.f);
 
 	planet->SetRadius(256.f);
-	planet->SetResolution(128);
+
+	// Define LOD resolutions...
+	planet->CreateLOD(4);
+	planet->CreateLOD(16);
+	planet->CreateLOD(64);
+	planet->CreateLOD(256);
 
 	mainPawn->SetPosition({ 0, 128, -1024 });
+	mainPawn->SetMovementSpeed(2.f);
 	mainPawn->SetMain();
 
 	SCENE->Add(planet);

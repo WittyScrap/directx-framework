@@ -5,16 +5,8 @@
 #include <sstream>
 #include <thread> // Oh no
 
-void Output(const char* szFormat, ...)
-{
-	char szBuff[1024];
-	va_list arg;
-	va_start(arg, szFormat);
-	_vsnprintf_s(szBuff, sizeof(szBuff), szFormat, arg);
-	va_end(arg);
-
-	OutputDebugString(s2ws(szBuff).c_str());
-}
+#undef clamp
+#define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
 
 struct PlanetConstantBuffer : public ConstantBuffer
 {
@@ -54,7 +46,7 @@ bool PlanetNode::Generate()
 
 	// I am so going to regret this am I not
 	thread planetGenerationThread(&PlanetNode::GenerateAllLODs, this);
-	planetGenerationThread.detach();
+	planetGenerationThread.detach(); // We detach the thread here since we do not want to block this function
 
 	return true;
 }
@@ -67,7 +59,7 @@ void PlanetNode::OnPreRender()
 	const CameraNode* mainCamera = MAIN_CAMERA;
 	const FLOAT cameraDistance = (mainCamera->GetPosition() - GetPosition()).Length() - minimumDistance + 1;
 	const FLOAT cameraGradient = (cameraDistance / (maximumDistance - minimumDistance)) * _meshLODs.size();
-	const size_t lodIndex = _meshLODs.size() - static_cast<size_t>(roundf(cameraGradient));
+	const size_t lodIndex = _meshLODs.size() - clamp(static_cast<size_t>(roundf(cameraGradient)), 0, _meshLODs.size());
 
 	SetLOD(lodIndex);
 
@@ -166,7 +158,7 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 
 void PlanetNode::SetLOD(size_t lod)
 {
-	clamp(lod, 0, _meshLODs.size() - 1);
+	lod = clamp(lod, 0, _meshLODs.size() - 1);
 
 	if (lod != _currentLOD)
 	{
@@ -174,5 +166,3 @@ void PlanetNode::SetLOD(size_t lod)
 		_currentLOD = static_cast<int>(lod);
 	}
 }
-
-#undef gridSize

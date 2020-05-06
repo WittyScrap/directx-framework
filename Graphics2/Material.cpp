@@ -101,7 +101,7 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 	DirectXFramework* framework = DirectXFramework::GetDXFramework();
 	const CameraNode* mainCamera = CameraNode::GetMain();
 
-	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer();
+	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer<ConstantBuffer>(0);
 
 	baseData->CompleteTransformation	= meshData.completeTransformation;
 	baseData->WorldTransformation		= meshData.worldTransformation;
@@ -113,10 +113,14 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 	baseData->SpecularCoefficient		= GetSpecularColor();
 	baseData->Shininess					= GetShininess();
 
-	// Update the constant buffer 
-	deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
-	deviceContext->PSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
-	deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer().Get(), 0, 0, baseData, 0, 0);
+	for (int cb = 0; cb < _constantBuffer->Size(); ++cb)
+	{
+		// Update the constant buffer 
+		deviceContext->VSSetConstantBuffers(cb, 1, _constantBuffer->GetConstantBuffer(cb).GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
+		deviceContext->PSSetConstantBuffers(cb, 1, _constantBuffer->GetConstantBuffer(cb).GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+
+		deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer(cb).Get(), 0, 0, _constantBuffer->GetLayoutPointer<void>(cb), 0, 0);
+	}
 
 	// Set the texture to be used by the pixel shader
 	for (const auto& texture : _textures)
@@ -140,7 +144,6 @@ shared_ptr<CBO>& Material::GetConstantBuffer()
 	if (_constantBuffer == nullptr)
 	{
 		_constantBuffer = make_shared<CBO>();
-		_constantBuffer->CreateBufferData<ConstantBuffer>();
 	}
 
 	return _constantBuffer;

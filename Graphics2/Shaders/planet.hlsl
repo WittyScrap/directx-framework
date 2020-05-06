@@ -1,7 +1,6 @@
 
-cbuffer ConstantBuffer 
+cbuffer ConstantBuffer : register(b0)
 {
-	// General (base) data
 	matrix completeTransform;	// The complete transformation
 	matrix worldTransform;		// The world transformation matrix
 	float4 cameraPosition;		// The world position of the camera
@@ -13,12 +12,15 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+};
 
-	// Planet-specific data
+cbuffer PlanetBuffer : register(b1)
+{
 	float  planetRadius;
 	float  planetPeaks;
 	float  planetOuterRadius;
 	float3 planetPosition;
+	float  planetHasAtmosphere;
 };
 
 Texture2D ground : register(t0);
@@ -81,7 +83,7 @@ VertexOut VS(VertexIn vin)
 	float lightRayTravelDistance = farDistance - near;
 	float maximumTravelDistance = sqrt(outerRadius2 - innerRadius2);
 
-	vout.Fog = (lightRayTravelDistance / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
+	vout.Fog = ((lightRayTravelDistance) / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
     
     return vout;
 }

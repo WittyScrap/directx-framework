@@ -1,6 +1,6 @@
 #define PI		3.14159265359f
 
-cbuffer ConstantBuffer 
+cbuffer ConstantBuffer : register(b0)
 {
 	matrix completeTransform;	// The complete transformation
 	matrix worldTransform;		// The world transformation matrix
@@ -13,8 +13,10 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+};
 
-	// Atmosphere-specific data
+cbuffer AtmosphereBuffer : register(b1)
+{
 	float3 v3PlanetPosition;	// The position of the planet in world space
 	float  fOuterRadius;		// The outer (atmosphere) radius
 	float  fInnerRadius;		// The inner (planetary) radius

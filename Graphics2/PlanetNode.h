@@ -64,6 +64,9 @@ public:
 
      inline  NoiseManager&          GetNoiseManager()                               { return _noises; }
 
+     inline  void                   SetHasAtmosphere(const bool& value)             { b_hasAtmosphere = value; }
+     inline  bool                   GetHasAtmosphere() const                        { return b_hasAtmosphere; }
+
              bool                   Generate();
     virtual  void                   OnPreRender() override;
 
@@ -101,6 +104,7 @@ private:
     FLOAT                           _maximumDistance{ 4000.f };
 
     int                             _currentLOD{ -1 };
+    bool                            b_hasAtmosphere{ true };
 };
 
 #undef MESH

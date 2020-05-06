@@ -48,6 +48,7 @@ void Graphics2::CreateSceneGraph()
 	noiseManager.SetMaximumHeight(10.f);
 
 	planet->SetRadius(256.f);
+	planet->SetPosition({ -5, 2, 2048 });
 
 	// Define LOD resolutions...
 	planet->CreateLOD(4);

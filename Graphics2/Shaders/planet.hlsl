@@ -19,8 +19,8 @@ cbuffer PlanetBuffer : register(b1)
 	float  planetRadius;
 	float  planetPeaks;
 	float  planetOuterRadius;
-	float3 planetPosition;
 	float  planetHasAtmosphere;
+	float3 planetPosition;
 };
 
 Texture2D ground : register(t0);
@@ -142,7 +142,7 @@ float4 PS(VertexOut input) : SV_Target
 	desertSand = lerp(desertSand, desertDetail, cameraHeight);
 	HiPeakSnow = lerp(HiPeakSnow, snowDetail, cameraHeight);
 
-	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len);
+	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len * (1 - planetHasAtmosphere));
 	float4 desertDetection = lerp(mountainDetection, desertSand, desert * .5f);
 	float4 polesDetection = lerp(desertDetection, HiPeakSnow, ice);
 	float4 cliffDetection = lerp(polesDetection, cliffRocks, slope);

@@ -41,7 +41,7 @@ class PlanetNode : public MeshNode
 public:
                                     PlanetNode() : MeshNode(L"Terrain")             { }
                                     PlanetNode(wstring name) : MeshNode(name)       { }
-
+                                                                                    // Abort planet generation thread (if it is still running)
     virtual                        ~PlanetNode()                                    { b_abortBuild = true; _planetBuildingThread.join(); }
 
     virtual  bool                   Initialise() override;

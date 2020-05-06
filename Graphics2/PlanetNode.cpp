@@ -12,8 +12,8 @@ CBUFFER PlanetConstantBuffer
 	float  PlanetRadius;
 	float  PlanetPeaks;
 	float  PlanetOuterRadius;
-	XMFLOAT3 PlanetPosition;
 	float  PlanetHasAtmosphere;
+	XMFLOAT3 PlanetPosition;
 };
 
 CBUFFER AtmosphereConstantBuffer
@@ -44,7 +44,7 @@ bool PlanetNode::Generate()
 	SetMaterial(_planetMaterial);
 	SetMaterial(0, _atmosphereMaterial);
 
-	// I am so going to regret this am I not
+	// Start planet generation thread
 	_planetBuildingThread = thread(&PlanetNode::GenerateAllLODs, this);
 
 	return true;
@@ -150,7 +150,7 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
 	planetBuffer->PlanetOuterRadius = _radius + _atmosphereThickness;
-	planetBuffer->PlanetHasAtmosphere = 1;
+	planetBuffer->PlanetHasAtmosphere = static_cast<float>(b_hasAtmosphere);
 }
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)

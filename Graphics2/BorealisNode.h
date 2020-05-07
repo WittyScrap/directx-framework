@@ -20,6 +20,9 @@ public:
     virtual bool            Initialise() override;
     virtual void            Update(FXMMATRIX& m) override;
 
+protected:
+            void            DoCameraSway();
+
 private:
     shared_ptr<Mesh>        _borealisModel;
     shared_ptr<MeshNode>    _borealisMeshNode;
@@ -29,5 +32,11 @@ private:
 
     float                   _accelerationSpeed{ .01f };
     float                   _rotationSpeed{ 10.f };
+
+    float                   _cameraSwayStrength{ .1f };
+    float                   _cameraBobStrength{ .025f };
+
+    float                   _cameraBobSpeed{ .01f };
+    float                   _time{ 0 };
 };
 

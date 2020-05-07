@@ -8,7 +8,7 @@
 #define RPY(v)	v.X * D2R, v.Y * D2R, v.Z * D2R
 #define XYZ(v)	v.X, v.Y, v.Z
 #define TRS		(_scale * XMMatrixRotationQuaternion(_rotation) * _position)
-#define WTRS	(XMMatrixScaling(XYZ(GetWorldScale())) * XMMatrixRotationQuaternion(GetWorldRotation()) * XMMatrixTranslation(XYZ(GetWorldPosition())))
+#define POS(m)	m._41, m._42, m._43
 
 
 using namespace std;

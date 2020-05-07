@@ -40,12 +40,19 @@ const Vector3 SceneNode::GetWorldPosition() const
 	XMFLOAT4X4 matrix;
 	XMStoreFloat4x4(&matrix, GetWorldMatrix());
 
-	return { matrix._41, matrix._42, matrix._43 };
+	return { POS(matrix) };
 }
 
 const XMVECTOR SceneNode::GetWorldRotation() const
 {
-	return XMQuaternionRotationMatrix(GetWorldMatrix());
+	XMVECTOR rotation = GetRotation();
+
+	if (_parent)
+	{
+		rotation = XMQuaternionMultiply(rotation, _parent->GetWorldRotation());
+	}
+
+	return rotation;
 }
 
 const Vector3 SceneNode::GetWorldScale() const

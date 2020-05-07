@@ -28,6 +28,6 @@ private:
     Vector3                 _pilotPosition{ 0, 1.f, 3.5f };
 
     float                   _accelerationSpeed{ .01f };
-    float                   _rotationSpeed{ 1.f };
+    float                   _rotationSpeed{ 10.f };
 };
 

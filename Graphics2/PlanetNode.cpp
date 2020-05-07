@@ -56,7 +56,7 @@ void PlanetNode::OnPreRender()
 	const FLOAT maximumDistance = _maximumDistance + _radius + _atmosphereThickness;
 
 	const CameraNode* mainCamera = MAIN_CAMERA;
-	const FLOAT cameraDistance = (mainCamera->GetPosition() - GetPosition()).Length() - minimumDistance + 1;
+	const FLOAT cameraDistance = (mainCamera->GetWorldPosition() - GetWorldPosition()).Length() - minimumDistance + 1;
 	const FLOAT cameraGradient = (cameraDistance / (maximumDistance - minimumDistance)) * _meshLODs.size();
 	const size_t lodIndex = _meshLODs.size() - clamp(static_cast<size_t>(roundf(cameraGradient)), 0, _meshLODs.size());
 
@@ -65,11 +65,11 @@ void PlanetNode::OnPreRender()
 	if (b_hasAtmosphere)
 	{
 		AtmosphereConstantBuffer* atmoBuffer = _atmosphereMaterial->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>(1);
-		atmoBuffer->v3PlanetPosition = GetPosition().ToDX3();
+		atmoBuffer->v3PlanetPosition = GetWorldPosition().ToDX3();
 	}
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>(1);
-	planetBuffer->PlanetPosition = GetPosition().ToDX3();
+	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
 }
 
 void PlanetNode::GenerateAllLODs()

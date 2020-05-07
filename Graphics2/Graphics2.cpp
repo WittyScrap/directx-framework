@@ -6,6 +6,7 @@
 #include "PlanetNode.h"
 #include "CameraNode.h"
 #include "PawnNode.h"
+#include "BorealisNode.h"
 
 Graphics2 app;
 
@@ -19,6 +20,7 @@ void Graphics2::CreateSceneGraph()
 
 	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
 	shared_ptr<PawnNode> mainPawn = SceneGraph::Create<PawnNode>();
+	shared_ptr<BorealisNode> borealis = SceneGraph::Create<BorealisNode>();
 
 	planet->SetDrawMode(MeshMode::TriangleList);
 	planet->SetMode(TerrainMode::Procedural);
@@ -56,12 +58,10 @@ void Graphics2::CreateSceneGraph()
 	planet->CreateLOD(64);
 	planet->CreateLOD(256);
 
-	mainPawn->SetPosition({ 0, 128, -1024 });
-	mainPawn->SetMovementSpeed(2.f);
-	mainPawn->SetMain();
+	borealis->SetPosition({ 0, 128, -1024 });
 
 	SCENE->Add(planet);
-	SCENE->Add(mainPawn);
+	SCENE->Add(borealis);
 }
 
 void Graphics2::UpdateSceneGraph()

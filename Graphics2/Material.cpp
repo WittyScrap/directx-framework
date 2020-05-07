@@ -105,7 +105,7 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 
 	baseData->CompleteTransformation	= meshData.completeTransformation;
 	baseData->WorldTransformation		= meshData.worldTransformation;
-	baseData->CameraPosition			= mainCamera->GetPosition().ToDX();
+	baseData->CameraPosition			= mainCamera->GetWorldPosition().ToDX();
 	baseData->LightVector				= XMVector4Normalize(directional->GetDirection());
 	baseData->LightColor				= directional->GetColor();
 	baseData->AmbientColor				= ambient->GetColor();

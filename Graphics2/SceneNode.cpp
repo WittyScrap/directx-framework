@@ -25,31 +25,27 @@ void SceneNode::RotateAround(const Vector3& axis, const float& angle)
 
 const XMMATRIX SceneNode::GetWorldMatrix() const
 {
-	return XMLoadFloat4x4(&_combinedWorldTransformation);
+	XMMATRIX transform = _scale * XMMatrixRotationQuaternion(_rotation) * _position;
+
+	if (_parent)
+	{
+		transform *= _parent->GetWorldMatrix();
+	}
+
+	return transform;
 }
 
 const Vector3 SceneNode::GetWorldPosition() const
 {
-	Vector3 position = GetPosition();
+	XMFLOAT4X4 matrix;
+	XMStoreFloat4x4(&matrix, GetWorldMatrix());
 
-	if (_parent)
-	{
-		position += _parent->GetWorldPosition();
-	}
-
-	return position;
+	return { matrix._41, matrix._42, matrix._43 };
 }
 
 const XMVECTOR SceneNode::GetWorldRotation() const
 {
-	XMVECTOR rotation = GetRotation();
-
-	if (_parent)
-	{
-		rotation = XMQuaternionMultiply(rotation, _parent->GetWorldRotation());
-	}
-
-	return rotation;
+	return XMQuaternionRotationMatrix(GetWorldMatrix());
 }
 
 const Vector3 SceneNode::GetWorldScale() const

@@ -42,6 +42,14 @@ void SceneGraph::Shutdown()
 void SceneGraph::Add(SceneNodePointer node)
 {
 	_children.push_back(node);
+
+	SceneNode* parent = node->GetParent();
+	if (parent != nullptr)
+	{
+		parent->Remove(node);
+	}
+
+	node->SetParent(this);
 }
 
 void SceneGraph::Remove(SceneNodePointer node)

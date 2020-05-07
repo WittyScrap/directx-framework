@@ -23,12 +23,53 @@ void SceneNode::RotateAround(const Vector3& axis, const float& angle)
 	_rotation = XMQuaternionMultiply(_rotation, transform);
 }
 
+const XMMATRIX SceneNode::GetWorldMatrix() const
+{
+	return XMLoadFloat4x4(&_combinedWorldTransformation);
+}
+
+const Vector3 SceneNode::GetWorldPosition() const
+{
+	Vector3 position = GetPosition();
+
+	if (_parent)
+	{
+		position += _parent->GetWorldPosition();
+	}
+
+	return position;
+}
+
+const XMVECTOR SceneNode::GetWorldRotation() const
+{
+	XMVECTOR rotation = GetRotation();
+
+	if (_parent)
+	{
+		rotation = XMQuaternionMultiply(rotation, _parent->GetWorldRotation());
+	}
+
+	return rotation;
+}
+
+const Vector3 SceneNode::GetWorldScale() const
+{
+	Vector3 scale = GetScale();
+
+	if (_parent)
+	{
+		scale *= _parent->GetWorldScale();
+	}
+
+	return scale;
+}
+
 const Vector3 SceneNode::GetForwardVector() const
 {
 	XMVECTOR v = XMVectorSet(XYZ(Vector3::ForwardVector), 0);
 	XMFLOAT3 out;
 
-	XMVECTOR o = XMVector3TransformNormal(v, GetRotationMatrix());
+	XMVECTOR o = XMVector3TransformNormal(v, XMMatrixRotationQuaternion(GetWorldRotation()));
 
 	XMStoreFloat3(&out, o);
 	return Vector3(out.x, out.y, out.z);
@@ -39,7 +80,7 @@ const Vector3 SceneNode::GetUpVector() const
 	XMVECTOR v = XMVectorSet(XYZ(Vector3::UpVector), 0);
 	XMFLOAT3 out;
 
-	XMVECTOR o = XMVector3TransformNormal(v, GetRotationMatrix());
+	XMVECTOR o = XMVector3TransformNormal(v, XMMatrixRotationQuaternion(GetWorldRotation()));
 
 	XMStoreFloat3(&out, o);
 	return Vector3(out.x, out.y, out.z);

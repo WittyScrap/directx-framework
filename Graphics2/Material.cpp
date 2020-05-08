@@ -67,20 +67,7 @@ bool Material::Activate()
 
 		ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
-		switch (_transparency)
-		{
-		case Transparency::Opaque:
-			deviceContext->OMSetBlendState(NULL, NULL, ~0);
-			break;
-
-		case Transparency::Transparent:
-			deviceContext->OMSetBlendState(_blendStateObject.Get(), NULL, ~0);
-			break;
-
-		default:
-			ErrorDialog(L"Invalid option", L"Invalid transparency flag detected.", exception());
-			break;
-		}
+		deviceContext->OMSetBlendState((ID3D11BlendState*)((uintptr_t)_blendStateObject.Get() * _blendEnabled), NULL, ~0);
 
 		deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
 		deviceContext->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
@@ -164,27 +151,23 @@ shared_ptr<CBO>& Material::GetConstantBuffer()
 	return _constantBuffer;
 }
 
-void Material::SetTransparencyMode(Transparency value)
+void Material::SetTransparencyModes(Blend src, Blend dst, Operation op)
 {
-	_transparency = value;
-
-	if (value == Transparency::Transparent)
-	{
-		D3D11_BLEND_DESC blendState;
-		ZeroMemory(&blendState, sizeof(D3D11_BLEND_DESC));
-		blendState.RenderTarget[0].BlendEnable = TRUE;
-		blendState.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendState.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendState.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendState.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-		blendState.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		blendState.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		blendState.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-		ThrowIfFailed(FRAMEWORK->GetDevice()->CreateBlendState(&blendState, _blendStateObject.GetAddressOf()));
-	}
-	else
+	if (_blendStateObject)
 	{
 		_blendStateObject.Reset();
 	}
+
+	D3D11_BLEND_DESC blendState;
+	ZeroMemory(&blendState, sizeof(D3D11_BLEND_DESC));
+	blendState.RenderTarget[0].BlendEnable				= TRUE;
+	blendState.RenderTarget[0].SrcBlend					= (D3D11_BLEND)src;
+	blendState.RenderTarget[0].DestBlend				= (D3D11_BLEND)dst;
+	blendState.RenderTarget[0].SrcBlendAlpha			= D3D11_BLEND_ONE;
+	blendState.RenderTarget[0].DestBlendAlpha			= D3D11_BLEND_ONE;
+	blendState.RenderTarget[0].BlendOp					= (D3D11_BLEND_OP)op;
+	blendState.RenderTarget[0].BlendOpAlpha				= (D3D11_BLEND_OP)op;
+	blendState.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	ThrowIfFailed(FRAMEWORK->GetDevice()->CreateBlendState(&blendState, _blendStateObject.GetAddressOf()));
 }

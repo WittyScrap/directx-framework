@@ -1,5 +1,6 @@
 #include "DirectXFramework.h"
 #include "CameraNode.h"
+#include "MeshNode.h"
 
 // DirectX libraries that are needed
 #pragma comment(lib, "d3d11.lib")
@@ -106,6 +107,9 @@ void DirectXFramework::Render()
 	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	// Now recurse through the scene graph, rendering each object
 	_sceneGraph->Render();
+	// Now render all queued mesh nodes, to ensure proper sorting (transparency last)
+	MeshNode::RenderQueuedNodes();
+
 	// Now display the scene
 	ThrowIfFailed(_swapChain->Present(0, 0));
 }

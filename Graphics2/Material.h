@@ -12,10 +12,22 @@ struct MeshObjectData
     XMMATRIX worldTransformation;
 };
 
-enum class Transparency
+enum class Blend
 {
-    Opaque,
-    Transparent
+    Zero                = D3D11_BLEND_ZERO,
+    One                 = D3D11_BLEND_ONE,
+    SrcAlpha            = D3D11_BLEND_SRC_ALPHA,
+    DestAlpha           = D3D11_BLEND_DEST_ALPHA,
+    OneMinusSrcAlpha    = D3D11_BLEND_INV_SRC_ALPHA,
+    OneMinusDestAlpha   = D3D11_BLEND_INV_DEST_ALPHA
+};
+
+enum class Operation
+{
+    Add      = D3D11_BLEND_OP_ADD,
+    Subtract = D3D11_BLEND_OP_SUBTRACT,
+    Min      = D3D11_BLEND_OP_MIN,
+    Max      = D3D11_BLEND_OP_MAX
 };
 
 /**
@@ -27,7 +39,16 @@ class Material
 {
 public:
                                             Material(wstring name, shared_ptr<Shader> source) :
-                                            _name{ name }, _shader(source), _albedo{ 1, 1, 1, 1 }, _specular{ 1, 1, 1, 1 }, _shininess{ 0 }, _opacity{ 1 }  { if (_shader) _shader->CompileOnce(); }
+                                                _name{ name },
+                                                _shader(source),
+                                                _albedo{ 1, 1, 1, 1 },
+                                                _specular{ 1, 1, 1, 1 },
+                                                _shininess{ 0 },
+                                                _opacity{ 1 },
+                                                _blendEnabled{ false },
+                                                _sourceBlend{ Blend::Zero },
+                                                _destinationBlend{ Blend::Zero },
+                                                _blendOperation{ Operation::Add }                                  { if (_shader) _shader->CompileOnce(); }
 
                                             Material() : Material(L"Material", nullptr)                            {}
                                             Material(wstring name) : Material(name, nullptr)                       {}
@@ -66,8 +87,11 @@ public:
             void                            SetName(const wstring& name)                { _name = name; }
             const wstring&                  GetName() const                             { return _name; }
 
-            void                            SetTransparencyMode(Transparency value);
-            const Transparency&             GetTransparencyMode() const                 { return _transparency; }
+            void                            SetTransparencyEnabled(BOOL state)          { _blendEnabled = state; }
+            const BOOL&                     GetTransparencyEnabled() const              { return _blendEnabled; }
+
+            void                            SetTransparencyModes(Blend src, Blend dst, Operation op = Operation::Add);
+
 
 private:
     wstring                             _name{ L"Material" };
@@ -81,7 +105,11 @@ private:
     FLOAT                               _shininess;
     FLOAT                               _opacity;
 
-    Transparency                        _transparency{ Transparency::Opaque };
+    Blend                               _sourceBlend;
+    Blend                               _destinationBlend;
+    Operation                           _blendOperation;
+    BOOL                                _blendEnabled;
+
     ComPtr<ID3D11BlendState>            _blendStateObject{ NULL };
 
     static Material*                    _activeMaterial;

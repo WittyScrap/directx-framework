@@ -4,6 +4,16 @@
 #include "Material.h"
 #include "Mesh.h"
 #include <vector>
+#include <map>
+
+#define RENDER_QUEUE_GEOMETRY       2000
+#define RENDER_QUEUE_TRANSPARENT    3000
+
+// Typedef
+class MeshNode;
+
+/** Defines a render queue as a map of indices to collections of items */
+typedef map<size_t, vector<MeshNode*>> RenderQueue;
 
 /**
  * Represents a node that can retain any type
@@ -25,6 +35,8 @@ public:
     virtual void                                Render()                                                                    override;
     virtual void                                Shutdown()                                                                  override;
 
+            void                                RenderImmediately();
+
             void                                SetMaterial(const shared_ptr<Material>& material);
             void                                SetMesh(const shared_ptr<Mesh>& mesh);
 
@@ -36,6 +48,9 @@ public:
 
             void                                Build(shared_ptr<Mesh> mesh);
 
+            void                                SetRenderQueue(const size_t& queue)                                         { _queueIndex = queue; }
+     static void                                RenderQueuedNodes();
+
 protected:
 
     static  ComPtr<ID3D11Device>                GetDevice();
@@ -46,7 +61,9 @@ protected:
 private:
             shared_ptr<Mesh>                    _mesh = nullptr;
             shared_ptr<Material>                _material = nullptr;
-
             vector<shared_ptr<Material>>        _materials;
+
+            size_t                              _queueIndex{ RENDER_QUEUE_GEOMETRY };
+    static  RenderQueue                         _renderQueue;
 };
 

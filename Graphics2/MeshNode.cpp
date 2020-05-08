@@ -2,6 +2,8 @@
 #include "DirectXFramework.h"
 #include "CameraNode.h"
 
+RenderQueue MeshNode::_renderQueue;
+
 /**
  * Carries the transformation matrix through.
  *
@@ -17,6 +19,19 @@ void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
  */
 void MeshNode::Render()
 {
+    _renderQueue[_queueIndex].push_back(this);
+}
+
+/**
+ * Destroys this mesh node.
+ *
+ */
+void MeshNode::Shutdown()
+{
+}
+
+void MeshNode::RenderImmediately()
+{
     OnPreRender();
 
     if (_mesh)
@@ -31,14 +46,6 @@ void MeshNode::Render()
             InternalRender(mesh, mat);
         }
     }
-}
-
-/**
- * Destroys this mesh node.
- *
- */
-void MeshNode::Shutdown()
-{
 }
 
 /**
@@ -162,4 +169,17 @@ void MeshNode::Build(shared_ptr<Mesh> mesh)
     {
         SetMaterial(it, mesh->GetSubmesh(it)->GetReferenceMaterial());
     }
+}
+
+void MeshNode::RenderQueuedNodes()
+{
+    for (const auto& queueItem : _renderQueue)
+    {
+        for (MeshNode* node : queueItem.second)
+        {
+            node->RenderImmediately();
+        }
+    }
+
+    _renderQueue.clear();
 }

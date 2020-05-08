@@ -28,6 +28,9 @@ public:
 	inline ComPtr<ID3D11DeviceContext>	GetDeviceContext() { return _deviceContext; }
 	inline shared_ptr<ResourceManager>	GetResourceManager() { return _resourceManager; }
 
+	void								EnableDepthTesting();
+	void								DisableDepthTesting();
+
 	void								SetBackgroundColour(XMFLOAT4 backgroundColour);
 
 										template<typename _TLight>
@@ -52,6 +55,8 @@ private:
 	ComPtr<ID3D11Texture2D>				_depthStencilBuffer;
 	ComPtr<ID3D11RenderTargetView>		_renderTargetView;
 	ComPtr<ID3D11DepthStencilView>		_depthStencilView;
+	ComPtr<ID3D11DepthStencilState>		_depthStencilActiveState;
+	ComPtr<ID3D11DepthStencilState>		_depthStencilInactiveState;
 
 	D3D11_VIEWPORT						_screenViewport;
 

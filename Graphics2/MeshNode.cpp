@@ -135,16 +135,19 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
             material = RESOURCES->GetDefaultMaterial(); material->Activate();
         }
 
-        // Calculate the world x view x projection transformation
-        XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
-        
-        // Create mesh data object and populate with mesh object specific data
-        MeshObjectData data;
-        data.completeTransformation = completeTransformation;
-        data.worldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
+        if (material->CheckPass())
+        {
+            // Calculate the world x view x projection transformation
+            XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
 
-        material->UpdateConstantBuffers(data);
-        mesh->Render();
+            // Create mesh data object and populate with mesh object specific data
+            MeshObjectData data;
+            data.completeTransformation = completeTransformation;
+            data.worldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
+
+            material->UpdateConstantBuffers(data);
+            mesh->Render();
+        }
     }
 }
 

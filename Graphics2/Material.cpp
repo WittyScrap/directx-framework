@@ -6,6 +6,7 @@
 #include "CameraNode.h"
 
 Material* Material::_activeMaterial{ nullptr };
+uint8_t Material::_pass{ RENDER_PASS_OPAQUE };
 
 void Material::SetShader(shared_ptr<Shader> source)
 {

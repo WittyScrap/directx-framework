@@ -1,5 +1,6 @@
 #include "DirectXFramework.h"
 #include "CameraNode.h"
+#include "Material.h"
 
 // DirectX libraries that are needed
 #pragma comment(lib, "d3d11.lib")
@@ -25,6 +26,16 @@ DirectXFramework::DirectXFramework(unsigned int width, unsigned int height) : Fr
 DirectXFramework * DirectXFramework::GetDXFramework()
 {
 	return _dxFramework;
+}
+
+void DirectXFramework::EnableDepthTesting()
+{
+	_deviceContext->OMSetDepthStencilState(_depthStencilActiveState.Get(), 1);
+}
+
+void DirectXFramework::DisableDepthTesting()
+{
+	_deviceContext->OMSetDepthStencilState(_depthStencilInactiveState.Get(), 1);
 }
 
 void DirectXFramework::SetBackgroundColour(XMFLOAT4 backgroundColour)
@@ -104,8 +115,14 @@ void DirectXFramework::Render()
 	// Clear the render target and the depth stencil view
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _backgroundColour);
 	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	// Now recurse through the scene graph, rendering each object
+
+	// Now recurse through the scene graph, rendering each opaque object first
+	Material::SetPass(RENDER_PASS_OPAQUE);
 	_sceneGraph->Render();
+	// Now render transparent geometry
+	Material::SetPass(RENDER_PASS_TRANSPARENT);
+	_sceneGraph->Render();
+
 	// Now display the scene
 	ThrowIfFailed(_swapChain->Present(0, 0));
 }
@@ -149,6 +166,29 @@ void DirectXFramework::OnResize(WPARAM wParam)
 	ComPtr<ID3D11Texture2D> depthBuffer;
 	ThrowIfFailed(_device->CreateTexture2D(&depthBufferTexture, NULL, depthBuffer.GetAddressOf()));
 	ThrowIfFailed(_device->CreateDepthStencilView(depthBuffer.Get(), 0, _depthStencilView.GetAddressOf()));
+
+	// Set up depth buffer state descriptor
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	dsDesc.DepthEnable = TRUE;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	// Disable stencil testing
+	dsDesc.StencilEnable = false;
+
+	// Create ACTIVE depth stencil state. This is the state to be set when ZWriting (writing
+	// to the depth buffer) is desired.
+	ThrowIfFailed(_device->CreateDepthStencilState(&dsDesc, _depthStencilActiveState.GetAddressOf()));
+
+	// Turn off depth testing
+	dsDesc.DepthEnable = FALSE;
+
+	// Now create the INACTIVE depth stencil state. This is to be used when ZWriting (writing
+	// to the depth buffer) should not happen, such as when rendering transparent geometry.
+	ThrowIfFailed(_device->CreateDepthStencilState(&dsDesc, _depthStencilInactiveState.GetAddressOf()));
+
+	// Bind active depth writing state by default
+	EnableDepthTesting();
 
 	// Bind the render target view buffer and the depth stencil view buffer to the output-merger stage
 	// of the pipeline. 

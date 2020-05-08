@@ -6,6 +6,9 @@
 
 #define IDLIST(t) map<int, t>
 
+#define RENDER_PASS_OPAQUE      0
+#define RENDER_PASS_TRANSPARENT 1
+
 struct MeshObjectData
 {
     XMMATRIX completeTransformation;
@@ -92,6 +95,10 @@ public:
 
             void                            SetTransparencyModes(Blend src, Blend dst, Operation op = Operation::Add);
 
+            static void                     SetPass(uint8_t pass)                       { _pass = pass; }
+            static uint8_t                  GetPass()                                   { return _pass; }
+
+            bool                            CheckPass()                                 { return _pass == _blendEnabled; }
 
 private:
     wstring                             _name{ L"Material" };
@@ -113,6 +120,7 @@ private:
     ComPtr<ID3D11BlendState>            _blendStateObject{ NULL };
 
     static Material*                    _activeMaterial;
+    static uint8_t                      _pass;
 };
 
 #undef IDLIST

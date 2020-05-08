@@ -209,7 +209,7 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 	atmoBuffer->fInnerRadius = innerRadius;
 
 	mat->SetTransparencyEnabled(true);
-	mat->SetTransparencyModes(Blend::SrcAlpha, Blend::OneMinusSrcAlpha);
+	mat->SetTransparencyModes(Blend::One, Blend::One, Operation::Add);
 }
 
 void PlanetNode::SetLOD(size_t lod)

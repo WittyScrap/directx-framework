@@ -103,8 +103,5 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut input) : SV_Target
 {
-	float4 atmo = atmoLUT.Sample(samplerState, input.TexCoord);
-	atmo.a = input.TexCoord.x * input.TexCoord.y;
-
-	return atmo;
+	return atmoLUT.Sample(samplerState, input.TexCoord) * input.TexCoord.x * input.TexCoord.y;
 }

@@ -27,10 +27,11 @@ enum class Blend
 
 enum class Operation
 {
-    Add      = D3D11_BLEND_OP_ADD,
-    Subtract = D3D11_BLEND_OP_SUBTRACT,
-    Min      = D3D11_BLEND_OP_MIN,
-    Max      = D3D11_BLEND_OP_MAX
+    Add                 = D3D11_BLEND_OP_ADD,
+    Subtract            = D3D11_BLEND_OP_SUBTRACT,
+    Min                 = D3D11_BLEND_OP_MIN,
+    Max                 = D3D11_BLEND_OP_MAX,
+    InverseSubtract     = D3D11_BLEND_OP_REV_SUBTRACT
 };
 
 /**

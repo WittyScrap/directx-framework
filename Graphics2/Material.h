@@ -12,6 +12,12 @@ struct MeshObjectData
     XMMATRIX worldTransformation;
 };
 
+enum class Transparency
+{
+    Opaque,
+    Transparent
+};
+
 /**
  * The Material class will hold and manage a reference to a Shader,
  * as well as any Texture or property that the shader may use.
@@ -60,6 +66,9 @@ public:
             void                            SetName(const wstring& name)                { _name = name; }
             const wstring&                  GetName() const                             { return _name; }
 
+            void                            SetTransparencyMode(Transparency value);
+            const Transparency&             GetTransparencyMode() const                 { return _transparency; }
+
 private:
     wstring                             _name{ L"Material" };
 	shared_ptr<Shader>                  _shader = nullptr;
@@ -71,6 +80,9 @@ private:
     XMFLOAT4                            _specular;
     FLOAT                               _shininess;
     FLOAT                               _opacity;
+
+    Transparency                        _transparency{ Transparency::Opaque };
+    ComPtr<ID3D11BlendState>            _blendStateObject{ NULL };
 
     static Material*                    _activeMaterial;
 };

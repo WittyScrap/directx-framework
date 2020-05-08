@@ -72,6 +72,8 @@ public:
              bool                   Generate();
     virtual  void                   OnPreRender() override;
 
+     static  shared_ptr<PlanetNode> GenerateRandom();
+
 protected:
              void                   GenerateAllLODs();
 

@@ -67,6 +67,21 @@ bool Material::Activate()
 
 		ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
+		switch (_transparency)
+		{
+		case Transparency::Opaque:
+			deviceContext->OMSetBlendState(NULL, NULL, ~0);
+			break;
+
+		case Transparency::Transparent:
+			deviceContext->OMSetBlendState(_blendStateObject.Get(), NULL, ~0);
+			break;
+
+		default:
+			ErrorDialog(L"Invalid option", L"Invalid transparency flag detected.", exception());
+			break;
+		}
+
 		deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
 		deviceContext->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
 		deviceContext->IASetInputLayout(_shader->GetInputLayout().Get());
@@ -147,4 +162,29 @@ shared_ptr<CBO>& Material::GetConstantBuffer()
 	}
 
 	return _constantBuffer;
+}
+
+void Material::SetTransparencyMode(Transparency value)
+{
+	_transparency = value;
+
+	if (value == Transparency::Transparent)
+	{
+		D3D11_BLEND_DESC blendState;
+		ZeroMemory(&blendState, sizeof(D3D11_BLEND_DESC));
+		blendState.RenderTarget[0].BlendEnable = TRUE;
+		blendState.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendState.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendState.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendState.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		blendState.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendState.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendState.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		ThrowIfFailed(FRAMEWORK->GetDevice()->CreateBlendState(&blendState, _blendStateObject.GetAddressOf()));
+	}
+	else
+	{
+		_blendStateObject.Reset();
+	}
 }

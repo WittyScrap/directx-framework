@@ -72,6 +72,47 @@ void PlanetNode::OnPreRender()
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
 }
 
+shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
+{
+	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
+
+	planet->SetDrawMode(MeshMode::TriangleList);
+	planet->SetMode(TerrainMode::Procedural);
+
+	auto& noiseManager = planet->GetNoiseManager();
+
+	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
+	planetNoise->SetNoiseOctaves(1);
+	planetNoise->SetNoiseScale(40.f);
+	planetNoise->SetPeakHeight(25.f);
+	planetNoise->RandomizeOffsets();
+
+	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
+	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
+	planetDetail->SetNoiseOctaves(8);
+	planetDetail->SetNoiseScale(5.f);
+	planetDetail->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
+
+	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
+	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
+	planetContinents->SetNoiseOctaves(4);
+	planetContinents->SetNoiseScale(80.f);
+	planetContinents->SetPeakHeight(1.f);
+	planetDetail->RandomizeOffsets();
+
+	noiseManager.SetMaximumHeight(10.f);
+	planet->SetRadius(256.f);
+
+	// Define LOD resolutions...
+	planet->CreateLOD(4);
+	planet->CreateLOD(16);
+	planet->CreateLOD(64);
+	planet->CreateLOD(256);
+
+	return planet;
+}
+
 void PlanetNode::GenerateAllLODs()
 {
 	for (size_t lod = 0; lod < _requestedLODs.size() && !b_abortBuild; ++lod)
@@ -166,6 +207,8 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 	AtmosphereConstantBuffer* atmoBuffer = mat->GetConstantBuffer()->GetLayoutPointer<AtmosphereConstantBuffer>(1);
 	atmoBuffer->fOuterRadius = outerRadius;
 	atmoBuffer->fInnerRadius = innerRadius;
+
+	mat->SetTransparencyMode(Transparency::Transparent);
 }
 
 void PlanetNode::SetLOD(size_t lod)

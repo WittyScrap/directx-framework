@@ -18,49 +18,17 @@ void Graphics2::CreateSceneGraph()
 	directionalLight->SetDirection({ -1, 0, 0 });
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
-	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
-	shared_ptr<PawnNode> mainPawn = SceneGraph::Create<PawnNode>();
 	shared_ptr<BorealisNode> borealis = SceneGraph::Create<BorealisNode>();
-
-	planet->SetDrawMode(MeshMode::TriangleList);
-	planet->SetMode(TerrainMode::Procedural);
-
-	auto& noiseManager = planet->GetNoiseManager();
-
-	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
-	planetNoise->SetNoiseOctaves(1);
-	planetNoise->SetNoiseScale(40.f);
-	planetNoise->SetPeakHeight(25.f);
-	planetNoise->RandomizeOffsets();
-
-	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
-	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
-	planetDetail->SetNoiseOctaves(8);
-	planetDetail->SetNoiseScale(5.f);
-	planetDetail->SetPeakHeight(1.f);
-	planetDetail->RandomizeOffsets();
-
-	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
-	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
-	planetContinents->SetNoiseOctaves(4);
-	planetContinents->SetNoiseScale(80.f);
-	planetContinents->SetPeakHeight(1.f);
-	planetDetail->RandomizeOffsets();
-
-	noiseManager.SetMaximumHeight(10.f);
-
-	planet->SetRadius(256.f);
-	planet->SetPosition({ -5, 2, 2048 });
-
-	// Define LOD resolutions...
-	planet->CreateLOD(4);
-	planet->CreateLOD(16);
-	planet->CreateLOD(64);
-	planet->CreateLOD(256);
+	shared_ptr<PlanetNode> planetA = PlanetNode::GenerateRandom();
+	shared_ptr<PlanetNode> planetB = PlanetNode::GenerateRandom();
 
 	borealis->SetPosition({ 0, 128, -1024 });
+	planetA->SetPosition({ -5, 2, 2048 });
+	planetB->SetPosition({ 512, 200, 1024 });
+	planetB->SetRadius(512.f);
 
-	SCENE->Add(planet);
+	SCENE->Add(planetA);
+	SCENE->Add(planetB);
 	SCENE->Add(borealis);
 }
 

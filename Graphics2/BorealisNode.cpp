@@ -28,15 +28,23 @@ void BorealisNode::Update(FXMMATRIX& m)
 {
 	if (GetForegroundWindow() == FRAMEWORK->GetHWnd())
 	{
+		int horizontal = GetKey('D') - GetKey('A');
+		int vertical = GetKey('R') - GetKey('F');
+		int forward = GetKey('W') - GetKey('S');
+
 		AddForce(
-			GetRightVector() * (_accelerationSpeed * (GetKey('D') - GetKey('A'))) +
-			GetUpVector() * (_accelerationSpeed * (GetKey('R') - GetKey('F'))) +
-			GetForwardVector() * (_accelerationSpeed * (GetKey('W') - GetKey('S')))
+			GetRightVector() * (_accelerationSpeed * horizontal) +
+			GetUpVector() * (_accelerationSpeed * vertical) +
+			GetForwardVector() * (_accelerationSpeed * forward)
 		);
 
-		RotateAround(GetUpVector(), GetMouseHorizontal() * _rotationSpeed);
-		RotateAround(GetRightVector(), GetMouseVertical() * _rotationSpeed);
-		RotateAround(GetForwardVector(), (GetKey('Q') - GetKey('E')) * _rotationSpeed * 0.1f);
+		float mouseX = GetMouseHorizontal() * _rotationSpeed;
+		float mouseY = GetMouseVertical() * _rotationSpeed;
+		int roll = GetKey('Q') - GetKey('E');
+
+		AddSpin(GetUpVector() * mouseX);
+		AddSpin(GetRightVector() * mouseY);
+		AddSpin(GetForwardVector() * roll * _rotationSpeed * 0.1f);
 
 		DoCameraSway();
 
@@ -44,6 +52,23 @@ void BorealisNode::Update(FXMMATRIX& m)
 		{
 			SetMouseLocked(true);
 			SetMouseVisible(false);
+		}
+
+		if (GetLinearVelocity().SqrLength() < _minimumSpeed * _minimumSpeed && horizontal == 0 && forward == 0 && vertical == 0)
+		{
+			SetLinearVelocity(Vector3::ZeroVector);
+		}
+
+		if (GetAngularVelocity().SqrLength() > 0.f)
+		{
+			if (GetAngularVelocity().SqrLength() > 1.f)
+			{
+				AddSpin(GetAngularVelocity().Normalized() * -.025f);
+			}
+			else
+			{
+				AddSpin(GetAngularVelocity() * -.025f);
+			}
 		}
 	}
 

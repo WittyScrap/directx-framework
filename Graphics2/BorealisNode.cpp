@@ -63,11 +63,11 @@ void BorealisNode::Update(FXMMATRIX& m)
 		{
 			if (GetAngularVelocity().SqrLength() > 1.f)
 			{
-				AddSpin(GetAngularVelocity().Normalized() * -.025f);
+				AddSpin(GetAngularVelocity().Normalized() * -.01f);
 			}
 			else
 			{
-				AddSpin(GetAngularVelocity() * -.025f);
+				AddSpin(GetAngularVelocity() * -.01f);
 			}
 		}
 	}

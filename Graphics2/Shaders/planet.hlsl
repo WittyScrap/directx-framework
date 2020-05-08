@@ -1,7 +1,6 @@
 
-cbuffer ConstantBuffer 
+cbuffer ConstantBuffer : register(b0)
 {
-	// General (base) data
 	matrix completeTransform;	// The complete transformation
 	matrix worldTransform;		// The world transformation matrix
 	float4 cameraPosition;		// The world position of the camera
@@ -13,11 +12,14 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+};
 
-	// Planet-specific data
+cbuffer PlanetBuffer : register(b1)
+{
 	float  planetRadius;
 	float  planetPeaks;
 	float  planetOuterRadius;
+	float  planetHasAtmosphere;
 	float3 planetPosition;
 };
 
@@ -81,7 +83,7 @@ VertexOut VS(VertexIn vin)
 	float lightRayTravelDistance = farDistance - near;
 	float maximumTravelDistance = sqrt(outerRadius2 - innerRadius2);
 
-	vout.Fog = (lightRayTravelDistance / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
+	vout.Fog = ((lightRayTravelDistance * planetHasAtmosphere) / maximumTravelDistance) * dot(vout.NormalSphere, -lightVector.xyz);
     
     return vout;
 }
@@ -140,7 +142,7 @@ float4 PS(VertexOut input) : SV_Target
 	desertSand = lerp(desertSand, desertDetail, cameraHeight);
 	HiPeakSnow = lerp(HiPeakSnow, snowDetail, cameraHeight);
 
-	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len);
+	float4 mountainDetection = lerp(flatGround, HiPeakSnow, len * (1 - planetHasAtmosphere));
 	float4 desertDetection = lerp(mountainDetection, desertSand, desert * .5f);
 	float4 polesDetection = lerp(desertDetection, HiPeakSnow, ice);
 	float4 cliffDetection = lerp(polesDetection, cliffRocks, slope);

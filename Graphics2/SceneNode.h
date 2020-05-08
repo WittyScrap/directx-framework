@@ -8,6 +8,7 @@
 #define RPY(v)	v.X * D2R, v.Y * D2R, v.Z * D2R
 #define XYZ(v)	v.X, v.Y, v.Z
 #define TRS		(_scale * XMMatrixRotationQuaternion(_rotation) * _position)
+#define POS(m)	m._41, m._42, m._43
 
 
 using namespace std;
@@ -43,21 +44,23 @@ public:
 
 	virtual void SetRotation(const XMVECTOR& quat)	  { _rotation = quat; }
 	virtual void SetRotation(const XMMATRIX& rot)	  { _rotation = XMQuaternionRotationMatrix(rot); }
-
 	virtual void SetRotation(const Vector3& forward, const Vector3& up);
+
 	virtual void RotateAround(const Vector3& axis, const float& angle);
 
 	const Vector3  GetPosition() const { XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._41, m._42, m._43 }; }
 	const XMVECTOR GetRotation() const { return _rotation; }
 	const Vector3  GetScale()	 const { XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._11, m._22, m._33 }; }
 
+	const XMMATRIX GetWorldMatrix() const;
+
+	const Vector3  GetWorldPosition() const;
+	const XMVECTOR GetWorldRotation() const;
+	const Vector3  GetWorldScale() const;
+
 	const Vector3 GetForwardVector() const;
 	const Vector3 GetUpVector() const;
 	const Vector3 GetRightVector()			const { return Vector3::Cross(GetUpVector(), GetForwardVector()); }
-
-	const XMMATRIX GetTranslationMatrix() const { return _position; }
-	const XMMATRIX GetRotationMatrix() const	{ return XMMatrixRotationQuaternion(_rotation); }
-	const XMMATRIX GetScaleMatrix() const		{ return _scale; }
 
 	const int GetKey(const int& keyCode);
 	const int GetKeyDown(const int& keyCode);
@@ -67,6 +70,9 @@ public:
 
 	void SetMouseLocked(const BOOL& value)		{ _mouseLocked = value; }
 	void SetMouseVisible(const BOOL& value)		{ if (value != _mouseVisible) { ShowCursor(value); _mouseVisible = value; } }
+
+	SceneNode* GetParent() const				{ return _parent; }
+	void SetParent(SceneNode* parent)			{ _parent = parent; }
 
 private:
 	void ResetMouse();
@@ -84,6 +90,8 @@ protected:
 
 	FLOAT				_mouseHorizontalAxis{ 0 };
 	FLOAT				_mouseVerticalAxis{ 0 };
+
+	SceneNode*			_parent{ nullptr };
 
 public:
 	static XMMATRIX GetTRS(const Vector3& t, const Vector3& r, const Vector3& s) { return XMMatrixScaling(XYZ(s)) * XMMatrixRotationRollPitchYaw(RPY(r)) * XMMatrixTranslation(XYZ(t)); }

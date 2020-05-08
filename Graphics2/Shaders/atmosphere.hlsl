@@ -1,6 +1,6 @@
 #define PI		3.14159265359f
 
-cbuffer ConstantBuffer 
+cbuffer ConstantBuffer : register(b0)
 {
 	matrix completeTransform;	// The complete transformation
 	matrix worldTransform;		// The world transformation matrix
@@ -13,8 +13,10 @@ cbuffer ConstantBuffer
 	float  shininess;			// How shiny this material should be
 	float  opacity;				// The opacity of this material.
 	float2 padding;				// Padding to be applied for lighting calculations
+};
 
-	// Atmosphere-specific data
+cbuffer AtmosphereBuffer : register(b1)
+{
 	float3 v3PlanetPosition;	// The position of the planet in world space
 	float  fOuterRadius;		// The outer (atmosphere) radius
 	float  fInnerRadius;		// The inner (planetary) radius
@@ -53,26 +55,24 @@ VertexOut VS(VertexIn vin)
 
 	// Calculate a ray from the camera's location to the "far point", AKA the vertex that is currently being rendered.
 	// Because the atmosphere's sphere is inverted, only the "far" points will be rendered at any given point in time.
-	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz;
-	float3 relativeFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - v3PlanetPosition;
-	float3 ray = relativeFarPoint - cameraPos;
+	float3 atmosphereFarPoint = mul(worldTransform, float4(vin.Position, 1.0f)).xyz - v3PlanetPosition;
+	float3 ray = atmosphereFarPoint - cameraPos;
 	float farDistance = length(ray);
 	ray /= farDistance;
 
-	float3 farPointToPlanetCenter = normalize(v3PlanetPosition - atmosphereFarPoint);
-	float3 cameraAtmosphereRay = normalize(cameraPosition.xyz - atmosphereFarPoint);
+	float3 farPointToPlanetCenter = normalize(-atmosphereFarPoint);
+	float3 cameraAtmosphereRay = normalize(cameraPos - atmosphereFarPoint);
 
 	// Determine near point
 	float B = 2.0 * dot(cameraPos, ray);
-	float C = cameraHeight2 - (fOuterRadius * fOuterRadius);
+	float C = cameraHeight2 - outerRadius2;
 	float det = max(0.0, B * B - 4.0 * C);
 	float near = 0.5 * (-B - sqrt(det));
 
 	// Calculate a gradient to determine the amount by which the camera has entered
 	// the atmosphere.
-	float atmosphereVertexHeight = length(atmosphereFarPoint - v3PlanetPosition);
+	float atmosphereVertexHeight = length(atmosphereFarPoint);
 	float atmosphereThickness = fOuterRadius - fInnerRadius;
-	float cameraInsetAmount = saturate(cameraHeight - atmosphereVertexHeight);
 	float cameraAtmosphereGradient = saturate((cameraHeight - fInnerRadius) / atmosphereThickness);
 
 	// Calculate the maximum distance that a light ray could travel across the atmosphere when
@@ -82,12 +82,13 @@ VertexOut VS(VertexIn vin)
 	float currentMaximumDistance = lerp(maximumTravelDistanceGround, maximumTravelDistanceSpace, cameraAtmosphereGradient); // The current maximum distance depends on how close to the ground the camera is.
 
 	// Calculate the total distance the light ray had to travel to get to the camera.
-	float lightTravelDistance = length(cameraPosition.xyz - atmosphereFarPoint) - max(near, 0);
+	float lightTravelDistance = length(cameraPos - atmosphereFarPoint) - max(near, 0);
 	float atmosphereFalloff = lightTravelDistance / currentMaximumDistance; // The falloff gradient
 
-	// Determine the normal of the "near" point in the atmosphere to calculate light value
-	float3 atmosphereNear = cameraPos + ray * near * cameraInsetAmount;
-	float3 atmosphereNormal = normalize(atmosphereNear - v3PlanetPosition);
+	// Determine the light ray's midpoint to get an average of the atmosphere's luminosity at this view angle
+	float lightMidpoint = (farDistance + max(near, 0)) / 2.f;
+	float3 atmosphereMidpoint = cameraPos + ray * lightMidpoint;
+	float3 atmosphereNormal = normalize(atmosphereMidpoint);
 
 	// Finally, calculate the light amount using the previously determined normal.
 	// Add a bias of 0.25 because atmosphere scattering would allow light to illuminate parts of the

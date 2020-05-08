@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AmbientLight.h" />
+    <ClInclude Include="BorealisNode.h" />
     <ClInclude Include="CameraNode.h" />
     <ClInclude Include="ConstantBufferObject.h" />
     <ClInclude Include="Core.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="NoiseManager.h" />
     <ClInclude Include="BasicNoise.h" />
     <ClInclude Include="PawnNode.h" />
+    <ClInclude Include="PhysicsNode.h" />
     <ClInclude Include="PlaneNode.h" />
     <ClInclude Include="PlanetBuilder.h" />
     <ClInclude Include="resource.h" />
@@ -205,6 +207,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BorealisNode.cpp" />
     <ClCompile Include="CameraNode.cpp" />
     <ClCompile Include="CubeNode.cpp" />
     <ClCompile Include="Framework.cpp" />
@@ -215,6 +218,7 @@
     <ClCompile Include="MeshNode.cpp" />
     <ClCompile Include="BasicNoise.cpp" />
     <ClCompile Include="NoiseManager.cpp" />
+    <ClCompile Include="PhysicsNode.cpp" />
     <ClCompile Include="PlaneNode.cpp" />
     <ClCompile Include="PlanetBuilder.cpp" />
     <ClCompile Include="ResourceManager.cpp" />

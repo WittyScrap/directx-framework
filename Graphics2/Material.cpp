@@ -6,6 +6,7 @@
 #include "CameraNode.h"
 
 Material* Material::_activeMaterial{ nullptr };
+uint8_t Material::_pass{ RENDER_PASS_OPAQUE };
 
 void Material::SetShader(shared_ptr<Shader> source)
 {
@@ -67,6 +68,8 @@ bool Material::Activate()
 
 		ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
+		deviceContext->OMSetBlendState((ID3D11BlendState*)((uintptr_t)_blendStateObject.Get() * _blendEnabled), NULL, ~0);
+
 		deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
 		deviceContext->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);
 		deviceContext->IASetInputLayout(_shader->GetInputLayout().Get());
@@ -101,11 +104,11 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 	DirectXFramework* framework = DirectXFramework::GetDXFramework();
 	const CameraNode* mainCamera = CameraNode::GetMain();
 
-	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer();
+	ConstantBuffer* baseData = GetConstantBuffer()->GetLayoutPointer<ConstantBuffer>(0);
 
 	baseData->CompleteTransformation	= meshData.completeTransformation;
 	baseData->WorldTransformation		= meshData.worldTransformation;
-	baseData->CameraPosition			= mainCamera->GetPosition().ToDX();
+	baseData->CameraPosition			= mainCamera->GetWorldPosition().ToDX();
 	baseData->LightVector				= XMVector4Normalize(directional->GetDirection());
 	baseData->LightColor				= directional->GetColor();
 	baseData->AmbientColor				= ambient->GetColor();
@@ -113,10 +116,14 @@ void Material::UpdateConstantBuffers(const MeshObjectData& meshData)
 	baseData->SpecularCoefficient		= GetSpecularColor();
 	baseData->Shininess					= GetShininess();
 
-	// Update the constant buffer 
-	deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
-	deviceContext->PSSetConstantBuffers(0, 1, _constantBuffer->GetConstantBuffer().GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
-	deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer().Get(), 0, 0, baseData, 0, 0);
+	for (int cb = 0; cb < _constantBuffer->Size(); ++cb)
+	{
+		// Update the constant buffer 
+		deviceContext->VSSetConstantBuffers(cb, 1, _constantBuffer->GetConstantBuffer(cb).GetAddressOf()); // Pass constant buffer to VS (Vertex Shader)
+		deviceContext->PSSetConstantBuffers(cb, 1, _constantBuffer->GetConstantBuffer(cb).GetAddressOf()); // Pass constant buffer to PS (Pixel Shader)
+
+		deviceContext->UpdateSubresource(_constantBuffer->GetConstantBuffer(cb).Get(), 0, 0, _constantBuffer->GetLayoutPointer<void>(cb), 0, 0);
+	}
 
 	// Set the texture to be used by the pixel shader
 	for (const auto& texture : _textures)
@@ -140,8 +147,28 @@ shared_ptr<CBO>& Material::GetConstantBuffer()
 	if (_constantBuffer == nullptr)
 	{
 		_constantBuffer = make_shared<CBO>();
-		_constantBuffer->CreateBufferData<ConstantBuffer>();
 	}
 
 	return _constantBuffer;
+}
+
+void Material::SetTransparencyModes(Blend src, Blend dst, Operation op)
+{
+	if (_blendStateObject)
+	{
+		_blendStateObject.Reset();
+	}
+
+	D3D11_BLEND_DESC blendState;
+	ZeroMemory(&blendState, sizeof(D3D11_BLEND_DESC));
+	blendState.RenderTarget[0].BlendEnable				= TRUE;
+	blendState.RenderTarget[0].SrcBlend					= (D3D11_BLEND)src;
+	blendState.RenderTarget[0].DestBlend				= (D3D11_BLEND)dst;
+	blendState.RenderTarget[0].SrcBlendAlpha			= D3D11_BLEND_ONE;
+	blendState.RenderTarget[0].DestBlendAlpha			= D3D11_BLEND_ONE;
+	blendState.RenderTarget[0].BlendOp					= (D3D11_BLEND_OP)op;
+	blendState.RenderTarget[0].BlendOpAlpha				= (D3D11_BLEND_OP)op;
+	blendState.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	ThrowIfFailed(FRAMEWORK->GetDevice()->CreateBlendState(&blendState, _blendStateObject.GetAddressOf()));
 }

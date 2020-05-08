@@ -2,6 +2,8 @@
 #include <wrl.h>
 #include <locale>
 #include <codecvt>
+#include <system_error>
+#include <sstream>
 
 // Helper macros
 
@@ -15,15 +17,6 @@ public: \
 // Various helper functions
 
 using namespace std;
-
-inline void ThrowIfFailed(HRESULT hr)
-{
-	if (FAILED(hr))
-	{
-		throw exception();
-	}
-}
-
 //-------------------------------------------------------------------------------------------
 
 // Utility functions to convert from wstring to string and back
@@ -48,7 +41,7 @@ inline string ws2s(const std::wstring& wstr)
 inline void ErrorDialog(const wstring& title, const wstring& content, const std::exception& exception)
 {
 	int o = MessageBoxEx(
-		0, (content + L"\n\nAbort: Close this application.\nRetry: Debug this application.\nIgnore: Continue without generating normals.").c_str(),
+		0, (content + L"\n\nAbort: Close this application.\nRetry: Debug this application.\nIgnore: Attempt to continue execution.").c_str(),
 		title.c_str(), MB_ABORTRETRYIGNORE | MB_ICONERROR, 0
 	);
 
@@ -76,4 +69,15 @@ inline void Output(const char* szFormat, ...)
 	va_end(arg);
 
 	OutputDebugString(s2ws(szBuff).c_str());
+}
+
+inline void ThrowIfFailed(HRESULT hr)
+{
+	if (FAILED(hr))
+	{
+		ostringstream o;
+		o << "Uncaught COM exception: " << system_category().message(hr) << endl;
+
+		ErrorDialog(L"Error!", s2ws(o.str()), exception());
+	}
 }

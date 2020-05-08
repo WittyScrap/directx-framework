@@ -132,6 +132,12 @@
     <ClInclude Include="PlanetBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BorealisNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsNode.h">
+      <Filter>Header Files\Scene Nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -212,6 +218,12 @@
     </ClCompile>
     <ClCompile Include="PlanetBuilder.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="BorealisNode.cpp">
+      <Filter>Source Files\Scene Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

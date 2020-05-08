@@ -93,7 +93,7 @@ private:
     MeshMode                        _draw{ MeshMode::TriangleList };
 
     FLOAT                           _radius{ 250 };
-    FLOAT                           _atmosphereThickness{ 35.f };
+    FLOAT                           _atmosphereThickness{ 50.f };
 
     FLOAT                           _constantValue{ 0 };
     const UINT                      _atmosphereMaxResolution{ 32 };

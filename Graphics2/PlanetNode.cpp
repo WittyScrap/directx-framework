@@ -190,14 +190,14 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	PlanetConstantBuffer* planetBuffer = mat->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>(1);
 	planetBuffer->PlanetRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
-	planetBuffer->PlanetOuterRadius = _radius + _atmosphereThickness;
+	planetBuffer->PlanetOuterRadius = planetBuffer->PlanetRadius + _atmosphereThickness;
 	planetBuffer->PlanetHasAtmosphere = static_cast<float>(b_hasAtmosphere);
 }
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 {
-	const float innerRadius = _radius;
-	const float outerRadius = _radius + _atmosphereThickness;
+	const float innerRadius = max(_radius, GetNoiseManager().GetMinimumHeight());
+	const float outerRadius = innerRadius + _atmosphereThickness;
 
 	mat->SetShader(RESOURCES->GetShader(L"Shaders/atmosphere.hlsl"));
 	mat->SetTexture(0, RESOURCES->GetTexture(L"PlanetData/atmo.png"));
@@ -208,7 +208,8 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 	atmoBuffer->fOuterRadius = outerRadius;
 	atmoBuffer->fInnerRadius = innerRadius;
 
-	mat->SetTransparencyMode(Transparency::Transparent);
+	mat->SetTransparencyEnabled(true);
+	mat->SetTransparencyModes(Blend::SrcAlpha, Blend::OneMinusSrcAlpha);
 }
 
 void PlanetNode::SetLOD(size_t lod)

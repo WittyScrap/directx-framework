@@ -27,6 +27,10 @@ void Graphics2::CreateSceneGraph()
 	planetB->SetPosition({ 512, 200, 1024 });
 	planetB->SetRadius(512.f);
 
+	// Set borealis in orbit
+	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), (planetB->GetWorldPosition() - borealis->GetWorldPosition())).Normalized();
+	borealis->SetLinearVelocity(tangentVector * planetB->GetOrbitalVelocity((borealis->GetWorldPosition() - planetB->GetWorldPosition()).Length()));
+
 	SCENE->Add(planetA);
 	SCENE->Add(planetB);
 	SCENE->Add(borealis);

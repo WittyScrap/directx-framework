@@ -6,7 +6,6 @@
 
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
-#define G 0.0000000000674f
 
 vector<PlanetNode*> PlanetNode::_allPlanets;
 

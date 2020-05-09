@@ -22,13 +22,17 @@ void Graphics2::CreateSceneGraph()
 	ambientLight->SetColor({ .25f, .25f, .25f, .25f });
 
 	shared_ptr<BorealisNode> borealis = SceneGraph::Create<BorealisNode>();
-	shared_ptr<PlanetNode> planetA = PlanetNode::GenerateRandom();
+	shared_ptr<PlanetNode> planetA = PlanetNode::GenerateRandom(2.f);
 	shared_ptr<PlanetNode> planetB = PlanetNode::GenerateRandom();
 
 	borealis->SetPosition({ 0, 200, 1024 });
 	planetA->SetPosition({ -2048, 2, 2048 });
 	planetB->SetPosition({ 512, 200, 1024 });
 
+	planetA->SetHasAtmosphere(false);
+	planetA->SetRadius(128.f);
+	planetA->SetGrassColor(.7f, .71f, .75f);
+	planetA->SetSandColor(.75f, .75f, .75f);
 	planetA->Orbit(planetB.get());
 
 	// Set borealis in orbit

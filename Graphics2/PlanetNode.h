@@ -87,7 +87,7 @@ public:
 
              void                   Orbit(const PlanetNode* const planet);
 
-     static  shared_ptr<PlanetNode> GenerateRandom();
+     static  shared_ptr<PlanetNode> GenerateRandom(const FLOAT noiseScale = 1.f);
      static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude = {});
 
 protected:
@@ -125,7 +125,7 @@ private:
     vector<LOD>                     _requestedLODs;
 
     FLOAT                           _minimumDistance{ 200.f };
-    FLOAT                           _maximumDistance{ 4000.f };
+    FLOAT                           _maximumDistance{ 10000.f };
 
     int                             _currentLOD{ -1 };
     bool                            b_hasAtmosphere{ true };
@@ -135,7 +135,7 @@ private:
 
     Vector3                         _linearVelocity{ 0, 0, 0 };
 
-    FLOAT                           _gravity{ .5f };
+    FLOAT                           _gravity{ .05f };
     static vector<PlanetNode*>      _allPlanets;
 };
 

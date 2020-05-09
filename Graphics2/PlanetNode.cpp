@@ -107,7 +107,7 @@ void PlanetNode::Orbit(const PlanetNode* const planet)
 	_linearVelocity = tangentVector * planet->GetOrbitalVelocity(directionToPlanet.Length());
 }
 
-shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
+shared_ptr<PlanetNode> PlanetNode::GenerateRandom(FLOAT noiseScale)
 {
 	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
 
@@ -118,21 +118,21 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 
 	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
 	planetNoise->SetNoiseOctaves(1);
-	planetNoise->SetNoiseScale(40.f);
+	planetNoise->SetNoiseScale(40.f * noiseScale);
 	planetNoise->SetPeakHeight(25.f);
 	planetNoise->RandomizeOffsets();
 
 	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
 	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
 	planetDetail->SetNoiseOctaves(8);
-	planetDetail->SetNoiseScale(5.f);
+	planetDetail->SetNoiseScale(5.f * noiseScale);
 	planetDetail->SetPeakHeight(1.f);
 	planetDetail->RandomizeOffsets();
 
 	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
 	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
 	planetContinents->SetNoiseOctaves(4);
-	planetContinents->SetNoiseScale(80.f);
+	planetContinents->SetNoiseScale(80.f * noiseScale);
 	planetContinents->SetPeakHeight(1.f);
 	planetDetail->RandomizeOffsets();
 

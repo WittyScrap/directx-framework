@@ -30,7 +30,7 @@ private:
 
     Vector3                 _pilotPosition{ 0, 1.f, 3.5f };
 
-    float                   _accelerationSpeed{ .01f };
+    float                   _accelerationSpeed{ .1f };
     float                   _rotationSpeed{ 0.1f };
 
     float                   _cameraSwayStrength{ .1f };

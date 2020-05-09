@@ -6,6 +6,9 @@
 
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+#define G 0.0000000000674f
+
+vector<PlanetNode*> PlanetNode::_allPlanets;
 
 CBUFFER PlanetConstantBuffer
 {
@@ -26,6 +29,11 @@ CBUFFER AtmosphereConstantBuffer
 bool PlanetNode::Initialise()
 {
 	return Generate();
+}
+
+FLOAT PlanetNode::GetMass() const
+{
+	return _gravity * (_radius * _radius) / G;
 }
 
 void PlanetNode::CreateLOD(const UINT& resolution)
@@ -111,6 +119,25 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 	planet->CreateLOD(256);
 
 	return planet;
+}
+
+Vector3 PlanetNode::CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass)
+{
+	Vector3 overallAcceleration;
+
+	for (PlanetNode* planet : _allPlanets)
+	{
+		Vector3 forceDir = planet->GetWorldPosition() - sourcePoint;
+		FLOAT distanceSqr = forceDir.SqrLength();
+		forceDir.Normalize();
+
+		Vector3 force = forceDir * G * sourceMass * planet->GetMass() / distanceSqr;
+		Vector3 acceleration = force / sourceMass;
+		
+		overallAcceleration += acceleration;
+	}
+
+	return overallAcceleration;
 }
 
 void PlanetNode::GenerateAllLODs()
@@ -220,5 +247,15 @@ void PlanetNode::SetLOD(size_t lod)
 	{
 		SetMesh(_meshLODs[lod]);
 		_currentLOD = static_cast<int>(lod);
+	}
+}
+
+void PlanetNode::RemovePlanet(PlanetNode* target)
+{
+	vector<PlanetNode*>::iterator it = find(_allPlanets.begin(), _allPlanets.end(), target);
+
+	if (it != _allPlanets.end())
+	{
+		_allPlanets.erase(it);
 	}
 }

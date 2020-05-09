@@ -42,9 +42,9 @@ void BorealisNode::Update(FXMMATRIX& m)
 		float mouseY = GetMouseVertical() * _rotationSpeed;
 		int roll = GetKey('Q') - GetKey('E');
 
-		AddSpin(GetUpVector() * mouseX);
-		AddSpin(GetRightVector() * mouseY);
-		AddSpin(GetForwardVector() * roll * _rotationSpeed * 0.1f);
+		AddSpin(Vector3::UpVector * mouseX);
+		AddSpin(Vector3::RightVector * mouseY);
+		AddSpin(Vector3::ForwardVector * roll * _rotationSpeed * 0.1f);
 
 		DoCameraSway();
 
@@ -52,11 +52,6 @@ void BorealisNode::Update(FXMMATRIX& m)
 		{
 			SetMouseLocked(true);
 			SetMouseVisible(false);
-		}
-
-		if (GetLinearVelocity().SqrLength() < _minimumSpeed * _minimumSpeed && horizontal == 0 && forward == 0 && vertical == 0)
-		{
-			SetLinearVelocity(Vector3::ZeroVector);
 		}
 
 		if (GetAngularVelocity().SqrLength() > 0.f)

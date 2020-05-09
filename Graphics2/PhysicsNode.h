@@ -25,8 +25,13 @@ public:
 
     virtual void            Update(FXMMATRIX& m) override;
 
+            void            SetSimulateGravity(const BOOL& bValue)              { b_simulateGravity = bValue; }
+            const BOOL&     GetSimulateGravity() const                          { return b_simulateGravity; }
+
 private:
     Vector3                 _linearVelocity{ 0, 0, 0 };
     Vector3                 _angularVelocity{ 0, 0, 0 };
+
+    BOOL                    b_simulateGravity{ true };
 };
 

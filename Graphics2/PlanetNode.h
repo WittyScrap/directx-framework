@@ -39,15 +39,17 @@ struct LOD
 class PlanetNode : public MeshNode
 {
 public:
-                                    PlanetNode() : MeshNode(L"Terrain")             { }
-                                    PlanetNode(wstring name) : MeshNode(name)       { }
-                                                                                    // Abort planet generation thread (if it is still running)
-    virtual                        ~PlanetNode()                                    { b_abortBuild = true; _planetBuildingThread.join(); }
+                                    PlanetNode() : MeshNode(L"Terrain")             { _allPlanets.push_back(this); }
+                                    PlanetNode(wstring name) : MeshNode(name)       { _allPlanets.push_back(this); }
+                                                                                    // Abort planet generation thread (if it is still running), remove this planet from the list of existing planets
+    virtual                        ~PlanetNode()                                    { b_abortBuild = true; _planetBuildingThread.join(); RemovePlanet(this); }
 
     virtual  bool                   Initialise() override;
 
      inline  FLOAT                  GetRadius() const                               { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                   { _radius = value; }
+
+             FLOAT                  GetMass() const;
 
      inline  FLOAT                  GetAtmosphereThickness() const                  { return _atmosphereThickness; }
      inline  void                   SetAtmosphereThickness(const FLOAT& value)      { _atmosphereThickness = value; }
@@ -73,6 +75,7 @@ public:
     virtual  void                   OnPreRender() override;
 
      static  shared_ptr<PlanetNode> GenerateRandom();
+     static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass);
 
 protected:
              void                   GenerateAllLODs();
@@ -85,6 +88,7 @@ protected:
 
 private:
              void                   SetLOD(size_t lod);
+     static  void                   RemovePlanet(PlanetNode* target);
 
 private:
     NoiseManager                    _noises;
@@ -112,6 +116,9 @@ private:
 
     thread                          _planetBuildingThread;
     bool                            b_abortBuild{ false };
+
+    static constexpr FLOAT          _gravity{ .25f };
+    static vector<PlanetNode*>      _allPlanets;
 };
 
 #undef MESH

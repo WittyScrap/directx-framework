@@ -26,7 +26,7 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<PlanetNode> planetB = PlanetNode::GenerateRandom();
 
 	borealis->SetPosition({ 0, 200, 1024 });
-	planetA->SetPosition({ -2048, 2, 2048 });
+	planetA->SetPosition({ -3000, 2, 2048 });
 	planetB->SetPosition({ 512, 200, 1024 });
 
 	planetA->SetHasAtmosphere(false);

@@ -83,6 +83,7 @@ void BorealisNode::DoCameraSway()
 
 	velocity *= -1;
 	_time += _cameraBobSpeed;
+	_time = fmod(_time, 2.f * PI);
 	float bobValue = static_cast<float>(sin(_time)) * _cameraBobStrength;
 
 	velocity.SetY(velocity.Y + bobValue);

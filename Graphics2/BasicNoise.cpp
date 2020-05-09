@@ -14,8 +14,6 @@ FLOAT BasicNoise::GetNoiseValue(FLOAT x, FLOAT y, FLOAT z) const
 
 void BasicNoise::RandomizeOffsets()
 { 
-	srand((unsigned int)time(0));
-	
 	_noiseOffsetX = (float)rand();
 	_noiseOffsetY = (float)rand(); 
 	_noiseOffsetZ = (float)rand();

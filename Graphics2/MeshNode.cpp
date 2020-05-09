@@ -3,15 +3,6 @@
 #include "CameraNode.h"
 
 /**
- * Carries the transformation matrix through.
- *
- */
-void MeshNode::Update(FXMMATRIX& currentWorldTransformation)
-{
-	SceneNode::Update(currentWorldTransformation);
-}
-
-/**
  * Displays the mesh contained in this mesh node.
  *
  */

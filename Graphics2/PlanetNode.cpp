@@ -7,6 +7,15 @@
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
 
+vector<PlanetNode*> PlanetNode::_allPlanets;
+
+void RandomColor(float& r, float& g, float& b)
+{
+	r = static_cast<float>(rand()) / RAND_MAX;
+	g = static_cast<float>(rand()) / RAND_MAX;
+	b = static_cast<float>(rand()) / RAND_MAX;
+}
+
 CBUFFER PlanetConstantBuffer
 {
 	float  PlanetRadius;
@@ -14,6 +23,8 @@ CBUFFER PlanetConstantBuffer
 	float  PlanetOuterRadius;
 	float  PlanetHasAtmosphere;
 	XMFLOAT3 PlanetPosition;
+	XMFLOAT4 PlanetGrassColor;
+	XMFLOAT4 PlanetSandColor;
 };
 
 CBUFFER AtmosphereConstantBuffer
@@ -26,6 +37,22 @@ CBUFFER AtmosphereConstantBuffer
 bool PlanetNode::Initialise()
 {
 	return Generate();
+}
+
+void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
+{
+	_linearVelocity += CalculateTotalGravity(GetWorldPosition(), GetMass(), { this });
+
+	Vector3 position = GetPosition();
+	position += _linearVelocity;
+	SetPosition(position);
+
+	MeshNode::Update(currentWorldTransformation);
+}
+
+FLOAT PlanetNode::GetMass() const
+{
+	return _gravity * (_radius * _radius) / G;
 }
 
 void PlanetNode::CreateLOD(const UINT& resolution)
@@ -72,7 +99,15 @@ void PlanetNode::OnPreRender()
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
 }
 
-shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
+void PlanetNode::Orbit(const PlanetNode* const planet)
+{
+	Vector3 directionToPlanet = planet->GetWorldPosition() - GetWorldPosition();
+	Vector3 tangentVector = Vector3::Cross(planet->GetUpVector(), directionToPlanet).Normalized();
+	
+	_linearVelocity = tangentVector * planet->GetOrbitalVelocity(directionToPlanet.Length());
+}
+
+shared_ptr<PlanetNode> PlanetNode::GenerateRandom(FLOAT noiseScale)
 {
 	shared_ptr<PlanetNode> planet = SceneGraph::Create<PlanetNode>(L"Terrain");
 
@@ -83,21 +118,21 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 
 	auto planetNoise = noiseManager.CreateNoise<BasicNoise>();
 	planetNoise->SetNoiseOctaves(1);
-	planetNoise->SetNoiseScale(40.f);
+	planetNoise->SetNoiseScale(40.f * noiseScale);
 	planetNoise->SetPeakHeight(25.f);
 	planetNoise->RandomizeOffsets();
 
 	auto planetDetail = noiseManager.CreateNoise<BasicNoise>();
 	planetDetail->SetNoiseDirection(NoiseDirection::ND_Inwards);
 	planetDetail->SetNoiseOctaves(8);
-	planetDetail->SetNoiseScale(5.f);
+	planetDetail->SetNoiseScale(5.f * noiseScale);
 	planetDetail->SetPeakHeight(1.f);
 	planetDetail->RandomizeOffsets();
 
 	auto planetContinents = noiseManager.CreateNoise<BasicNoise>();
 	planetContinents->SetNoiseBlendMode(NoiseBlendMode::BM_Multiply);
 	planetContinents->SetNoiseOctaves(4);
-	planetContinents->SetNoiseScale(80.f);
+	planetContinents->SetNoiseScale(80.f * noiseScale);
 	planetContinents->SetPeakHeight(1.f);
 	planetDetail->RandomizeOffsets();
 
@@ -105,12 +140,44 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 	planet->SetRadius(256.f);
 
 	// Define LOD resolutions...
+
 	planet->CreateLOD(4);
 	planet->CreateLOD(16);
 	planet->CreateLOD(64);
 	planet->CreateLOD(256);
+	
+	// Set colors
+
+	float r, g, b;
+	RandomColor(r, g, b);
+	planet->SetGrassColor(r, g, b);
+
+	RandomColor(r, g, b);
+	planet->SetSandColor(r, g, b);
 
 	return planet;
+}
+
+Vector3 PlanetNode::CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude)
+{
+	Vector3 overallAcceleration;
+
+	for (PlanetNode* planet : _allPlanets)
+	{
+		if (find(exclude.begin(), exclude.end(), planet) == exclude.end())
+		{
+			Vector3 forceDir = planet->GetWorldPosition() - sourcePoint;
+			FLOAT distanceSqr = forceDir.SqrLength();
+			forceDir.Normalize();
+
+			Vector3 force = forceDir * G * sourceMass * planet->GetMass() / distanceSqr;
+			Vector3 acceleration = force / sourceMass;
+
+			overallAcceleration += acceleration;
+		}
+	}
+
+	return overallAcceleration;
 }
 
 void PlanetNode::GenerateAllLODs()
@@ -192,6 +259,8 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
 	planetBuffer->PlanetOuterRadius = planetBuffer->PlanetRadius + _atmosphereThickness;
 	planetBuffer->PlanetHasAtmosphere = static_cast<float>(b_hasAtmosphere);
+	planetBuffer->PlanetGrassColor = _grassColor;
+	planetBuffer->PlanetSandColor = _sandColor;
 }
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
@@ -220,5 +289,15 @@ void PlanetNode::SetLOD(size_t lod)
 	{
 		SetMesh(_meshLODs[lod]);
 		_currentLOD = static_cast<int>(lod);
+	}
+}
+
+void PlanetNode::RemovePlanet(PlanetNode* target)
+{
+	vector<PlanetNode*>::iterator it = find(_allPlanets.begin(), _allPlanets.end(), target);
+
+	if (it != _allPlanets.end())
+	{
+		_allPlanets.erase(it);
 	}
 }

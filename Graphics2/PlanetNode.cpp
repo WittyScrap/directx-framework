@@ -39,6 +39,17 @@ bool PlanetNode::Initialise()
 	return Generate();
 }
 
+void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
+{
+	_linearVelocity += CalculateTotalGravity(GetWorldPosition(), GetMass(), { this });
+
+	Vector3 position = GetPosition();
+	position += _linearVelocity;
+	SetPosition(position);
+
+	MeshNode::Update(currentWorldTransformation);
+}
+
 FLOAT PlanetNode::GetMass() const
 {
 	return _gravity * (_radius * _radius) / G;
@@ -86,6 +97,14 @@ void PlanetNode::OnPreRender()
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>(1);
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
+}
+
+void PlanetNode::Orbit(const PlanetNode* const planet)
+{
+	Vector3 directionToPlanet = planet->GetWorldPosition() - GetWorldPosition();
+	Vector3 tangentVector = Vector3::Cross(planet->GetUpVector(), directionToPlanet).Normalized();
+	
+	_linearVelocity = tangentVector * planet->GetOrbitalVelocity(directionToPlanet.Length());
 }
 
 shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
@@ -139,20 +158,23 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 	return planet;
 }
 
-Vector3 PlanetNode::CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass)
+Vector3 PlanetNode::CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude)
 {
 	Vector3 overallAcceleration;
 
 	for (PlanetNode* planet : _allPlanets)
 	{
-		Vector3 forceDir = planet->GetWorldPosition() - sourcePoint;
-		FLOAT distanceSqr = forceDir.SqrLength();
-		forceDir.Normalize();
+		if (find(exclude.begin(), exclude.end(), planet) == exclude.end())
+		{
+			Vector3 forceDir = planet->GetWorldPosition() - sourcePoint;
+			FLOAT distanceSqr = forceDir.SqrLength();
+			forceDir.Normalize();
 
-		Vector3 force = forceDir * G * sourceMass * planet->GetMass() / distanceSqr;
-		Vector3 acceleration = force / sourceMass;
-		
-		overallAcceleration += acceleration;
+			Vector3 force = forceDir * G * sourceMass * planet->GetMass() / distanceSqr;
+			Vector3 acceleration = force / sourceMass;
+
+			overallAcceleration += acceleration;
+		}
 	}
 
 	return overallAcceleration;

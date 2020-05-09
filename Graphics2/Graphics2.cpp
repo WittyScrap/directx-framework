@@ -29,6 +29,8 @@ void Graphics2::CreateSceneGraph()
 	planetA->SetPosition({ -2048, 2, 2048 });
 	planetB->SetPosition({ 512, 200, 1024 });
 
+	planetA->Orbit(planetB.get());
+
 	// Set borealis in orbit
 	Vector3 borealisToPlanet = planetB->GetWorldPosition() - borealis->GetWorldPosition();
 	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), borealisToPlanet).Normalized();

@@ -33,7 +33,10 @@ void PhysicsNode::SetAngularVelocity(const Vector3& angularVelocity)
 
 void PhysicsNode::Update(FXMMATRIX& m)
 {
-	_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1);
+	if (b_simulateGravity)
+	{
+		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1);
+	}
 
 	Vector3 position = GetPosition();
 	position += _linearVelocity;

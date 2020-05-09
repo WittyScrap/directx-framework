@@ -45,7 +45,8 @@ public:
                                                                                      // Abort planet generation thread (if it is still running), remove this planet from the list of existing planets
     virtual                        ~PlanetNode()                                     { b_abortBuild = true; _planetBuildingThread.join(); RemovePlanet(this); }
 
-    virtual  bool                   Initialise() override;
+    virtual  bool                   Initialise()                                     override;
+    virtual  void                   Update(FXMMATRIX& currentWorldTransformation)    override;
 
      inline  FLOAT                  GetRadius() const                                { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                    { _radius = value; }
@@ -84,8 +85,10 @@ public:
      inline  FLOAT                  GetHeightFromSurface(const Vector3& point) const { return (point - GetWorldPosition()).Length() - _radius; }
      inline  FLOAT                  GetOrbitalVelocity(const FLOAT& height) const    { return sqrt(G * GetMass() / height); }
 
+             void                   Orbit(const PlanetNode* const planet);
+
      static  shared_ptr<PlanetNode> GenerateRandom();
-     static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass);
+     static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude = {});
 
 protected:
              void                   GenerateAllLODs();
@@ -129,6 +132,8 @@ private:
 
     thread                          _planetBuildingThread;
     bool                            b_abortBuild{ false };
+
+    Vector3                         _linearVelocity{ 0, 0, 0 };
 
     FLOAT                           _gravity{ .5f };
     static vector<PlanetNode*>      _allPlanets;

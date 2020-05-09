@@ -75,6 +75,9 @@ public:
      inline  const FLOAT&           GetGravity() const                               { return _gravity; }
      inline  void                   SetGravity(const FLOAT& gravity)                 { _gravity = gravity; }
 
+     inline  void                   SetGrassColor(FLOAT r, FLOAT g, FLOAT b)         { _grassColor = XMFLOAT4(r, g, b, 1.f); }
+     inline  void                   SetSandColor(FLOAT r, FLOAT g, FLOAT b)          { _sandColor = XMFLOAT4(r, g, b, 1.f); }
+
              bool                   Generate();
     virtual  void                   OnPreRender() override;
 
@@ -105,6 +108,9 @@ private:
 
     FLOAT                           _radius{ 250 };
     FLOAT                           _atmosphereThickness{ 35.f };
+
+    XMFLOAT4                        _grassColor{ 1, 1, 1, 1 };
+    XMFLOAT4                        _sandColor{ 1, 1, 1, 1 };
 
     FLOAT                           _constantValue{ 0 };
     const UINT                      _atmosphereMaxResolution{ 32 };

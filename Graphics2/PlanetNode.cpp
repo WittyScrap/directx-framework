@@ -9,6 +9,13 @@
 
 vector<PlanetNode*> PlanetNode::_allPlanets;
 
+void RandomColor(float& r, float& g, float& b)
+{
+	r = static_cast<float>(rand()) / RAND_MAX;
+	g = static_cast<float>(rand()) / RAND_MAX;
+	b = static_cast<float>(rand()) / RAND_MAX;
+}
+
 CBUFFER PlanetConstantBuffer
 {
 	float  PlanetRadius;
@@ -16,6 +23,8 @@ CBUFFER PlanetConstantBuffer
 	float  PlanetOuterRadius;
 	float  PlanetHasAtmosphere;
 	XMFLOAT3 PlanetPosition;
+	XMFLOAT4 PlanetGrassColor;
+	XMFLOAT4 PlanetSandColor;
 };
 
 CBUFFER AtmosphereConstantBuffer
@@ -112,10 +121,20 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom()
 	planet->SetRadius(256.f);
 
 	// Define LOD resolutions...
+
 	planet->CreateLOD(4);
 	planet->CreateLOD(16);
 	planet->CreateLOD(64);
 	planet->CreateLOD(256);
+	
+	// Set colors
+
+	float r, g, b;
+	RandomColor(r, g, b);
+	planet->SetGrassColor(r, g, b);
+
+	RandomColor(r, g, b);
+	planet->SetSandColor(r, g, b);
 
 	return planet;
 }
@@ -218,6 +237,8 @@ void PlanetNode::PopulateGroundMaterial(shared_ptr<Material>& mat)
 	planetBuffer->PlanetPeaks = GetNoiseManager().GetMaximumHeight();
 	planetBuffer->PlanetOuterRadius = planetBuffer->PlanetRadius + _atmosphereThickness;
 	planetBuffer->PlanetHasAtmosphere = static_cast<float>(b_hasAtmosphere);
+	planetBuffer->PlanetGrassColor = _grassColor;
+	planetBuffer->PlanetSandColor = _sandColor;
 }
 
 void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)

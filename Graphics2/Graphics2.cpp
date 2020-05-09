@@ -12,6 +12,9 @@ Graphics2 app;
 
 void Graphics2::CreateSceneGraph()
 {
+	time_t t{ 0 };
+	srand((unsigned int)time(&t));
+
 	shared_ptr<AmbientLight> ambientLight = AddLight<AmbientLight>();
 	shared_ptr<DirectionalLight> directionalLight = AddLight<DirectionalLight>();
 
@@ -22,14 +25,14 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<PlanetNode> planetA = PlanetNode::GenerateRandom();
 	shared_ptr<PlanetNode> planetB = PlanetNode::GenerateRandom();
 
-	borealis->SetPosition({ 0, 128, -1024 });
-	planetA->SetPosition({ -5, 2, 2048 });
+	borealis->SetPosition({ 0, 200, 1024 });
+	planetA->SetPosition({ -2048, 2, 2048 });
 	planetB->SetPosition({ 512, 200, 1024 });
-	planetB->SetRadius(512.f);
 
 	// Set borealis in orbit
-	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), (planetB->GetWorldPosition() - borealis->GetWorldPosition())).Normalized();
-	borealis->SetLinearVelocity(tangentVector * planetB->GetOrbitalVelocity((borealis->GetWorldPosition() - planetB->GetWorldPosition()).Length()));
+	Vector3 borealisToPlanet = planetB->GetWorldPosition() - borealis->GetWorldPosition();
+	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), borealisToPlanet).Normalized();
+	borealis->SetLinearVelocity(tangentVector * planetB->GetOrbitalVelocity(borealisToPlanet.Length()));
 
 	SCENE->Add(planetA);
 	SCENE->Add(planetB);

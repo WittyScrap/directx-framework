@@ -44,7 +44,7 @@ void BorealisNode::Update(FXMMATRIX& m)
 
 		AddSpin(Vector3::UpVector * mouseX);
 		AddSpin(Vector3::RightVector * mouseY);
-		AddSpin(Vector3::ForwardVector * roll * _rotationSpeed * 0.1f);
+		AddSpin(Vector3::ForwardVector * static_cast<float>(roll) * _rotationSpeed * 0.1f);
 
 		DoCameraSway();
 

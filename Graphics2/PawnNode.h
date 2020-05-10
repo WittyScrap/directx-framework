@@ -34,13 +34,13 @@ void PawnNode::Update(FXMMATRIX& m)
 {
     Vector3 location = GetPosition();
 
-    RotateAround(GetForwardVector(),    static_cast<float>(GetKey('Q') - GetKey('E')) * _rotationSpeed * .5f);
-    RotateAround(GetUpVector(),         GetMouseHorizontal() * _rotationSpeed);
-    RotateAround(GetRightVector(),      GetMouseVertical() * _rotationSpeed);
+    RotateAround(GetForwardVector(),    static_cast<float>(GetKey('Q') - GetKey('E')) * _rotationSpeed * .5f * FRAMEWORK->GetDeltaTime());
+    RotateAround(GetUpVector(),         GetMouseHorizontal() * _rotationSpeed * FRAMEWORK->GetDeltaTime());
+    RotateAround(GetRightVector(),      GetMouseVertical() * _rotationSpeed * FRAMEWORK->GetDeltaTime());
 
-    location += GetForwardVector()  * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S'));
-    location += GetRightVector()    * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A'));
-    location += GetUpVector()       * _movementSpeed * static_cast<float>(GetKey('R') - GetKey('F'));
+    location += GetForwardVector()  * _movementSpeed * static_cast<float>(GetKey('W') - GetKey('S') * FRAMEWORK->GetDeltaTime());
+    location += GetRightVector()    * _movementSpeed * static_cast<float>(GetKey('D') - GetKey('A') * FRAMEWORK->GetDeltaTime());
+    location += GetUpVector()       * _movementSpeed * static_cast<float>(GetKey('R') - GetKey('F') * FRAMEWORK->GetDeltaTime());
 
     SetPosition(location);
 

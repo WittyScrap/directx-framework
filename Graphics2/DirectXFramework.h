@@ -5,6 +5,10 @@
 #include "SceneGraph.h"
 #include "ResourceManager.h"
 #include "ILight.h"
+#include <chrono>
+
+using namespace std::chrono;
+
 
 class DirectXFramework : public Framework
 {
@@ -30,6 +34,8 @@ public:
 
 	void								EnableDepthTesting();
 	void								DisableDepthTesting();
+
+	inline const float&					GetDeltaTime() { return _deltaTime; }
 
 	void								SetBackgroundColour(XMFLOAT4 backgroundColour);
 
@@ -70,6 +76,8 @@ private:
 	vector<shared_ptr<ILight>>			_sceneLights;
 
 	float							    _backgroundColour[4];
+	float								_deltaTime{ 0 };
+	time_point<steady_clock>			_previousFrameTime{ high_resolution_clock::now() };
 
 	bool GetDeviceAndSwapChain();
 };

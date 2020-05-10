@@ -22,6 +22,7 @@ public:
 
 protected:
             void            DoCameraSway();
+            void            RegisterThrust(const int& x, const int& y, const int& z);
 
 private:
     shared_ptr<Mesh>        _borealisModel;
@@ -29,16 +30,20 @@ private:
     shared_ptr<CameraNode>  _camera;
 
     Vector3                 _pilotPosition{ 0, 1.f, 3.5f };
+    Vector3                 _lastThrust{ 0, 0, 0 };
 
     float                   _accelerationSpeed{ 1.f };
     float                   _rotationSpeed{ 5.f };
 
-    float                   _cameraSwayStrength{ .1f };
+    float                   _cameraSwayStrength{ .12f };
+    float                   _cameraSwaySmoothness{ .12f };
     float                   _cameraBobStrength{ .025f };
+    float                   _cameraHeadlookSensitivity{ 1024.f };
 
     float                   _cameraBobSpeed{ .01f };
     float                   _time{ 0 };
 
     float                   _minimumSpeed{ .05f };
+    bool                    b_headlookActive{ false };
 };
 

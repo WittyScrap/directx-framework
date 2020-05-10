@@ -1,4 +1,7 @@
 #include "BorealisNode.h"
+#define lerp(a, b, t) ((a) + (t) * ((b) - (a)))
+
+using namespace std;
 
 bool BorealisNode::Initialise()
 {
@@ -38,17 +41,36 @@ void BorealisNode::Update(FXMMATRIX& m)
 			GetForwardVector() * (_accelerationSpeed * forward)
 		);
 
-		float mouseX = GetMouseHorizontal() * _rotationSpeed;
-		float mouseY = GetMouseVertical() * _rotationSpeed;
+		RegisterThrust(horizontal, vertical, forward);
+
+		float mouseX = GetMouseHorizontal();
+		float mouseY = GetMouseVertical();
 		int roll = GetKey('Q') - GetKey('E');
 
-		AddSpin(Vector3::UpVector * mouseX);
-		AddSpin(Vector3::RightVector * mouseY);
-		AddSpin(Vector3::ForwardVector * static_cast<float>(roll) * _rotationSpeed * 0.1f);
+		if (GetKeyDown(VK_MBUTTON))
+		{
+			b_headlookActive = !b_headlookActive;
+
+			if (!b_headlookActive)
+			{
+				_camera->SetRotation(XMQuaternionIdentity());
+			}
+		}
+
+		if (!b_headlookActive)
+		{
+			AddSpin(Vector3::UpVector * mouseX * _rotationSpeed);
+			AddSpin(Vector3::RightVector * mouseY * _rotationSpeed);
+			AddSpin(Vector3::ForwardVector * static_cast<float>(roll)* _rotationSpeed * 0.1f);
+		}
+		else
+		{
+			_camera->RotateAround(Vector3::UpVector, mouseX * _cameraHeadlookSensitivity * FRAMEWORK->GetDeltaTime());
+		}
 
 		DoCameraSway();
 
-		if (!_mouseLocked && GetKey(VK_MBUTTON))
+		if (!_mouseLocked && GetKey(VK_LBUTTON))
 		{
 			SetMouseLocked(true);
 			SetMouseVisible(false);
@@ -72,16 +94,10 @@ void BorealisNode::Update(FXMMATRIX& m)
 
 void BorealisNode::DoCameraSway()
 {
-	Vector3 velocity = GetLinearVelocity();
+	Vector3 velocity = _lastThrust;
 	float length = velocity.Length();
 
-	if (length > _cameraSwayStrength)
-	{
-		velocity /= length;
-		velocity *= _cameraSwayStrength;
-	}
-
-	velocity *= -1;
+	velocity *= -_cameraSwayStrength;
 	_time += _cameraBobSpeed;
 	_time = fmod(_time, 2.f * PI);
 	float bobValue = static_cast<float>(sin(_time)) * _cameraBobStrength;
@@ -89,4 +105,13 @@ void BorealisNode::DoCameraSway()
 	velocity.SetY(velocity.Y + bobValue);
 
 	_camera->SetPosition(_pilotPosition + velocity);
+}
+
+void BorealisNode::RegisterThrust(const int& x, const int& y, const int& z)
+{
+	const float& deltaTime = FRAMEWORK->GetDeltaTime();
+
+	_lastThrust.SetX(lerp(_lastThrust.X, x, _cameraSwaySmoothness));
+	_lastThrust.SetY(lerp(_lastThrust.Y, y, _cameraSwaySmoothness));
+	_lastThrust.SetZ(lerp(_lastThrust.Z, z, _cameraSwaySmoothness));
 }

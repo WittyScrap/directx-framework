@@ -135,7 +135,7 @@ private:
 
     Vector3                         _linearVelocity{ 0, 0, 0 };
 
-    FLOAT                           _gravity{ .05f };
+    FLOAT                           _gravity{ 9.85f };
     static vector<PlanetNode*>      _allPlanets;
 };
 

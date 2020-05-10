@@ -2,6 +2,7 @@
 #include "CameraNode.h"
 #include "Material.h"
 
+
 // DirectX libraries that are needed
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -98,6 +99,12 @@ void DirectXFramework::Shutdown()
 
 void DirectXFramework::Update()
 {
+	// Calculate delta time
+	auto current = high_resolution_clock::now();
+	auto delta = duration_cast<milliseconds>(current - _previousFrameTime);
+	_deltaTime = delta.count() / 1000.f;
+	_previousFrameTime = current;
+
 	// Do any updates to the scene graph nodes
 	UpdateSceneGraph();
 	// Now apply any updates that have been made to world transformations

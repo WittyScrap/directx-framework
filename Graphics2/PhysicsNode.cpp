@@ -35,16 +35,16 @@ void PhysicsNode::Update(FXMMATRIX& m)
 {
 	if (b_simulateGravity)
 	{
-		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1);
+		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1) * FRAMEWORK->GetDeltaTime();
 	}
 
 	Vector3 position = GetPosition();
-	position += _linearVelocity;
+	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
-	RotateAround(GetForwardVector(), _angularVelocity.Z);
-	RotateAround(GetRightVector(), _angularVelocity.X);
-	RotateAround(GetUpVector(), _angularVelocity.Y);
+	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());
+	RotateAround(GetRightVector(), _angularVelocity.X * FRAMEWORK->GetDeltaTime());
+	RotateAround(GetUpVector(), _angularVelocity.Y * FRAMEWORK->GetDeltaTime());
 
 	SceneGraph::Update(m);
 }

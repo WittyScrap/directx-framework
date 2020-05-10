@@ -41,10 +41,13 @@ bool PlanetNode::Initialise()
 
 void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
 {
-	_linearVelocity += CalculateTotalGravity(GetWorldPosition(), GetMass(), { this });
+	// Since gravity is expressed as m/s/s, not multiplying the acceleration by delta time would give us an accelleration by
+	// m/s/frame. Multiplying by the time delta between the previous frame and current frame will move the acceleration range
+	// back to seconds.
+	_linearVelocity += CalculateTotalGravity(GetWorldPosition(), GetMass(), { this }) * FRAMEWORK->GetDeltaTime();
 
 	Vector3 position = GetPosition();
-	position += _linearVelocity;
+	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
 	MeshNode::Update(currentWorldTransformation);

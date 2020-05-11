@@ -1,5 +1,6 @@
 #pragma once
 #include "MeshNode.h"
+#include "CameraNode.h"
 
 
 /**
@@ -14,8 +15,12 @@ public:
     virtual                    ~SkyboxNode()                                        {}
 
     virtual bool                Initialise() override;
+    virtual void                Update(FXMMATRIX& m) override;
+
+            void                Link(const shared_ptr<CameraNode>& camera)          { _linkedCamera = camera; }
 
 private:
     shared_ptr<Material>        _material;
+    shared_ptr<CameraNode>      _linkedCamera;
 };
 

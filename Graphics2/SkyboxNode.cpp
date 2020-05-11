@@ -13,3 +13,9 @@ bool SkyboxNode::Initialise()
 
 	return MeshNode::Initialise();
 }
+
+void SkyboxNode::Update(FXMMATRIX& m)
+{
+	SetPosition(_linkedCamera->GetWorldPosition());
+	MeshNode::Update(m);
+}

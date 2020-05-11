@@ -22,8 +22,8 @@ bool BorealisNode::Initialise()
 		Add(_camera);
 
 		auto skybox = SceneGraph::Create<SkyboxNode>(L"Skybox");
-		_camera->Add(skybox);
-		skybox->SetPosition(Vector3::ZeroVector);
+		skybox->Link(_camera);
+		SCENE->Add(skybox);
 	}
 
 	SetMouseLocked(true);

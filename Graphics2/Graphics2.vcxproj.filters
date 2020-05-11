@@ -144,6 +144,9 @@
     <ClInclude Include="SatelliteNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SkyboxNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">
@@ -230,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="BorealisNode.cpp">
       <Filter>Source Files\Scene Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyboxNode.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

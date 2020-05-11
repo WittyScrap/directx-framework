@@ -68,7 +68,7 @@ bool Material::Activate()
 
 		ComPtr<ID3D11DeviceContext> deviceContext = DirectXFramework::GetDXFramework()->GetDeviceContext();
 
-		deviceContext->OMSetBlendState((ID3D11BlendState*)((uintptr_t)_blendStateObject.Get() * _blendEnabled), NULL, ~0);
+		deviceContext->OMSetBlendState((ID3D11BlendState*)((uintptr_t)_blendStateObject.Get() * b_blendEnabled), NULL, ~0);
 
 		deviceContext->VSSetShader(_shader->GetVertexShader().Get(), 0, 0);
 		deviceContext->PSSetShader(_shader->GetFragmentShader().Get(), 0, 0);

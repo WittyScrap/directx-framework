@@ -1,4 +1,5 @@
 #include "BorealisNode.h"
+#include "SkyboxNode.h"
 #define lerp(a, b, t) ((a) + (t) * ((b) - (a)))
 
 using namespace std;
@@ -19,6 +20,10 @@ bool BorealisNode::Initialise()
 		_camera->SetPosition(_pilotPosition);
 
 		Add(_camera);
+
+		auto skybox = SceneGraph::Create<SkyboxNode>(L"Skybox");
+		_camera->Add(skybox);
+		skybox->SetPosition(Vector3::ZeroVector);
 	}
 
 	SetMouseLocked(true);

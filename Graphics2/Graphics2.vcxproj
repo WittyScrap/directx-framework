@@ -194,6 +194,7 @@
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SimplexNoise.h" />
+    <ClInclude Include="SkyboxNode.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="PlanetNode.h" />
     <ClInclude Include="Texture.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="PlanetNode.cpp" />
     <ClCompile Include="SimplexNoise.cpp" />
+    <ClCompile Include="SkyboxNode.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />

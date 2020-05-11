@@ -181,6 +181,7 @@
     <ClInclude Include="MeshNode.h" />
     <ClInclude Include="NoiseManager.h" />
     <ClInclude Include="BasicNoise.h" />
+    <ClInclude Include="Orbitable.h" />
     <ClInclude Include="PawnNode.h" />
     <ClInclude Include="PhysicsNode.h" />
     <ClInclude Include="PlaneNode.h" />

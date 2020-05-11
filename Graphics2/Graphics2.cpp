@@ -33,12 +33,9 @@ void Graphics2::CreateSceneGraph()
 	planetA->SetHasAtmosphere(false);
 	planetA->SetGrassColor(.7f, .71f, .75f);
 	planetA->SetSandColor(.75f, .75f, .75f);
-	planetA->Orbit(planetB.get());
 
-	// Set borealis in orbit
-	Vector3 borealisToPlanet = planetB->GetWorldPosition() - borealis->GetWorldPosition();
-	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), borealisToPlanet).Normalized();
-	borealis->SetLinearVelocity(tangentVector * planetB->GetOrbitalVelocity(borealisToPlanet.Length()));
+	planetA->Orbit(planetB.get());
+	borealis->Orbit(planetB.get());
 
 	SCENE->Add(planetA);
 	SCENE->Add(planetB);

@@ -1,12 +1,13 @@
 #pragma once
 #include "SceneGraph.h"
+#include "Orbitable.h"
 
 
 /**
  * Handles a simplistic physics system.
  *
  */
-class PhysicsNode :	public SceneGraph
+class PhysicsNode :	public SceneGraph, public Orbitable<PhysicsNode>
 {
 public:
                             PhysicsNode() : PhysicsNode(L"Physics Node")        {}

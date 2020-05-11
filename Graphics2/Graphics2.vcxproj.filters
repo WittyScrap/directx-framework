@@ -138,6 +138,9 @@
     <ClInclude Include="PhysicsNode.h">
       <Filter>Header Files\Scene Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="Orbitable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Graphics2.rc">

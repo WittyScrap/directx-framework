@@ -34,6 +34,7 @@ public:
 
 	void								EnableDepthTesting();
 	void								DisableDepthTesting();
+	void								DisableDepthBuffer();
 
 	inline const float&					GetDeltaTime() { return _deltaTime; }
 
@@ -63,6 +64,7 @@ private:
 	ComPtr<ID3D11DepthStencilView>		_depthStencilView;
 	ComPtr<ID3D11DepthStencilState>		_depthStencilActiveState;
 	ComPtr<ID3D11DepthStencilState>		_depthStencilInactiveState;
+	ComPtr<ID3D11DepthStencilState>		_depthStencilDisabledState;
 
 	D3D11_VIEWPORT						_screenViewport;
 

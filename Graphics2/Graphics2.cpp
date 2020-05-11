@@ -1,12 +1,9 @@
 #include "Graphics2.h"
-#include "RobotNode.h"
-#include "PlaneNode.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
 #include "PlanetNode.h"
-#include "CameraNode.h"
-#include "PawnNode.h"
 #include "BorealisNode.h"
+#include "SatelliteNode.h"
 
 Graphics2 app;
 
@@ -24,25 +21,26 @@ void Graphics2::CreateSceneGraph()
 	shared_ptr<BorealisNode> borealis = SceneGraph::Create<BorealisNode>();
 	shared_ptr<PlanetNode> planetA = PlanetNode::GenerateRandom();
 	shared_ptr<PlanetNode> planetB = PlanetNode::GenerateRandom(.5f);
+	shared_ptr<SatelliteNode> satellite = SceneGraph::Create<SatelliteNode>(L"Satellite");
 
 	borealis->SetPosition({ 0, 200, 512 });
 	planetA->SetPosition({ -3000, 2, 2048 });
 	planetB->SetPosition({ 512, 200, 1024 });
+	satellite->SetPosition({ -3500, 2, 2048 });
 
 	planetB->SetRadius(512.f);
 	planetA->SetHasAtmosphere(false);
 	planetA->SetGrassColor(.7f, .71f, .75f);
 	planetA->SetSandColor(.75f, .75f, .75f);
-	planetA->Orbit(planetB.get());
 
-	// Set borealis in orbit
-	Vector3 borealisToPlanet = planetB->GetWorldPosition() - borealis->GetWorldPosition();
-	Vector3 tangentVector = Vector3::Cross(planetB->GetUpVector(), borealisToPlanet).Normalized();
-	borealis->SetLinearVelocity(tangentVector * planetB->GetOrbitalVelocity(borealisToPlanet.Length()));
+	planetA->Orbit(planetB.get());
+	borealis->Orbit(planetB.get());
+	satellite->Orbit(planetA.get());
 
 	SCENE->Add(planetA);
 	SCENE->Add(planetB);
 	SCENE->Add(borealis);
+	SCENE->Add(satellite);
 }
 
 void Graphics2::UpdateSceneGraph()

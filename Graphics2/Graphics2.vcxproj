@@ -181,6 +181,7 @@
     <ClInclude Include="MeshNode.h" />
     <ClInclude Include="NoiseManager.h" />
     <ClInclude Include="BasicNoise.h" />
+    <ClInclude Include="Orbitable.h" />
     <ClInclude Include="PawnNode.h" />
     <ClInclude Include="PhysicsNode.h" />
     <ClInclude Include="PlaneNode.h" />
@@ -188,10 +189,12 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="RobotNode.h" />
+    <ClInclude Include="SatelliteNode.h" />
     <ClInclude Include="SceneGraph.h" />
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SimplexNoise.h" />
+    <ClInclude Include="SkyboxNode.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="PlanetNode.h" />
     <ClInclude Include="Texture.h" />
@@ -228,6 +231,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="PlanetNode.cpp" />
     <ClCompile Include="SimplexNoise.cpp" />
+    <ClCompile Include="SkyboxNode.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />

@@ -7,7 +7,7 @@ bool CameraNode::Initialise()
 {
 	UpdateMatrices();
 
-	return true;
+	return SceneGraph::Initialise();
 }
 
 void CameraNode::Update(FXMMATRIX& m)

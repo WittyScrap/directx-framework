@@ -6,8 +6,9 @@
 
 #define IDLIST(t) map<int, t>
 
-#define RENDER_PASS_OPAQUE      0
-#define RENDER_PASS_TRANSPARENT 1
+#define RENDER_PASS_BACKGROUND  0
+#define RENDER_PASS_OPAQUE      1
+#define RENDER_PASS_TRANSPARENT 2
 
 struct MeshObjectData
 {
@@ -49,7 +50,7 @@ public:
                                                 _specular{ 1, 1, 1, 1 },
                                                 _shininess{ 0 },
                                                 _opacity{ 1 },
-                                                _blendEnabled{ false },
+                                                b_blendEnabled{ false },
                                                 _sourceBlend{ Blend::Zero },
                                                 _destinationBlend{ Blend::Zero },
                                                 _blendOperation{ Operation::Add }                                  { if (_shader) _shader->CompileOnce(); }
@@ -91,15 +92,18 @@ public:
             void                            SetName(const wstring& name)                { _name = name; }
             const wstring&                  GetName() const                             { return _name; }
 
-            void                            SetTransparencyEnabled(BOOL state)          { _blendEnabled = state; }
-            const BOOL&                     GetTransparencyEnabled() const              { return _blendEnabled; }
+            void                            SetTransparencyEnabled(BOOL state)          { b_blendEnabled = state; }
+            const BOOL&                     GetTransparencyEnabled() const              { return b_blendEnabled; }
+
+            void                            SetIsBackground(const BOOL& state)          { b_background = state; }
+            const BOOL&                     GetIsBackground() const                     { return b_background; }
 
             void                            SetTransparencyModes(Blend src, Blend dst, Operation op = Operation::Add);
 
             static void                     SetPass(uint8_t pass)                       { _pass = pass; }
             static uint8_t                  GetPass()                                   { return _pass; }
 
-            bool                            CheckPass()                                 { return _pass == _blendEnabled; }
+            bool                            CheckPass()                                 { return _pass == 2 && b_blendEnabled || _pass == 0 && b_background || (_pass == 1 && !b_blendEnabled && !b_background); }
 
 private:
     wstring                             _name{ L"Material" };
@@ -116,7 +120,8 @@ private:
     Blend                               _sourceBlend;
     Blend                               _destinationBlend;
     Operation                           _blendOperation;
-    BOOL                                _blendEnabled;
+    BOOL                                b_blendEnabled;
+    BOOL                                b_background{ false };
 
     ComPtr<ID3D11BlendState>            _blendStateObject{ NULL };
 

@@ -39,6 +39,11 @@ void DirectXFramework::DisableDepthTesting()
 	_deviceContext->OMSetDepthStencilState(_depthStencilInactiveState.Get(), 1);
 }
 
+void DirectXFramework::DisableDepthBuffer()
+{
+	_deviceContext->OMSetDepthStencilState(_depthStencilDisabledState.Get(), 1);
+}
+
 void DirectXFramework::SetBackgroundColour(XMFLOAT4 backgroundColour)
 {
 	_backgroundColour[0] = backgroundColour.x;
@@ -123,6 +128,11 @@ void DirectXFramework::Render()
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _backgroundColour);
 	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+	// First, render background objects only, disabling depth testing
+	DisableDepthBuffer();
+	Material::SetPass(RENDER_PASS_BACKGROUND);
+	_sceneGraph->Render();
+
 	// Now recurse through the scene graph, rendering each opaque object first
 	EnableDepthTesting();
 	Material::SetPass(RENDER_PASS_OPAQUE);
@@ -196,6 +206,15 @@ void DirectXFramework::OnResize(WPARAM wParam)
 	// Now create the INACTIVE depth stencil state. This is to be used when ZWriting (writing
 	// to the depth buffer) should not happen, such as when rendering transparent geometry.
 	ThrowIfFailed(_device->CreateDepthStencilState(&dsDesc, _depthStencilInactiveState.GetAddressOf()));
+
+	// Turn off depth testing entirely
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthEnable = FALSE;
+
+	// Now create DISABLED depth stencil state, to be used in drawing background objects. Because this
+	// does not write to the depth buffer at all, any geometry will pass the depth test and write
+	// successfully on top of any pixel drawn in this mode.
+	ThrowIfFailed(_device->CreateDepthStencilState(&dsDesc, _depthStencilDisabledState.GetAddressOf()));
 
 	// Bind active depth writing state by default
 	EnableDepthTesting();

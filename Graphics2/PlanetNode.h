@@ -86,6 +86,7 @@ public:
      inline  FLOAT                  GetOrbitalVelocity(const FLOAT& height) const    { return sqrt(G * GetMass() / height); }
 
              void                   Orbit(const PlanetNode* const planet);
+     inline  const Vector3&         GetLinearVelocity() const                        { return _linearVelocity; }
 
      static  shared_ptr<PlanetNode> GenerateRandom(const FLOAT noiseScale = 1.f);
      static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude = {});

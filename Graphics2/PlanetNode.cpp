@@ -107,7 +107,7 @@ void PlanetNode::Orbit(const PlanetNode* const planet)
 	Vector3 directionToPlanet = planet->GetWorldPosition() - GetWorldPosition();
 	Vector3 tangentVector = Vector3::Cross(planet->GetUpVector(), directionToPlanet).Normalized();
 	
-	_linearVelocity = tangentVector * planet->GetOrbitalVelocity(directionToPlanet.Length());
+	_linearVelocity = tangentVector * planet->GetOrbitalVelocity(directionToPlanet.Length()) + planet->_linearVelocity;
 }
 
 shared_ptr<PlanetNode> PlanetNode::GenerateRandom(FLOAT noiseScale)

@@ -94,6 +94,9 @@ public:
             void                            SetTransparencyEnabled(BOOL state)          { _blendEnabled = state; }
             const BOOL&                     GetTransparencyEnabled() const              { return _blendEnabled; }
 
+            void                            SetZWrite(BOOL state)                       { _zWrite = state; }
+            const BOOL&                     GetZWrite() const                           { return _zWrite; }
+
             void                            SetTransparencyModes(Blend src, Blend dst, Operation op = Operation::Add);
 
             static void                     SetPass(uint8_t pass)                       { _pass = pass; }
@@ -117,6 +120,7 @@ private:
     Blend                               _destinationBlend;
     Operation                           _blendOperation;
     BOOL                                _blendEnabled;
+    BOOL                                _zWrite{ true };
 
     ComPtr<ID3D11BlendState>            _blendStateObject{ NULL };
 

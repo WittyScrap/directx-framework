@@ -18,5 +18,5 @@ inline void Orbitable<TBase>::Orbit(PlanetNode* target)
 {
 	Vector3 objectToPlanet = target->GetWorldPosition() - dynamic_cast<TBase*>(this)->GetWorldPosition();
 	Vector3 tangentVector = Vector3::Cross(target->GetUpVector(), objectToPlanet).Normalized();
-	dynamic_cast<TBase*>(this)->SetLinearVelocity(tangentVector * target->GetOrbitalVelocity(objectToPlanet.Length()));
+	dynamic_cast<TBase*>(this)->SetLinearVelocity(tangentVector * target->GetOrbitalVelocity(objectToPlanet.Length()) + target->GetLinearVelocity());
 }

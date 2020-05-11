@@ -128,6 +128,13 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
 
         if (material->CheckPass())
         {
+            bool disableZWrite = !material->GetZWrite();
+
+            if (disableZWrite)
+            {
+                FRAMEWORK->DisableDepthTesting();
+            }
+
             // Calculate the world x view x projection transformation
             XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
 
@@ -138,6 +145,11 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
 
             material->UpdateConstantBuffers(data);
             mesh->Render();
+
+            if (disableZWrite)
+            {
+                FRAMEWORK->EnableDepthTesting();
+            }
         }
     }
 }

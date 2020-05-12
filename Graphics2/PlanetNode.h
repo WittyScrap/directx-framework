@@ -85,6 +85,10 @@ public:
      inline  FLOAT                  GetHeightFromSurface(const Vector3& point) const { return (point - GetWorldPosition()).Length() - _radius; }
      inline  FLOAT                  GetOrbitalVelocity(const FLOAT& height) const    { return sqrt(G * GetMass() / height); }
 
+     inline  void                   SetSOI(const FLOAT& height)                      { _SOIHeight = height; }
+     inline  const FLOAT&           GetSOI() const                                   { return _SOIHeight; }
+     inline  BOOL                   PointInSOI(const Vector3& p)                     { return (p - GetWorldPosition()).SqrLength() < ((_radius + _SOIHeight) * (_radius + _SOIHeight)); }
+
              void                   Orbit(const PlanetNode* const planet);
      inline  const Vector3&         GetLinearVelocity() const                        { return _linearVelocity; }
 
@@ -112,6 +116,7 @@ private:
 
     FLOAT                           _radius{ 250 };
     FLOAT                           _atmosphereThickness{ 35.f };
+    FLOAT                           _SOIHeight{ 50.f };
 
     XMFLOAT4                        _grassColor{ 1, 1, 1, 1 };
     XMFLOAT4                        _sandColor{ 1, 1, 1, 1 };

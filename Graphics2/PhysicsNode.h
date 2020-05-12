@@ -7,11 +7,11 @@
  * Handles a simplistic physics system.
  *
  */
-class PhysicsNode :	public SceneGraph, public Orbitable<PhysicsNode>
+class PhysicsNode :	public Orbitable<PhysicsNode, SceneGraph>
 {
 public:
                             PhysicsNode() : PhysicsNode(L"Physics Node")        {}
-                            PhysicsNode(wstring name) : SceneGraph(name)        {}
+                            PhysicsNode(wstring name) : Orbitable(name)         {}
 
     virtual                ~PhysicsNode()                                       {}
 

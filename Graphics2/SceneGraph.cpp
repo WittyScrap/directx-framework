@@ -13,13 +13,13 @@ bool SceneGraph::Initialise(void)
 	return true;
 }
 
-void SceneGraph::Update(FXMMATRIX& currentWorldTransformation)
+void SceneGraph::Update()
 {
-	Super::Update(currentWorldTransformation);
+	Super::Update();
 
 	for (SceneNodePointer& child : _children)
 	{
-		child->Update(XMLoadFloat4x4(&_combinedWorldTransformation));
+		child->Update();
 	}
 }
 

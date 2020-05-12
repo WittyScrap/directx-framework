@@ -31,7 +31,7 @@ void PhysicsNode::SetAngularVelocity(const Vector3& angularVelocity)
 	_angularVelocity = angularVelocity;
 }
 
-void PhysicsNode::Update(FXMMATRIX& m)
+void PhysicsNode::Update()
 {
 	if (b_simulateGravity)
 	{
@@ -46,5 +46,5 @@ void PhysicsNode::Update(FXMMATRIX& m)
 	RotateAround(GetRightVector(), _angularVelocity.X * FRAMEWORK->GetDeltaTime());
 	RotateAround(GetUpVector(), _angularVelocity.Y * FRAMEWORK->GetDeltaTime());
 
-	SceneGraph::Update(m);
+	SceneGraph::Update();
 }

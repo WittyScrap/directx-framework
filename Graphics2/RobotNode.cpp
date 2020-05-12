@@ -79,10 +79,10 @@ bool RobotNode::Initialise()
 	return true;
 }
 
-void RobotNode::Update(FXMMATRIX& m)
+void RobotNode::Update()
 {
 	// Rotate around!
 	RotateAround(Vector3::UpVector, RotationSpeed);
 
-	SceneGraph::Update(m);
+	SceneGraph::Update();
 }

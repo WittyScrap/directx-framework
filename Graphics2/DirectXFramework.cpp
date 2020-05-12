@@ -114,7 +114,7 @@ void DirectXFramework::Update()
 	UpdateSceneGraph();
 	// Now apply any updates that have been made to world transformations
 	// to all the nodes
-	_sceneGraph->Update(XMMatrixIdentity());
+	_sceneGraph->Update();
 }
 
 void DirectXFramework::Render()

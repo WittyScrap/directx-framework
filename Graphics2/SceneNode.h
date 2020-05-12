@@ -28,7 +28,7 @@ public:
 
 	// Core methods
 	virtual bool			Initialise()															= 0;
-	virtual void			Update(FXMMATRIX& currentWorldTransformation)							{ XMStoreFloat4x4(&_combinedWorldTransformation, TRS * currentWorldTransformation); ResetMouse(); }
+	virtual void			Update()																{ ResetMouse(); }
 	virtual void			Render()																= 0;
 	virtual void			Shutdown()																= 0;
 		
@@ -77,7 +77,6 @@ private:
 			void			ResetMouse();
 
 protected:
-	XMFLOAT4X4			_combinedWorldTransformation;
 	wstring				_name;
 
 	XMMATRIX			_position = XMMatrixIdentity();

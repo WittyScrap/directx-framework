@@ -18,7 +18,7 @@ public:
     virtual                ~BorealisNode()                                      {}
 
     virtual bool            Initialise() override;
-    virtual void            Update(FXMMATRIX& m) override;
+    virtual void            Update() override;
 
 protected:
             void            DoCameraSway();

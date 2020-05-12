@@ -32,7 +32,7 @@ bool BorealisNode::Initialise()
 	return _borealisModel != nullptr && PhysicsNode::Initialise();
 }
 
-void BorealisNode::Update(FXMMATRIX& m)
+void BorealisNode::Update()
 {
 	if (GetForegroundWindow() == FRAMEWORK->GetHWnd())
 	{
@@ -94,7 +94,7 @@ void BorealisNode::Update(FXMMATRIX& m)
 		}
 	}
 
-	PhysicsNode::Update(m);
+	PhysicsNode::Update();
 }
 
 void BorealisNode::DoCameraSway()

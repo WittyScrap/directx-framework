@@ -20,7 +20,7 @@ bool PlaneNode::Initialise()
 	return SceneGraph::Initialise();
 }
 
-void PlaneNode::Update(FXMMATRIX& m)
+void PlaneNode::Update()
 {
 	/*Vector3 yawController(GetRotation());
 	Vector3 rollController(_planeController->GetRotation());
@@ -60,5 +60,5 @@ void PlaneNode::Update(FXMMATRIX& m)
 
 	SetPosition(location);*/
 
-	SceneGraph::Update(m);
+	SceneGraph::Update();
 }

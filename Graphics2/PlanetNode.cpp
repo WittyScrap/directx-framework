@@ -39,7 +39,7 @@ bool PlanetNode::Initialise()
 	return Generate();
 }
 
-void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
+void PlanetNode::Update()
 {
 	// Since gravity is expressed as m/s/s, not multiplying the acceleration by delta time would give us an accelleration by
 	// m/s/frame. Multiplying by the time delta between the previous frame and current frame will move the acceleration range
@@ -50,7 +50,7 @@ void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
 	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
-	MeshNode::Update(currentWorldTransformation);
+	MeshNode::Update();
 }
 
 FLOAT PlanetNode::GetMass() const

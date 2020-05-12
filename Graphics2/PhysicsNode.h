@@ -24,7 +24,7 @@ public:
             void            SetLinearVelocity(const Vector3& velocity);
             void            SetAngularVelocity(const Vector3& angularVelocity);
 
-    virtual void            Update(FXMMATRIX& m) override;
+    virtual void            Update() override;
 
             void            SetSimulateGravity(const BOOL& bValue)              { b_simulateGravity = bValue; }
             const BOOL&     GetSimulateGravity() const                          { return b_simulateGravity; }

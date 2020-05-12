@@ -15,7 +15,7 @@ public:
     virtual                             ~CameraNode()                                                                                       {}
 
     virtual bool                        Initialise()                        override;
-    virtual void                        Update(FXMMATRIX& m)                override;
+    virtual void                        Update()                            override;
 
             XMMATRIX					GetViewTransformation() const;
             XMMATRIX					GetProjectionTransformation() const;

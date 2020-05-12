@@ -46,7 +46,7 @@ public:
     virtual                        ~PlanetNode()                                     { b_abortBuild = true; _planetBuildingThread.join(); RemovePlanet(this); }
 
     virtual  bool                   Initialise()                                     override;
-    virtual  void                   Update(FXMMATRIX& currentWorldTransformation)    override;
+    virtual  void                   Update()                                         override;
 
      inline  FLOAT                  GetRadius() const                                { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                    { _radius = value; }

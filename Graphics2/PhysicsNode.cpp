@@ -43,6 +43,7 @@ void PhysicsNode::Update()
 	SetPosition(position);
 
 	Vector3 depenetrationOffset;
+
 	for (PlanetNode* planet : PlanetNode::GetAllPlanets())
 	{
 		if (planet->PointInSOI(GetWorldPosition()))
@@ -52,8 +53,12 @@ void PhysicsNode::Update()
 	}
 
 	position += depenetrationOffset;
-	_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
+
+	if (depenetrationOffset.SqrLength() > 0)
+	{
+		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime();
+	}
 
 	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());
 	RotateAround(GetRightVector(), _angularVelocity.X * FRAMEWORK->GetDeltaTime());

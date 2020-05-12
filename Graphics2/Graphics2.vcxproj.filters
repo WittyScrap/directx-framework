@@ -145,7 +145,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SkyboxNode.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Scene Nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -235,7 +235,7 @@
       <Filter>Source Files\Scene Nodes</Filter>
     </ClCompile>
     <ClCompile Include="SkyboxNode.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scene Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

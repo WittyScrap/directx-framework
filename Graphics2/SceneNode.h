@@ -49,32 +49,32 @@ public:
 
 			const Vector3	GetPosition() const														{ XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._41, m._42, m._43 }; }
 			const XMVECTOR	GetRotation() const														{ return _rotation; }
-			const Vector3	GetScale()	 const														{ XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._11, m._22, m._33 }; }
+			const Vector3	GetScale() const														{ XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._11, m._22, m._33 }; }
 
-			const XMMATRIX GetWorldMatrix() const;
+			const XMMATRIX	GetWorldMatrix() const;
 
-			const Vector3  GetWorldPosition() const;
-			const XMVECTOR GetWorldRotation() const;
-			const Vector3  GetWorldScale() const;
+			const Vector3	GetWorldPosition() const;
+			const XMVECTOR	GetWorldRotation() const;
+			const Vector3	GetWorldScale() const;
 
-			const Vector3 GetForwardVector() const;
-			const Vector3 GetUpVector() const;
-			const Vector3 GetRightVector() const													{ return Vector3::Cross(GetUpVector(), GetForwardVector()); }
+			const Vector3	GetForwardVector() const;
+			const Vector3	GetUpVector() const;
+			const Vector3	GetRightVector() const													{ return Vector3::Cross(GetUpVector(), GetForwardVector()); }
 
-			const int GetKey(const int& keyCode);
-			const int GetKeyDown(const int& keyCode);
+			const int		GetKey(const int& keyCode);
+			const int		GetKeyDown(const int& keyCode);
 
-			const float GetMouseHorizontal();
-			const float GetMouseVertical();
+			const float		GetMouseHorizontal();
+			const float		GetMouseVertical();
 
-			void SetMouseLocked(const BOOL& value)													{ _mouseLocked = value; }
-			void SetMouseVisible(const BOOL& value)													{ if (value != _mouseVisible) { ShowCursor(value); _mouseVisible = value; } }
+			void			SetMouseLocked(const BOOL& value)										{ _mouseLocked = value; }
+			void			SetMouseVisible(const BOOL& value)										{ if (value != _mouseVisible) { ShowCursor(value); _mouseVisible = value; } }
 
-			SceneNode* GetParent() const															{ return _parent; }
-			void SetParent(SceneNode* parent)														{ _parent = parent; }
+			SceneNode*		GetParent() const														{ return _parent; }
+			void			SetParent(SceneNode* parent)											{ _parent = parent; }
 
 private:
-			void ResetMouse();
+			void			ResetMouse();
 
 protected:
 	XMFLOAT4X4			_combinedWorldTransformation;

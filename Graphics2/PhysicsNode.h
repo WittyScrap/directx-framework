@@ -29,10 +29,13 @@ public:
             void            SetSimulateGravity(const BOOL& bValue)              { b_simulateGravity = bValue; }
             const BOOL&     GetSimulateGravity() const                          { return b_simulateGravity; }
 
+            const Vector3   GetCollisionForce(const PlanetNode* planet);
+
 private:
     Vector3                 _linearVelocity{ 0, 0, 0 };
     Vector3                 _angularVelocity{ 0, 0, 0 };
 
     BOOL                    b_simulateGravity{ true };
+    FLOAT                   _mass{ 1.f };
 };
 

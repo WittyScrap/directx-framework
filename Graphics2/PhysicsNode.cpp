@@ -35,7 +35,15 @@ void PhysicsNode::Update()
 {
 	if (b_simulateGravity)
 	{
-		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1) * FRAMEWORK->GetDeltaTime();
+		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), _mass) * FRAMEWORK->GetDeltaTime();
+	}
+
+	for (PlanetNode* planet : PlanetNode::GetAllPlanets())
+	{
+		if (planet->PointInSOI(GetWorldPosition()))
+		{
+			_linearVelocity += GetCollisionForce(planet);
+		}
 	}
 
 	Vector3 position = GetPosition();
@@ -47,4 +55,26 @@ void PhysicsNode::Update()
 	RotateAround(GetUpVector(), _angularVelocity.Y * FRAMEWORK->GetDeltaTime());
 
 	SceneGraph::Update();
+}
+
+const Vector3 PhysicsNode::GetCollisionForce(const PlanetNode* planet)
+{
+	const Vector3& worldPosition = GetWorldPosition();
+	const Vector3& planetWorldPosition = planet->GetWorldPosition();
+	const Vector3& planetSurface = (worldPosition - planetWorldPosition).Normalized() * planet->GetRadius();
+
+	if ((planetWorldPosition - worldPosition).SqrLength() < (planet->GetRadius() * planet->GetRadius()))
+	{
+		return -_linearVelocity;
+
+		FLOAT collisionDistance = (planetSurface - worldPosition).Length();
+		FLOAT velocitySquared = _linearVelocity.SqrLength();
+		Vector3 impactNormal = (planetWorldPosition - worldPosition).Normalized();
+
+		return -impactNormal * ((.5f * _mass * velocitySquared) / collisionDistance);
+	}
+	else
+	{
+		return Vector3::ZeroVector;
+	}
 }

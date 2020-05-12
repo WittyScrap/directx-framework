@@ -95,6 +95,8 @@ public:
      static  shared_ptr<PlanetNode> GenerateRandom(const FLOAT noiseScale = 1.f);
      static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude = {});
 
+     static  vector<PlanetNode*>&   GetAllPlanets()                                  { return _allPlanets; }
+
 protected:
              void                   GenerateAllLODs();
 

@@ -114,7 +114,7 @@ void SceneNode::ResetMouse()
 {
 	if (_mouseLocked)
 	{
-		if (GetKey(VK_ESCAPE))
+		if (GetKey(VK_ESCAPE) || GetForegroundWindow() != FRAMEWORK->GetHWnd())
 		{
 			SetMouseVisible(true);
 			_mouseLocked = false;

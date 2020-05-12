@@ -25,7 +25,7 @@ void SceneNode::RotateAround(const Vector3& axis, const float& angle)
 
 const XMMATRIX SceneNode::GetWorldMatrix() const
 {
-	XMMATRIX transform = _scale * XMMatrixRotationQuaternion(_rotation) * _position;
+	XMMATRIX transform = XMMatrixScalingFromVector(_scale) * XMMatrixRotationQuaternion(_rotation) * XMMatrixTranslationFromVector(_position);
 
 	if (_parent)
 	{

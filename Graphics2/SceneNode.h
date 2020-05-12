@@ -38,18 +38,18 @@ public:
 	virtual void			Remove(SceneNodePointer node)											{};
 	virtual	SceneNodePointer Find(wstring name)														{ return (_name == name) ? shared_from_this() : nullptr; }
 
-	virtual void			SetPosition(const Vector3& position)									{ _position = XMMatrixTranslation(XYZ(position)); }
+	virtual void			SetPosition(const Vector3& position)									{ _position = XMVectorSet(XYZ(position), 1.f); }
 	virtual void			SetRotation(const Vector3& rotation)									{ _rotation = XMQuaternionRotationRollPitchYaw(RPY(rotation)); }
 	virtual void			SetRotation(const XMVECTOR& quat)										{ _rotation = quat; }
 	virtual void			SetRotation(const XMMATRIX& rot)										{ _rotation = XMQuaternionRotationMatrix(rot); }
 	virtual void			SetRotation(const Vector3& forward, const Vector3& up)					;
-	virtual void			SetScale(const Vector3& scale)											{ _scale = XMMatrixScaling(XYZ(scale)); }
+	virtual void			SetScale(const Vector3& scale)											{ _scale = XMVectorSet(XYZ(scale), 1.f); }
 
 	virtual void			RotateAround(const Vector3& axis, const float& angle);
 
-			const Vector3	GetPosition() const														{ XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._41, m._42, m._43 }; }
+			const Vector3	GetPosition() const														{ XMFLOAT3 m; XMStoreFloat3(&m, _position); return { m.x, m.y, m.z }; }
 			const XMVECTOR	GetRotation() const														{ return _rotation; }
-			const Vector3	GetScale() const														{ XMFLOAT4X4 m; XMStoreFloat4x4(&m, _position); return { m._11, m._22, m._33 }; }
+			const Vector3	GetScale() const														{ XMFLOAT3 m; XMStoreFloat3(&m, _position); return { m.x, m.y, m.z }; }
 
 			const XMMATRIX	GetWorldMatrix() const;
 
@@ -79,9 +79,9 @@ private:
 protected:
 	wstring				_name;
 
-	XMMATRIX			_position = XMMatrixIdentity();
+	XMVECTOR			_position = XMVectorSet(0, 0, 0, 1);
 	XMVECTOR			_rotation = XMQuaternionIdentity();
-	XMMATRIX			_scale = XMMatrixIdentity();
+	XMVECTOR			_scale = XMVectorSet(1, 1, 1, 1);
 
 	BOOL				_mouseLocked{ false };
 	BOOL				_mouseVisible{ true };

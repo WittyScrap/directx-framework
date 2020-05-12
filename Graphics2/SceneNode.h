@@ -23,8 +23,8 @@ typedef shared_ptr<SceneNode>	SceneNodePointer;
 class SceneNode : public enable_shared_from_this<SceneNode>
 {
 public:
-	SceneNode(wstring name) { _name = name; };
-	~SceneNode(void) {};
+	SceneNode(wstring name) { _name = name; }
+	~SceneNode(void) {}
 
 	// Core methods
 	virtual bool			Initialise()															= 0;

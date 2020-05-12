@@ -38,16 +38,21 @@ void PhysicsNode::Update()
 		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), _mass) * FRAMEWORK->GetDeltaTime();
 	}
 
+	Vector3 position = GetPosition();
+	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
+	SetPosition(position);
+
+	Vector3 depenetrationOffset;
 	for (PlanetNode* planet : PlanetNode::GetAllPlanets())
 	{
 		if (planet->PointInSOI(GetWorldPosition()))
 		{
-			_linearVelocity += GetCollisionForce(planet);
+			depenetrationOffset += GetCollisionOffset(planet);
 		}
 	}
 
-	Vector3 position = GetPosition();
-	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
+	position += depenetrationOffset;
+	_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
 	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());
@@ -57,21 +62,19 @@ void PhysicsNode::Update()
 	SceneGraph::Update();
 }
 
-const Vector3 PhysicsNode::GetCollisionForce(const PlanetNode* planet)
+const Vector3 PhysicsNode::GetCollisionOffset(const PlanetNode* planet)
 {
 	const Vector3& worldPosition = GetWorldPosition();
 	const Vector3& planetWorldPosition = planet->GetWorldPosition();
-	const Vector3& planetSurface = (worldPosition - planetWorldPosition).Normalized() * planet->GetRadius();
+	const FLOAT sqrRadius = planet->GetRadius() * planet->GetRadius();
+	const Vector3& planetToObject = worldPosition - planetWorldPosition;
 
-	if ((planetWorldPosition - worldPosition).SqrLength() < (planet->GetRadius() * planet->GetRadius()))
+	if ((planetWorldPosition - worldPosition).SqrLength() < sqrRadius)
 	{
-		return -_linearVelocity;
+		const Vector3  r = planetToObject.Normalized() * planet->GetRadius();
+		const Vector3& p = planetToObject;
 
-		FLOAT collisionDistance = (planetSurface - worldPosition).Length();
-		FLOAT velocitySquared = _linearVelocity.SqrLength();
-		Vector3 impactNormal = (planetWorldPosition - worldPosition).Normalized();
-
-		return -impactNormal * ((.5f * _mass * velocitySquared) / collisionDistance);
+		return r - p;
 	}
 	else
 	{

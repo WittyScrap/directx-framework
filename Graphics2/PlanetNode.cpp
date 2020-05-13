@@ -100,6 +100,23 @@ void PlanetNode::OnPreRender()
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>(1);
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
+
+	MeshNode::OnPreRender(); // Does nothing, for now... ;)
+}
+
+void PlanetNode::OnPostRender()
+{
+
+}
+
+const FLOAT PlanetNode::GetHeightAtPoint(const FLOAT& radius, const Vector3& unitPos) const
+{
+	return _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, unitPos.X, unitPos.Y, unitPos.Z) : radius;
+}
+
+const FLOAT PlanetNode::GetHeightAtPoint(const Vector3& unitPos) const
+{
+	return GetHeightAtPoint(_radius, unitPos);
 }
 
 void PlanetNode::Orbit(const PlanetNode* const planet)
@@ -137,7 +154,7 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom(FLOAT noiseScale)
 	planetContinents->SetNoiseOctaves(4);
 	planetContinents->SetNoiseScale(80.f * noiseScale);
 	planetContinents->SetPeakHeight(1.f);
-	planetDetail->RandomizeOffsets();
+	planetContinents->RandomizeOffsets();
 
 	noiseManager.SetMaximumHeight(10.f);
 	planet->SetRadius(256.f);
@@ -197,6 +214,7 @@ shared_ptr<Mesh> PlanetNode::GenerateLOD(const LOD& resolution)
 	shared_ptr<Mesh> terrain = make_shared<Mesh>();
 	PlanetBuilder terrainBuilder(resolution.planetLOD);
 
+	terrainBuilder.SetStopFlag(&b_abortBuild);
 	terrainBuilder.Generate();
 	MakeSphere(terrainBuilder.GetVertices(), resolution.planetLOD, _radius, true);
 	terrainBuilder.Map(terrain.get());
@@ -215,6 +233,7 @@ shared_ptr<Mesh> PlanetNode::GenerateLOD(const LOD& resolution)
 
 		PlanetBuilder atmosphereBuilder(resolution.atmosphereLOD);
 
+		atmosphereBuilder.SetStopFlag(&b_abortBuild);
 		atmosphereBuilder.Generate();
 		MakeSphere(atmosphereBuilder.GetVertices(), resolution.atmosphereLOD, _radius + _atmosphereThickness, false);
 		atmosphereBuilder.Map(atmosphere.get());
@@ -233,10 +252,7 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices, const UINT& resolution, f
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		const float height = deform && _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, 
-																		  (vertices[i].X / resolution) * 128,
-																		  (vertices[i].Y / resolution) * 128,
-																		  (vertices[i].Z / resolution) * 128) : radius;
+		const float height = deform ? GetHeightAtPoint(radius, (vertices[i] / static_cast<float>(resolution)) * 128.f) : radius;
 
 		vertices[i].Normalize();
 		vertices[i] *= height;
@@ -282,6 +298,40 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 
 	mat->SetTransparencyEnabled(true);
 	mat->SetTransparencyModes(Blend::One, Blend::One, Operation::Add);
+}
+
+void PlanetNode::RealizeScatter(Vector3& cubePosition) const
+{
+	FLOAT height = GetHeightAtPoint(cubePosition);
+
+	Vector3 c = MAIN_CAMERA->GetWorldPosition();
+	Vector3 n = (cubePosition - GetWorldPosition()).Normalized();
+	Vector3 p = n * height;
+
+	FLOAT dist = (c - p).Length();
+
+	if (dist < _scatterMinimumDistance)
+	{
+		Vector3 u = GetUpVector();
+		Vector3 r = Vector3::Cross(n, u);
+
+		r.Normalize();
+		u = Vector3::Cross(r, n);
+		u.Normalize();
+
+		XMMATRIX t = XMMatrixLookToLH(p, n, u);
+		RenderScatter(t);
+	}
+}
+
+void PlanetNode::RenderScatter(XMMATRIX& location) const
+{
+	RenderTransformed(_scatterMesh, _scatterMesh->GetReferenceMaterial(), location);
+
+	for (size_t submesh = 0; submesh < _scatterMesh->GetSubmeshCount(); ++submesh)
+	{
+		RenderTransformed(_scatterMesh->GetSubmesh(submesh), _scatterMesh->GetSubmesh(submesh)->GetReferenceMaterial(), location);
+	}
 }
 
 void PlanetNode::SetLOD(size_t lod)

@@ -45,41 +45,41 @@ void PlanetBuilder::GenerateVertices()
 	_texCoord.resize(_vertices.size());
 
 	int v = 0;
-	for (int y = 0; y <= gridSize; y++)
+	for (int y = 0; y <= gridSize && CanProceed(); y++)
 	{
-		for (int x = 0; x <= gridSize; x++)
+		for (int x = 0; x <= gridSize && CanProceed(); x++)
 		{
 			SetVertex(v, F(x) - offset, F(y) - offset, -offset);
 			_texCoord[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
-		for (int z = 1; z <= gridSize; z++)
+		for (int z = 1; z <= gridSize && CanProceed(); z++)
 		{
 			SetVertex(v, F(gridSize) - offset, F(y) - offset, F(z) - offset);
 			_texCoord[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
-		for (int x = gridSize - 1; x >= 0; x--)
+		for (int x = gridSize - 1; x >= 0 && CanProceed(); x--)
 		{
 			SetVertex(v, F(x) - offset, F(y) - offset, F(gridSize) - offset);
 			_texCoord[v++] = { F(x) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
-		for (int z = gridSize - 1; z > 0; z--)
+		for (int z = gridSize - 1; z > 0 && CanProceed(); z--)
 		{
 			SetVertex(v, -offset, F(y) - offset, F(z) - offset);
 			_texCoord[v++] = { F(z) / F(gridSize * 4) * 4, F(y) / F(gridSize) };
 		}
 	}
 
-	for (int z = 1; z < gridSize; z++)
+	for (int z = 1; z < gridSize && CanProceed(); z++)
 	{
-		for (int x = 1; x < gridSize; x++)
+		for (int x = 1; x < gridSize && CanProceed(); x++)
 		{
 			SetVertex(v, F(x) - offset, F(gridSize) - offset, F(z) - offset);
 			_texCoord[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
 		}
 	}
-	for (int z = 1; z < gridSize; z++)
+	for (int z = 1; z < gridSize && CanProceed(); z++)
 	{
-		for (int x = 1; x < gridSize; x++)
+		for (int x = 1; x < gridSize && CanProceed(); x++)
 		{
 			SetVertex(v, F(x) - offset, -offset, F(z) - offset);
 			_texCoord[v++] = { F(x) / F(gridSize), F(z) / F(gridSize) };
@@ -95,9 +95,9 @@ void PlanetBuilder::GenerateIndices()
 	const int ring = (gridSize + gridSize) * 2;
 	int t = 0, v = 0;
 
-	for (int y = 0; y < gridSize; y++, v++)
+	for (int y = 0; y < gridSize && CanProceed(); y++, v++)
 	{
-		for (int q = 0; q < ring - 1; q++, v++)
+		for (int q = 0; q < ring - 1 && CanProceed(); q++, v++)
 		{
 			t = CreateQuad(t, v, v + 1, v + ring, v + ring + 1);
 		}
@@ -113,7 +113,7 @@ int PlanetBuilder::GenerateTopFace(int t, int ring)
 {
 	int v = ring * gridSize;
 
-	for (int x = 0; x < gridSize - 1; x++, v++)
+	for (int x = 0; x < gridSize - 1 && CanProceed(); x++, v++)
 	{
 		t = CreateQuad(t, v, v + 1, v + ring - 1, v + ring);
 	}
@@ -124,10 +124,10 @@ int PlanetBuilder::GenerateTopFace(int t, int ring)
 	int vMid = vMin + 1;
 	int vMax = v + 2;
 
-	for (int z = 1; z < gridSize - 1; z++, vMin--, vMid++, vMax++)
+	for (int z = 1; z < gridSize - 1 && CanProceed(); z++, vMin--, vMid++, vMax++)
 	{
 		t = CreateQuad(t, vMin, vMid, vMin - 1, vMid + gridSize - 1);
-		for (int x = 1; x < gridSize - 1; x++, vMid++)
+		for (int x = 1; x < gridSize - 1 && CanProceed(); x++, vMid++)
 		{
 			t = CreateQuad(t, vMid, vMid + 1, vMid + gridSize - 1, vMid + gridSize);
 		}
@@ -136,7 +136,7 @@ int PlanetBuilder::GenerateTopFace(int t, int ring)
 
 	int vTop = vMin - 2;
 	t = CreateQuad(t, vMin, vMid, vTop + 1, vTop);
-	for (int x = 1; x < gridSize - 1; x++, vTop--, vMid++)
+	for (int x = 1; x < gridSize - 1 && CanProceed(); x++, vTop--, vMid++)
 	{
 		t = CreateQuad(t, vMid, vMid + 1, vTop, vTop - 1);
 	}
@@ -151,7 +151,7 @@ int PlanetBuilder::GenerateBottomFace(int t, int ring)
 	int vMid = CAST(int, _vertices.size() - CAST(size_t, gridSize - 1) * CAST(size_t, gridSize - 1));
 
 	t = CreateQuad(t, ring - 1, vMid, 0, 1);
-	for (int x = 1; x < gridSize - 1; x++, v++, vMid++)
+	for (int x = 1; x < gridSize - 1 && CanProceed(); x++, v++, vMid++)
 	{
 		t = CreateQuad(t, vMid, vMid + 1, v, v + 1);
 	}
@@ -161,10 +161,10 @@ int PlanetBuilder::GenerateBottomFace(int t, int ring)
 	vMid -= gridSize - 2;
 	int vMax = v + 2;
 
-	for (int z = 1; z < gridSize - 1; z++, vMin--, vMid++, vMax++)
+	for (int z = 1; z < gridSize - 1 && CanProceed(); z++, vMin--, vMid++, vMax++)
 	{
 		t = CreateQuad(t, vMin, vMid + gridSize - 1, vMin + 1, vMid);
-		for (int x = 1; x < gridSize - 1; x++, vMid++)
+		for (int x = 1; x < gridSize - 1 && CanProceed(); x++, vMid++)
 		{
 			t = CreateQuad(t, vMid + gridSize - 1, vMid + gridSize, vMid, vMid + 1);
 		}
@@ -173,7 +173,7 @@ int PlanetBuilder::GenerateBottomFace(int t, int ring)
 
 	int vTop = vMin - 1;
 	t = CreateQuad(t, vTop + 1, vTop, vTop + 2, vMid);
-	for (int x = 1; x < gridSize - 1; x++, vTop--, vMid++)
+	for (int x = 1; x < gridSize - 1 && CanProceed(); x++, vTop--, vMid++)
 	{
 		t = CreateQuad(t, vTop, vTop - 1, vMid, vMid + 1);
 	}

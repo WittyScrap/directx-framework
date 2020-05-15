@@ -57,7 +57,7 @@ void PhysicsNode::Update()
 
 	if (depenetrationOffset.SqrLength() > 0)
 	{
-		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime();
+		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime() * 2.f;
 	}
 
 	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());

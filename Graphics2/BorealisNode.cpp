@@ -6,7 +6,7 @@ using namespace std;
 
 bool BorealisNode::Initialise()
 {
-	_borealisModel = RESOURCES->LoadModelFromFile(L"Models/Borealis/borealis.fbx");
+	_borealisModel = RESOURCES->GetMesh(L"Models/Borealis/borealis.fbx");
 
 	if (_borealisModel)
 	{
@@ -32,7 +32,7 @@ bool BorealisNode::Initialise()
 	return _borealisModel != nullptr && PhysicsNode::Initialise();
 }
 
-void BorealisNode::Update(FXMMATRIX& m)
+void BorealisNode::Update()
 {
 	if (GetForegroundWindow() == FRAMEWORK->GetHWnd())
 	{
@@ -94,7 +94,7 @@ void BorealisNode::Update(FXMMATRIX& m)
 		}
 	}
 
-	PhysicsNode::Update(m);
+	PhysicsNode::Update();
 }
 
 void BorealisNode::DoCameraSway()

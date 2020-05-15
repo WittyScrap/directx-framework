@@ -14,7 +14,7 @@ public:
     virtual ~PlaneNode() {}
 
     virtual bool Initialise() override;
-    virtual void Update(FXMMATRIX& m) override;
+    virtual void Update() override;
 
     float MovementSpeed{ 0.f };
     float TurningSpeed{ 0.25f };

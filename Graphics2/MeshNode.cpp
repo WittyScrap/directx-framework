@@ -8,6 +8,9 @@
  */
 void MeshNode::Render()
 {
+    // Pre-render event, this is usually where
+    // any alteration to constant buffer data
+    // can be safely made.
     OnPreRender();
 
     if (_mesh)
@@ -22,6 +25,12 @@ void MeshNode::Render()
             InternalRender(mesh, mat);
         }
     }
+
+    // Post-render event, this can be used to
+    // render any custom meshes or geometry not
+    // handled by the collection of submeshes in
+    // this node.
+    OnPostRender();
 }
 
 /**
@@ -119,9 +128,14 @@ ComPtr<ID3D11DeviceContext> MeshNode::GetDeviceContext()
  */
 void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> material)
 {
+    RenderTransformed(mesh, material, GetWorldMatrix());
+}
+
+void MeshNode::RenderTransformed(shared_ptr<Mesh> mesh, shared_ptr<Material> material, XMMATRIX transform)
+{
     if (mesh)
     {
-        if (!material || !material->Activate()) 
+        if (!material || !material->Activate())
         {
             material = RESOURCES->GetDefaultMaterial(); material->Activate();
         }
@@ -129,12 +143,13 @@ void MeshNode::InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> materi
         if (material->CheckPass())
         {
             // Calculate the world x view x projection transformation
-            XMMATRIX completeTransformation = XMLoadFloat4x4(&_combinedWorldTransformation) * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
+            XMMATRIX worldMatrix = transform;
+            XMMATRIX completeTransformation = worldMatrix * MAIN_CAMERA->GetViewTransformation() * MAIN_CAMERA->GetProjectionTransformation();
 
             // Create mesh data object and populate with mesh object specific data
             MeshObjectData data;
             data.completeTransformation = completeTransformation;
-            data.worldTransformation = XMLoadFloat4x4(&_combinedWorldTransformation);
+            data.worldTransformation = worldMatrix;
 
             material->UpdateConstantBuffers(data);
             mesh->Render();

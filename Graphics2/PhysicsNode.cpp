@@ -31,20 +31,59 @@ void PhysicsNode::SetAngularVelocity(const Vector3& angularVelocity)
 	_angularVelocity = angularVelocity;
 }
 
-void PhysicsNode::Update(FXMMATRIX& m)
+void PhysicsNode::Update()
 {
 	if (b_simulateGravity)
 	{
-		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), 1) * FRAMEWORK->GetDeltaTime();
+		_linearVelocity += PlanetNode::CalculateTotalGravity(GetWorldPosition(), _mass) * FRAMEWORK->GetDeltaTime();
 	}
 
 	Vector3 position = GetPosition();
 	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
+	Vector3 depenetrationOffset;
+
+	for (PlanetNode* planet : PlanetNode::GetAllPlanets())
+	{
+		if (planet->PointInSOI(GetWorldPosition()))
+		{
+			depenetrationOffset += GetCollisionOffset(planet);
+		}
+	}
+
+	position += depenetrationOffset;
+	SetPosition(position);
+
+	if (depenetrationOffset.SqrLength() > 0)
+	{
+		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime() * 1.5f;
+	}
+
 	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());
 	RotateAround(GetRightVector(), _angularVelocity.X * FRAMEWORK->GetDeltaTime());
 	RotateAround(GetUpVector(), _angularVelocity.Y * FRAMEWORK->GetDeltaTime());
 
-	SceneGraph::Update(m);
+	SceneGraph::Update();
+}
+
+const Vector3 PhysicsNode::GetCollisionOffset(const PlanetNode* planet)
+{
+	const Vector3& worldPosition = GetWorldPosition();
+	const Vector3& planetWorldPosition = planet->GetWorldPosition();
+	const Vector3& planetToObject = worldPosition - planetWorldPosition;
+	const FLOAT planetHeight = planet->GetHeightAtPoint(planetToObject.Normalized()) + _sphereCollisionRadius;
+	const FLOAT sqrRadius = planetHeight * planetHeight;
+
+	if ((planetWorldPosition - worldPosition).SqrLength() < sqrRadius)
+	{
+		const Vector3  r = planetToObject.Normalized() * planetHeight;
+		const Vector3& p = planetToObject;
+
+		return r - p;
+	}
+	else
+	{
+		return Vector3::ZeroVector;
+	}
 }

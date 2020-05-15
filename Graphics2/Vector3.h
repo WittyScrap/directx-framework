@@ -42,6 +42,9 @@ public:
     static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
     static const XMVECTOR Cross(const XMVECTOR& lhs, const XMVECTOR& rhs);
 
+    static const Vector3& Min(const Vector3& lhs, const Vector3& rhs);
+    static const Vector3& Max(const Vector3& lhs, const Vector3& rhs);
+
     const Vector3 operator+(const Vector3& rhs) const;
     const Vector3 operator-(const Vector3& rhs) const;
     const Vector3 operator*(const Vector3& rhs) const;

@@ -13,7 +13,7 @@ public:
 	~SceneGraph(void) {};
 
 	virtual bool Initialise(void);
-	virtual void Update(FXMMATRIX& currentWorldTransformation);
+	virtual void Update(void);
 	virtual void Render(void);
 	virtual void Shutdown(void);
 

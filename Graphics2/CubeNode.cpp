@@ -9,12 +9,12 @@ bool CubeNode::Initialise()
 	return true;
 }
 
-void CubeNode::Update(FXMMATRIX& m)
+void CubeNode::Update()
 {
 	SetRotation(Vector3::UpVector * _currentRotation);
 	_currentRotation += _rotationSpeed;
 
-	MeshNode::Update(m);
+	MeshNode::Update();
 }
 
 void CubeNode::SetRotationSpeed(const float& speed)

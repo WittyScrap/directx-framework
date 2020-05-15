@@ -15,7 +15,7 @@ public:
     virtual                    ~SkyboxNode()                                        {}
 
     virtual bool                Initialise() override;
-    virtual void                Update(FXMMATRIX& m) override;
+    virtual void                Update() override;
 
             void                Link(const shared_ptr<CameraNode>& camera)          { _linkedCamera = camera; }
 

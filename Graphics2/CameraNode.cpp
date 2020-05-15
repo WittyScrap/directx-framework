@@ -10,11 +10,11 @@ bool CameraNode::Initialise()
 	return SceneGraph::Initialise();
 }
 
-void CameraNode::Update(FXMMATRIX& m)
+void CameraNode::Update()
 {
-	SceneGraph::Update(m);
+	SceneGraph::Update();
 
-	XMMATRIX matrix = XMLoadFloat4x4(&_combinedWorldTransformation);
+	XMMATRIX matrix = GetWorldMatrix();
 	XMVECTOR determinant = XMMatrixDeterminant(matrix);
 	XMMATRIX transform = XMMatrixInverse(&determinant, matrix);
 

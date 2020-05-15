@@ -21,6 +21,7 @@ public:
 
     virtual bool                                Initialise()                                                                override { return true; }
     virtual void                                OnPreRender()                                                               {}
+    virtual void                                OnPostRender()                                                              {}
     virtual void                                Render()                                                                    override;
     virtual void                                Shutdown()                                                                  override;
 
@@ -41,6 +42,7 @@ protected:
     static  ComPtr<ID3D11DeviceContext>         GetDeviceContext();
 
             void                                InternalRender(shared_ptr<Mesh> mesh, shared_ptr<Material> material);
+    static  void                                RenderTransformed(shared_ptr<Mesh> mesh, shared_ptr<Material> material, XMMATRIX transform);
 
 private:
             shared_ptr<Mesh>                    _mesh = nullptr;

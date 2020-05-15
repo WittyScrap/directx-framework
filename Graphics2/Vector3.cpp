@@ -115,6 +115,30 @@ const XMVECTOR Vector3::Cross(const XMVECTOR& lhs, const XMVECTOR& rhs)
 	return XMVector3Cross(lhs, rhs);
 }
 
+const Vector3& Vector3::Min(const Vector3& lhs, const Vector3& rhs)
+{
+	if (lhs.SqrLength() < rhs.SqrLength())
+	{
+		return lhs;
+	}
+	else
+	{
+		return rhs;
+	}
+}
+
+const Vector3& Vector3::Max(const Vector3& lhs, const Vector3& rhs)
+{
+	if (rhs.SqrLength() > rhs.SqrLength())
+	{
+		return lhs;
+	}
+	else
+	{
+		return rhs;
+	}
+}
+
 const Vector3 Vector3::operator+(const Vector3& rhs) const
 {
 	return Vector3(_x + rhs._x, _y + rhs._y, _z + rhs._z);

@@ -15,7 +15,7 @@ public:
     inline  void        SetRotationSpeed(const FLOAT& rotationSpeed)        { _rotationSpeed = rotationSpeed; }
 
     virtual bool        Initialise()         override;
-    virtual void        Update(FXMMATRIX& m) override;
+    virtual void        Update()             override;
 
 private:
         FLOAT           _movementSpeed{ 2.5f };
@@ -30,7 +30,7 @@ inline bool PawnNode::Initialise()
     return CameraNode::Initialise();
 }
 
-void PawnNode::Update(FXMMATRIX& m)
+void PawnNode::Update()
 {
     Vector3 location = GetPosition();
 
@@ -44,7 +44,7 @@ void PawnNode::Update(FXMMATRIX& m)
 
     SetPosition(location);
 
-    CameraNode::Update(m);
+    CameraNode::Update();
 
     if (!_mouseLocked && GetKeyDown(VK_LBUTTON) && GetForegroundWindow() == FRAMEWORK->GetHWnd())
     {

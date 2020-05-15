@@ -25,7 +25,7 @@ void SceneNode::RotateAround(const Vector3& axis, const float& angle)
 
 const XMMATRIX SceneNode::GetWorldMatrix() const
 {
-	XMMATRIX transform = _scale * XMMatrixRotationQuaternion(_rotation) * _position;
+	XMMATRIX transform = XMMatrixScalingFromVector(_scale) * XMMatrixRotationQuaternion(_rotation) * XMMatrixTranslationFromVector(_position);
 
 	if (_parent)
 	{
@@ -114,7 +114,7 @@ void SceneNode::ResetMouse()
 {
 	if (_mouseLocked)
 	{
-		if (GetKey(VK_ESCAPE))
+		if (GetKey(VK_ESCAPE) || GetForegroundWindow() != FRAMEWORK->GetHWnd())
 		{
 			SetMouseVisible(true);
 			_mouseLocked = false;

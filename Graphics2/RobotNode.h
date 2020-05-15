@@ -14,7 +14,7 @@ public:
     virtual ~RobotNode() {}
 
     virtual bool Initialise() override;
-    virtual void Update(FXMMATRIX& m) override;
+    virtual void Update() override;
 
     float RotationSpeed{ 1 };
 };

@@ -46,7 +46,7 @@ public:
     virtual                        ~PlanetNode()                                     { b_abortBuild = true; _planetBuildingThread.join(); RemovePlanet(this); }
 
     virtual  bool                   Initialise()                                     override;
-    virtual  void                   Update(FXMMATRIX& currentWorldTransformation)    override;
+    virtual  void                   Update()                                         override;
 
      inline  FLOAT                  GetRadius() const                                { return _radius; }
      inline  void                   SetRadius(const FLOAT& value)                    { _radius = value; }
@@ -61,6 +61,7 @@ public:
 
      inline  void                   SetMinimumDistance(const FLOAT& value)           { _minimumDistance = value; }
      inline  void                   SetMaximumDistance(const FLOAT& value)           { _maximumDistance = value; }
+     inline  void                   SetScatterDistance(const FLOAT& value)           { _scatterMinimumDistance = value; }
 
      inline  void                   SetDrawMode(const MeshMode& value)               { _draw = value; }
              void                   CreateLOD(const UINT& resolution);
@@ -81,15 +82,28 @@ public:
 
              bool                   Generate();
     virtual  void                   OnPreRender() override;
+    virtual  void                   OnPostRender() override;
+
+             const FLOAT            GetHeightAtPoint(const FLOAT& radius, const Vector3& unitPos) const;
+             const FLOAT            GetHeightAtPoint(const Vector3& unitPos) const;
 
      inline  FLOAT                  GetHeightFromSurface(const Vector3& point) const { return (point - GetWorldPosition()).Length() - _radius; }
      inline  FLOAT                  GetOrbitalVelocity(const FLOAT& height) const    { return sqrt(G * GetMass() / height); }
 
+     inline  void                   SetSOI(const FLOAT& height)                      { _SOIHeight = height; }
+     inline  const FLOAT&           GetSOI() const                                   { return _SOIHeight; }
+     inline  BOOL                   PointInSOI(const Vector3& p)                     { return (p - GetWorldPosition()).SqrLength() < ((_radius + _SOIHeight) * (_radius + _SOIHeight)); }
+
              void                   Orbit(const PlanetNode* const planet);
      inline  const Vector3&         GetLinearVelocity() const                        { return _linearVelocity; }
 
+     inline  void                   SetScatterMesh(const shared_ptr<Mesh>& mesh)     { _scatterMesh = mesh; }
+     inline  void                   ClearScatterMesh()                               { _scatterMesh = nullptr; }
+
      static  shared_ptr<PlanetNode> GenerateRandom(const FLOAT noiseScale = 1.f);
      static  Vector3                CalculateTotalGravity(Vector3 sourcePoint, FLOAT sourceMass, initializer_list<PlanetNode*> exclude = {});
+
+     static  vector<PlanetNode*>&   GetAllPlanets()                                  { return _allPlanets; }
 
 protected:
              void                   GenerateAllLODs();
@@ -99,6 +113,9 @@ protected:
 
              void                   PopulateGroundMaterial(shared_ptr<Material>& mat);
              void                   PopulateAtmosphereMaterial(shared_ptr<Material>& mat);
+
+             void                   RealizeScatter(Vector3& cubePosition) const;
+             void                   RenderScatter(XMMATRIX& location) const;
 
 private:
              void                   SetLOD(size_t lod);
@@ -112,6 +129,7 @@ private:
 
     FLOAT                           _radius{ 250 };
     FLOAT                           _atmosphereThickness{ 35.f };
+    FLOAT                           _SOIHeight{ 50.f };
 
     XMFLOAT4                        _grassColor{ 1, 1, 1, 1 };
     XMFLOAT4                        _sandColor{ 1, 1, 1, 1 };
@@ -127,6 +145,9 @@ private:
 
     FLOAT                           _minimumDistance{ 200.f };
     FLOAT                           _maximumDistance{ 10000.f };
+
+    shared_ptr<Mesh>                _scatterMesh{ nullptr };
+    FLOAT                           _scatterMinimumDistance{ 1500.f };
 
     int                             _currentLOD{ -1 };
     bool                            b_hasAtmosphere{ true };

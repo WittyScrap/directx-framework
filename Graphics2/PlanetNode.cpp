@@ -7,6 +7,9 @@
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
 
+#define SCALE_CONST 64.f
+#define SCALE(x) x.X * SCALE_CONST, x.Y * SCALE_CONST, x.Z * SCALE_CONST
+
 vector<PlanetNode*> PlanetNode::_allPlanets;
 
 void RandomColor(float& r, float& g, float& b)
@@ -39,7 +42,7 @@ bool PlanetNode::Initialise()
 	return Generate();
 }
 
-void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
+void PlanetNode::Update()
 {
 	// Since gravity is expressed as m/s/s, not multiplying the acceleration by delta time would give us an accelleration by
 	// m/s/frame. Multiplying by the time delta between the previous frame and current frame will move the acceleration range
@@ -50,7 +53,7 @@ void PlanetNode::Update(FXMMATRIX& currentWorldTransformation)
 	position += _linearVelocity * FRAMEWORK->GetDeltaTime();
 	SetPosition(position);
 
-	MeshNode::Update(currentWorldTransformation);
+	MeshNode::Update();
 }
 
 FLOAT PlanetNode::GetMass() const
@@ -100,6 +103,29 @@ void PlanetNode::OnPreRender()
 
 	PlanetConstantBuffer* planetBuffer = _planetMaterial->GetConstantBuffer()->GetLayoutPointer<PlanetConstantBuffer>(1);
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
+
+	MeshNode::OnPreRender(); // Does nothing, for now... ;)
+							 // No like it just does nothing, don't get your hopes up.
+}
+
+void PlanetNode::OnPostRender()
+{
+	if (_scatterMesh)
+	{
+		// Place a single scatter in a predefined location since I do not have time to do more.
+		Vector3 p(0, 0, 1);
+		RealizeScatter(p);
+	}
+}
+
+const FLOAT PlanetNode::GetHeightAtPoint(const FLOAT& radius, const Vector3& unitPos) const
+{
+	return _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, SCALE(unitPos)) : radius;
+}
+
+const FLOAT PlanetNode::GetHeightAtPoint(const Vector3& unitPos) const
+{
+	return GetHeightAtPoint(_radius, unitPos);
 }
 
 void PlanetNode::Orbit(const PlanetNode* const planet)
@@ -137,7 +163,7 @@ shared_ptr<PlanetNode> PlanetNode::GenerateRandom(FLOAT noiseScale)
 	planetContinents->SetNoiseOctaves(4);
 	planetContinents->SetNoiseScale(80.f * noiseScale);
 	planetContinents->SetPeakHeight(1.f);
-	planetDetail->RandomizeOffsets();
+	planetContinents->RandomizeOffsets();
 
 	noiseManager.SetMaximumHeight(10.f);
 	planet->SetRadius(256.f);
@@ -197,6 +223,7 @@ shared_ptr<Mesh> PlanetNode::GenerateLOD(const LOD& resolution)
 	shared_ptr<Mesh> terrain = make_shared<Mesh>();
 	PlanetBuilder terrainBuilder(resolution.planetLOD);
 
+	terrainBuilder.SetStopFlag(&b_abortBuild);
 	terrainBuilder.Generate();
 	MakeSphere(terrainBuilder.GetVertices(), resolution.planetLOD, _radius, true);
 	terrainBuilder.Map(terrain.get());
@@ -215,6 +242,7 @@ shared_ptr<Mesh> PlanetNode::GenerateLOD(const LOD& resolution)
 
 		PlanetBuilder atmosphereBuilder(resolution.atmosphereLOD);
 
+		atmosphereBuilder.SetStopFlag(&b_abortBuild);
 		atmosphereBuilder.Generate();
 		MakeSphere(atmosphereBuilder.GetVertices(), resolution.atmosphereLOD, _radius + _atmosphereThickness, false);
 		atmosphereBuilder.Map(atmosphere.get());
@@ -233,13 +261,8 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices, const UINT& resolution, f
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		const float height = deform && _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, 
-																		  (vertices[i].X / resolution) * 128,
-																		  (vertices[i].Y / resolution) * 128,
-																		  (vertices[i].Z / resolution) * 128) : radius;
-
 		vertices[i].Normalize();
-		vertices[i] *= height;
+		vertices[i] *= deform ? GetHeightAtPoint(radius, vertices[i]) : radius;
 	}
 }
 
@@ -282,6 +305,41 @@ void PlanetNode::PopulateAtmosphereMaterial(shared_ptr<Material>& mat)
 
 	mat->SetTransparencyEnabled(true);
 	mat->SetTransparencyModes(Blend::One, Blend::One, Operation::Add);
+}
+
+void PlanetNode::RealizeScatter(Vector3& cubePosition) const
+{
+	FLOAT height = GetHeightAtPoint(cubePosition);
+
+	Vector3 c = MAIN_CAMERA->GetWorldPosition();
+	Vector3 p = cubePosition  * height + GetWorldPosition();
+
+	FLOAT dist = (c - p).Length();
+
+	if (dist < _scatterMinimumDistance)
+	{
+		Vector3 u = GetUpVector();
+		Vector3 r = Vector3::Cross(u, cubePosition);
+
+		r.Normalize();
+
+		XMMATRIX T = XMMatrixTranslation(XYZ(p));
+		XMMATRIX R = XMMatrixIdentity(); // Cannot figure out rotation from axis...
+		XMMATRIX S = XMMatrixScaling(10, 10, 10);
+
+		XMMATRIX M = S * R * T;
+		RenderScatter(M);
+	}
+}
+
+void PlanetNode::RenderScatter(XMMATRIX& location) const
+{
+	RenderTransformed(_scatterMesh, _scatterMesh->GetReferenceMaterial(), location);
+
+	for (size_t submesh = 0; submesh < _scatterMesh->GetSubmeshCount(); ++submesh)
+	{
+		RenderTransformed(_scatterMesh->GetSubmesh(submesh), _scatterMesh->GetSubmesh(submesh)->GetReferenceMaterial(), location);
+	}
 }
 
 void PlanetNode::SetLOD(size_t lod)

@@ -7,6 +7,9 @@
 #undef clamp
 #define clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
 
+#define SCALE_CONST 64.f
+#define SCALE(x) x.X * SCALE_CONST, x.Y * SCALE_CONST, x.Z * SCALE_CONST
+
 vector<PlanetNode*> PlanetNode::_allPlanets;
 
 void RandomColor(float& r, float& g, float& b)
@@ -102,16 +105,18 @@ void PlanetNode::OnPreRender()
 	planetBuffer->PlanetPosition = GetWorldPosition().ToDX3();
 
 	MeshNode::OnPreRender(); // Does nothing, for now... ;)
+							 // No like it just does nothing, don't get your hopes up.
 }
 
 void PlanetNode::OnPostRender()
 {
-
+	/// TODO: Terrain scatters
+	// pls give me high grade
 }
 
 const FLOAT PlanetNode::GetHeightAtPoint(const FLOAT& radius, const Vector3& unitPos) const
 {
-	return _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, unitPos.X, unitPos.Y, unitPos.Z) : radius;
+	return _mode == TerrainMode::Procedural ? _noises.GetNoiseValue(radius, SCALE(unitPos)) : radius;
 }
 
 const FLOAT PlanetNode::GetHeightAtPoint(const Vector3& unitPos) const
@@ -252,10 +257,8 @@ void PlanetNode::MakeSphere(vector<Vector3>& vertices, const UINT& resolution, f
 {
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{
-		const float height = deform ? GetHeightAtPoint(radius, (vertices[i] / static_cast<float>(resolution)) * 128.f) : radius;
-
 		vertices[i].Normalize();
-		vertices[i] *= height;
+		vertices[i] *= deform ? GetHeightAtPoint(radius, vertices[i]) : radius;
 	}
 }
 

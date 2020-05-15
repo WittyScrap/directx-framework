@@ -71,12 +71,13 @@ const Vector3 PhysicsNode::GetCollisionOffset(const PlanetNode* planet)
 {
 	const Vector3& worldPosition = GetWorldPosition();
 	const Vector3& planetWorldPosition = planet->GetWorldPosition();
-	const FLOAT sqrRadius = planet->GetRadius() * planet->GetRadius();
 	const Vector3& planetToObject = worldPosition - planetWorldPosition;
+	const FLOAT planetHeight = planet->GetHeightAtPoint(planetToObject.Normalized());
+	const FLOAT sqrRadius = planetHeight * planetHeight;
 
 	if ((planetWorldPosition - worldPosition).SqrLength() < sqrRadius)
 	{
-		const Vector3  r = planetToObject.Normalized() * planet->GetRadius();
+		const Vector3  r = planetToObject.Normalized() * planetHeight;
 		const Vector3& p = planetToObject;
 
 		return r - p;

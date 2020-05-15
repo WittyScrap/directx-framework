@@ -2,7 +2,7 @@
 
 bool SkyboxNode::Initialise()
 {
-	shared_ptr<Mesh> invertedCube = RESOURCES->LoadModelFromFile(L"Models/Miscellaneous/skybox.fbx");
+	shared_ptr<Mesh> invertedCube = RESOURCES->GetMesh(L"Models/Miscellaneous/skybox.fbx");
 	_material = SceneGraph::Create<Material>(L"SkyboxMat");
 	_material->SetShader(L"Shaders/skybox.hlsl");
 	_material->SetTexture(0, RESOURCES->GetTexture(L"Models/Miscellaneous/skybox.png"));

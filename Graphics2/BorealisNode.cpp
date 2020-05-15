@@ -6,7 +6,7 @@ using namespace std;
 
 bool BorealisNode::Initialise()
 {
-	_borealisModel = RESOURCES->LoadModelFromFile(L"Models/Borealis/borealis.fbx");
+	_borealisModel = RESOURCES->GetMesh(L"Models/Borealis/borealis.fbx");
 
 	if (_borealisModel)
 	{

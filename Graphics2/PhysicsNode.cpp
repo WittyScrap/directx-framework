@@ -57,7 +57,7 @@ void PhysicsNode::Update()
 
 	if (depenetrationOffset.SqrLength() > 0)
 	{
-		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime() * 2.f;
+		_linearVelocity += depenetrationOffset / FRAMEWORK->GetDeltaTime() * 1.5f;
 	}
 
 	RotateAround(GetForwardVector(), _angularVelocity.Z * FRAMEWORK->GetDeltaTime());
@@ -72,7 +72,7 @@ const Vector3 PhysicsNode::GetCollisionOffset(const PlanetNode* planet)
 	const Vector3& worldPosition = GetWorldPosition();
 	const Vector3& planetWorldPosition = planet->GetWorldPosition();
 	const Vector3& planetToObject = worldPosition - planetWorldPosition;
-	const FLOAT planetHeight = planet->GetHeightAtPoint(planetToObject.Normalized());
+	const FLOAT planetHeight = planet->GetHeightAtPoint(planetToObject.Normalized()) + _sphereCollisionRadius;
 	const FLOAT sqrRadius = planetHeight * planetHeight;
 
 	if ((planetWorldPosition - worldPosition).SqrLength() < sqrRadius)

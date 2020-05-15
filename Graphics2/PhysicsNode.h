@@ -30,6 +30,7 @@ public:
             const BOOL&     GetSimulateGravity() const                          { return b_simulateGravity; }
 
             const Vector3   GetCollisionOffset(const PlanetNode* planet);
+            void            SetSphereCollisionRadius(const FLOAT& radius)       { _sphereCollisionRadius = radius; }
 
 private:
     Vector3                 _linearVelocity{ 0, 0, 0 };
@@ -37,5 +38,6 @@ private:
 
     BOOL                    b_simulateGravity{ true };
     FLOAT                   _mass{ 1.f };
+    FLOAT                   _sphereCollisionRadius{ 7.5f };
 };
 

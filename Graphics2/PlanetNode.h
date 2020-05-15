@@ -147,7 +147,7 @@ private:
     FLOAT                           _maximumDistance{ 10000.f };
 
     shared_ptr<Mesh>                _scatterMesh{ nullptr };
-    FLOAT                           _scatterMinimumDistance{ 1500.f };
+    FLOAT                           _scatterMinimumDistance{ 100.f };
 
     int                             _currentLOD{ -1 };
     bool                            b_hasAtmosphere{ true };

@@ -110,8 +110,23 @@ void PlanetNode::OnPreRender()
 
 void PlanetNode::OnPostRender()
 {
-	/// TODO: Terrain scatters
-	// pls give me high grade
+	if (_scatterMesh)
+	{
+		for (float x = -1.f; x < 1.f; x += .25f)
+		{
+			for (float y = -1.f; y < 1.f; y += .25f)
+			{
+				for (float z = -1.f; z < 1.f; z += .25f)
+				{
+					// Construct target vector
+					Vector3 n(x, y, z);
+					n.Normalize();
+
+					RealizeScatter(n);
+				}
+			}
+		}
+	}
 }
 
 const FLOAT PlanetNode::GetHeightAtPoint(const FLOAT& radius, const Vector3& unitPos) const
@@ -308,22 +323,22 @@ void PlanetNode::RealizeScatter(Vector3& cubePosition) const
 	FLOAT height = GetHeightAtPoint(cubePosition);
 
 	Vector3 c = MAIN_CAMERA->GetWorldPosition();
-	Vector3 n = (cubePosition - GetWorldPosition()).Normalized();
-	Vector3 p = n * height;
+	Vector3 p = cubePosition  * height + GetWorldPosition();
 
 	FLOAT dist = (c - p).Length();
 
 	if (dist < _scatterMinimumDistance)
 	{
 		Vector3 u = GetUpVector();
-		Vector3 r = Vector3::Cross(n, u);
+		Vector3 r = Vector3::Cross(u, cubePosition);
 
 		r.Normalize();
-		u = Vector3::Cross(r, n);
-		u.Normalize();
 
-		XMMATRIX t = XMMatrixLookToLH(p, n, u);
-		RenderScatter(t);
+		XMMATRIX T = XMMatrixTranslation(XYZ(p));
+		XMMATRIX R = XMMatrixIdentity(); // Cannot figure out rotation from axis...
+
+		XMMATRIX M = R * T;
+		RenderScatter(M);
 	}
 }
 

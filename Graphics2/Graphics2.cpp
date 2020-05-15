@@ -29,7 +29,7 @@ void Graphics2::CreateSceneGraph()
 	satellite->SetPosition({ -3500, 2, 2048 });
 
 	planetB->SetRadius(512.f);
-	planetB->SetScatterMesh(RESOURCES->GetMesh(L"/Models/Scatters/Tree/tree.fbx"));
+	planetB->SetScatterMesh(RESOURCES->GetMesh(L"Models/Scatters/Tree/tree.fbx"));
 	planetA->SetHasAtmosphere(false);
 	planetA->SetGrassColor(.7f, .71f, .75f);
 	planetA->SetSandColor(.75f, .75f, .75f);

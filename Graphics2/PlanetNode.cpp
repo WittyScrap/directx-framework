@@ -112,20 +112,9 @@ void PlanetNode::OnPostRender()
 {
 	if (_scatterMesh)
 	{
-		for (float x = -1.f; x < 1.f; x += .25f)
-		{
-			for (float y = -1.f; y < 1.f; y += .25f)
-			{
-				for (float z = -1.f; z < 1.f; z += .25f)
-				{
-					// Construct target vector
-					Vector3 n(x, y, z);
-					n.Normalize();
-
-					RealizeScatter(n);
-				}
-			}
-		}
+		// Place a single scatter in a predefined location since I do not have time to do more.
+		Vector3 p(0, 0, 1);
+		RealizeScatter(p);
 	}
 }
 
@@ -336,8 +325,9 @@ void PlanetNode::RealizeScatter(Vector3& cubePosition) const
 
 		XMMATRIX T = XMMatrixTranslation(XYZ(p));
 		XMMATRIX R = XMMatrixIdentity(); // Cannot figure out rotation from axis...
+		XMMATRIX S = XMMatrixScaling(10, 10, 10);
 
-		XMMATRIX M = R * T;
+		XMMATRIX M = S * R * T;
 		RenderScatter(M);
 	}
 }
